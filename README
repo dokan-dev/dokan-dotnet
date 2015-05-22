@@ -1,6 +1,0 @@
-An rewrite of DokanNet 0.6.0 that includes an CLS compatible api. 
-More about Dokan and DokanNet at http://dokan-dev.net/en/
-------------------------------------------------------------------
-It made for another project of mine , so I posted it here so you can freely fork it .	
-If you have any enchantments to add feel free to send an pull request.
-Code is licensed under MIT : http://www.opensource.org/licenses/mit-license.php

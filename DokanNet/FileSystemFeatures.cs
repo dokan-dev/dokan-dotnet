@@ -5,6 +5,7 @@ namespace DokanNet
     [Flags]
     public enum FileSystemFeatures : uint
     {
+        None = 0,
         CaseSensitiveSearch = 1,
         CasePreservedNames = 2,
         UnicodeOnDisk = 4,

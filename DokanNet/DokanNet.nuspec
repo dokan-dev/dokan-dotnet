@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>DokanNet</id>
+        <version>1.0.4.0</version>
+        <title>DokanNet</title>
+        <authors>MaximeC</authors>
+        <owners>MaximeC</owners>
+        <projectUrl>https://github.com/dokan-dev/dokan-dotnet</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>DotNet Wrapper for Dokan, user mode file system for windows</description>
+        <copyright>Copyright (C)  2007</copyright>
+    </metadata>
+    <files>
+        <file src="bin\Release\DokanNet.dll" target="lib\net35\DokanNet.dll" />
+    </files>
+</package>
