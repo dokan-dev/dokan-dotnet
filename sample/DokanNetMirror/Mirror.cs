@@ -6,20 +6,10 @@ using System.Security.AccessControl;
 using DokanNet;
 using FileAccess = DokanNet.FileAccess;
 
-namespace Mirror
+namespace DokanNetMirror
 {
     internal class Mirror : IDokanOperations
     {
-
-        static void Main(string[] args)
-        {
-            new Mirror("PATH_TO_MIRROR").Mount("MIRROR");
-            Console.ReadKey(true);
-        }
-        
-        
-        
-        
         private readonly string _path;
 
         private const FileAccess DataAccess = FileAccess.ReadData |
