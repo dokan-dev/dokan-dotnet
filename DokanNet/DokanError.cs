@@ -1,6 +1,6 @@
 ﻿namespace DokanNet
 {
-    public enum DokanError
+    public enum DokanError : int
     {
         // From WinError.h -> http://msdn.microsoft.com/en-us/library/ms819773.aspx
         ErrorFileNotFound = -2, // MessageText: The system cannot find the file specified.
@@ -23,7 +23,7 @@
 
         ErrorPrivilegeNotHeld = -1314,
         ErrorNotReady         =         -21,
-
+        Undefined = int.MaxValue
 
     }
 }
