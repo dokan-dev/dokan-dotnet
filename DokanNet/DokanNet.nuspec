@@ -12,6 +12,6 @@
         <copyright>Copyright (C)  2007</copyright>
     </metadata>
     <files>
-        <file src="bin\Release\DokanNet.dll" target="lib\net35\DokanNet.dll" />
+        <file src="bin\x86\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
     </files>
 </package>
