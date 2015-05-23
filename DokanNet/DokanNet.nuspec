@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>DokanNet</id>
-        <version>1.0.5.0</version>
+        <version>1.0.6.0</version>
         <title>DokanNet</title>
         <authors>MaximeC</authors>
         <owners>MaximeC</owners>
@@ -12,6 +12,6 @@
         <copyright>Copyright (C)  2007</copyright>
     </metadata>
     <files>
-        <file src="bin\x86\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
+        <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
     </files>
 </package>
