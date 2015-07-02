@@ -49,7 +49,7 @@ namespace DokanNet
 
         DokanError UnlockFile(string fileName, long offset, long length, DokanFileInfo info);
 
-        DokanError GetDiskFreeSpace(out long free, out long total, out long used,
+        DokanError GetDiskFreeSpace(out long free, out long total, out long free2,
                                     DokanFileInfo info);
 
         DokanError GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
