@@ -1,6 +1,9 @@
 ﻿namespace DokanNet
 {
-	public enum DokanError
+	/// <summary>
+	/// Defines result status codes for Dokan operations.
+	/// </summary>
+	public enum DokanResult
 	{
 		/// <summary>
 		/// The operation completed successfully.
