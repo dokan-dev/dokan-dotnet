@@ -1,29 +1,82 @@
 ﻿namespace DokanNet
 {
-    public enum DokanError : int
-    {
-        // From WinError.h -> http://msdn.microsoft.com/en-us/library/ms819773.aspx
-        ErrorFileNotFound = -2, // MessageText: The system cannot find the file specified.
-        ErrorPathNotFound = -3, // MessageText: The system cannot find the path specified.
-        ErrorAccessDenied = -5, // MessageText: Access is denied.
-        ErrorSharingViolation = -32,
-        ErrorFileExists = -80,
-        ErrorDiskFull = -112, // There is not enough space on the disk.
-        ErrorInvalidName = -123,
-        ErrorDirNotEmpty = -145, // MessageText: The directory is not empty.
+	public enum DokanError
+	{
+		/// <summary>
+		/// The operation completed successfully.
+		/// </summary>
+		Success = 0,
 
-        ErrorAlreadyExists = -183,
-        // MessageText: Cannot create a file when that file already exists.
+		/// <summary>
+		/// Incorrect function.
+		/// </summary>
+		Error = -1,
+		
+		/// <summary>
+		/// The system cannot find the file specified.
+		/// </summary>
+		FileNotFound = -2,
 
-        ErrorExceptionInService = -1064,
-        //  An exception occurred in the service when handling thecontrol request. 
-        ErrorSuccess = 0,
-        ErrorError = -1,
-        ErrorNotImplemented = -120,
+		/// <summary>
+		/// The system cannot find the path specified.
+		/// </summary>
+		PathNotFound = -3,
 
-        ErrorPrivilegeNotHeld = -1314,
-        ErrorNotReady         =         -21,
-        Undefined = int.MaxValue
+		/// <summary>
+		/// Access is denied.
+		/// </summary>
+		AccessDenied = -5,
 
-    }
+		/// <summary>
+		/// The device is not ready.
+		/// </summary>
+		NotReady = -21,
+		
+		/// <summary>
+		/// The process cannot access the file because it is being used by another process.
+		/// </summary>
+		SharingViolation = -32,
+
+		/// <summary>
+		/// The file exists.
+		/// </summary>
+		FileExists = -80,
+
+		/// <summary>
+		/// There is not enough space on the disk.
+		/// </summary>
+		DiskFull = -112,
+
+		/// <summary>
+		/// This function is not supported on this system.
+		/// </summary>
+		NotImplemented = -120,
+		
+		/// <summary>
+		/// The filename, directory name, or volume label syntax is incorrect.
+		/// </summary>
+		InvalidName = -123,
+
+		/// <summary>
+		/// The directory is not empty.
+		/// </summary>
+		DirNotEmpty = -145,
+
+		/// <summary>
+		/// Cannot create a file when that file already exists.
+		/// </summary>
+		AlreadyExists = -183,
+		
+		/// <summary>
+		/// An exception occurred in the service when handling the control request.
+		/// </summary>
+		ExceptionInService = -1064,
+
+		/// <summary>
+		/// A required privilege is not held by the client.
+		/// </summary>
+		PrivilegeNotHeld = -1314,
+
+		Undefined = int.MaxValue
+	}
 }
