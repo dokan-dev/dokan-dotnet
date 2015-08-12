@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNetMirror", "DokanNetMirror\DokanNetMirror.csproj", "{01247A47-387C-4BB4-8068-31CB3F16BD9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet", "..\DokanNet\DokanNet.csproj", "{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistoryFS", "RegistoryFS\RegistoryFS.csproj", "{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
