@@ -25,17 +25,17 @@ namespace RegistoryFS
 
         public DokanError Cleanup(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError CloseFile(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError CreateDirectory(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError CreateFile(
@@ -47,17 +47,17 @@ namespace RegistoryFS
             System.IO.FileAttributes attributes,
             DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError DeleteDirectory(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError DeleteFile(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
 
@@ -85,7 +85,7 @@ namespace RegistoryFS
             string filename,
             DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError FindFiles(
@@ -106,13 +106,13 @@ namespace RegistoryFS
                     finfo.CreationTime = DateTime.Now;
                     files.Add(finfo);
                 }
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             else
             {
                 RegistryKey key = GetRegistoryEntry(filename);
                 if (key == null)
-                    return DokanError.ErrorError;
+                    return DokanError.Error;
                 foreach (string name in key.GetSubKeyNames())
                 {
                     FileInformation finfo = new FileInformation();
@@ -133,7 +133,7 @@ namespace RegistoryFS
                     finfo.CreationTime = DateTime.Now;
                     files.Add(finfo);
                 }
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
         }
 
@@ -151,19 +151,19 @@ namespace RegistoryFS
                 fileinfo.LastWriteTime = DateTime.Now;
                 fileinfo.CreationTime = DateTime.Now;
 
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
 
             RegistryKey key = GetRegistoryEntry(filename);
             if (key == null)
-                return DokanError.ErrorError;
+                return DokanError.Error;
 
             fileinfo.Attributes = System.IO.FileAttributes.Directory;
             fileinfo.LastAccessTime = DateTime.Now;
             fileinfo.LastWriteTime = DateTime.Now;
             fileinfo.CreationTime = DateTime.Now;
 
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError LockFile(
@@ -172,7 +172,7 @@ namespace RegistoryFS
             long length,
             DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError MoveFile(
@@ -181,12 +181,12 @@ namespace RegistoryFS
             bool replace,
             DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError OpenDirectory(string filename, DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError ReadFile(
@@ -197,17 +197,17 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             readBytes = 0;
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError SetEndOfFile(string filename, long length, DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError SetAllocationSize(string filename, long length, DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError SetFileAttributes(
@@ -215,7 +215,7 @@ namespace RegistoryFS
             System.IO.FileAttributes attr,
             DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError SetFileTime(
@@ -225,17 +225,17 @@ namespace RegistoryFS
             DateTime? mtime,
             DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError UnlockFile(string filename, long offset, long length, DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError Unmount(DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError GetDiskFreeSpace(
@@ -247,7 +247,7 @@ namespace RegistoryFS
             freeBytesAvailable = 512 * 1024 * 1024;
             totalBytes = 1024 * 1024 * 1024;
             totalFreeBytes = 512 * 1024 * 1024;
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError WriteFile(
@@ -258,7 +258,7 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             writtenBytes = 0;
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
@@ -267,20 +267,20 @@ namespace RegistoryFS
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
             fileSystemName = String.Empty;
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
             DokanFileInfo info)
         {
             security = null;
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         public DokanError SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
             DokanFileInfo info)
         {
-            return DokanError.ErrorError;
+            return DokanError.Error;
         }
 
         #endregion

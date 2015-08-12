@@ -73,23 +73,23 @@ namespace DokanNetMirror
                         {
                             info.IsDirectory = pathIsDirectory;
                             info.Context = new object();
-                            // Must set it to someting if you return DokanError.ErrorSuccess
+                            // Must set it to someting if you return DokanError.Success
 
-                            return DokanError.ErrorSuccess;
+                            return DokanError.Success;
                         }
                     }
                     else
                     {
-                        return DokanError.ErrorFileNotFound;
+                        return DokanError.FileNotFound;
                     }
                     break;
                 case FileMode.CreateNew:
                     if (pathExists)
-                        return DokanError.ErrorAlreadyExists;
+                        return DokanError.AlreadyExists;
                     break;
                 case FileMode.Truncate:
                     if (!pathExists)
-                        return DokanError.ErrorFileNotFound;
+                        return DokanError.FileNotFound;
 
                     break;
                 default:
@@ -105,11 +105,11 @@ namespace DokanNetMirror
             }
             catch (UnauthorizedAccessException) // Don't have access rights 
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
 
 
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError OpenDirectory(string fileName, DokanFileInfo info)
@@ -117,7 +117,7 @@ namespace DokanNetMirror
             string path = GetPath(fileName);
             if (!Directory.Exists(path))
             {
-                return DokanError.ErrorPathNotFound;
+                return DokanError.PathNotFound;
             }
 
             try
@@ -126,24 +126,24 @@ namespace DokanNetMirror
             }
             catch (UnauthorizedAccessException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError CreateDirectory(string fileName, DokanFileInfo info)
         {
             if (Directory.Exists(GetPath(fileName)))
-                return DokanError.ErrorAlreadyExists;
+                return DokanError.AlreadyExists;
 
             try
             {
                 Directory.CreateDirectory(GetPath(fileName));
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (UnauthorizedAccessException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
         }
 
@@ -166,7 +166,7 @@ namespace DokanNetMirror
                     File.Delete(GetPath(fileName));
                 }
             }
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError CloseFile(string fileName, DokanFileInfo info)
@@ -176,7 +176,7 @@ namespace DokanNetMirror
                 (info.Context as FileStream).Dispose();
             }
             info.Context = null;
-            return DokanError.ErrorSuccess; // could recreate cleanup code hear but this is not called sometimes
+            return DokanError.Success; // could recreate cleanup code hear but this is not called sometimes
         }
 
         public DokanError ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info)
@@ -195,7 +195,7 @@ namespace DokanNetMirror
                 stream.Position = offset;
                 bytesRead = stream.Read(buffer, 0, buffer.Length);
             }
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset,
@@ -216,7 +216,7 @@ namespace DokanNetMirror
                 stream.Write(buffer, 0, buffer.Length);
                 bytesWritten = buffer.Length;
             }
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError FlushFileBuffers(string fileName, DokanFileInfo info)
@@ -224,11 +224,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).Flush();
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (IOException)
             {
-                return DokanError.ErrorDiskFull;
+                return DokanError.DiskFull;
             }
         }
 
@@ -249,7 +249,7 @@ namespace DokanNetMirror
                                LastWriteTime = finfo.LastWriteTime,
                                Length = (finfo is FileInfo) ? ((FileInfo) finfo).Length : 0,
                            };
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
@@ -280,7 +280,7 @@ namespace DokanNetMirror
                                                                                                       FileName =
                                                                                                           finfo.Name,
                                                                                                   }).ToArray();
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info)
@@ -288,19 +288,19 @@ namespace DokanNetMirror
             try
             {
                 File.SetAttributes(GetPath(fileName), attributes);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (UnauthorizedAccessException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
             catch (FileNotFoundException)
             {
-                return DokanError.ErrorFileNotFound;
+                return DokanError.FileNotFound;
             }
             catch (DirectoryNotFoundException)
             {
-                return DokanError.ErrorPathNotFound;
+                return DokanError.PathNotFound;
             }
         }
 
@@ -322,29 +322,29 @@ namespace DokanNetMirror
                 {
                     File.SetCreationTime(path, lastWriteTime.Value);
                 }
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (UnauthorizedAccessException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
             catch (FileNotFoundException)
             {
-                return DokanError.ErrorFileNotFound;
+                return DokanError.FileNotFound;
             }
         }
 
         public DokanError DeleteFile(string fileName, DokanFileInfo info)
         {
-            return File.Exists(GetPath(fileName)) ? DokanError.ErrorSuccess : DokanError.ErrorFileNotFound;
+            return File.Exists(GetPath(fileName)) ? DokanError.Success : DokanError.FileNotFound;
             // we just check here if we could delete file the true deletion is in Cleanup
         }
 
         public DokanError DeleteDirectory(string fileName, DokanFileInfo info)
         {
             return Directory.EnumerateFileSystemEntries(GetPath(fileName)).Any()
-                       ? DokanError.ErrorDirNotEmpty
-                       : DokanError.ErrorSuccess; // if dir is not empdy could not delete
+                       ? DokanError.DirNotEmpty
+                       : DokanError.Success; // if dir is not empdy could not delete
         }
 
         public DokanError MoveFile(string oldName, string newName, bool replace, DokanFileInfo info)
@@ -356,7 +356,7 @@ namespace DokanNetMirror
                 info.Context = null;
 
                 File.Move(oldpath, newpath);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             else if (replace)
             {
@@ -365,9 +365,9 @@ namespace DokanNetMirror
                 if (!info.IsDirectory)
                     File.Delete(newpath);
                 File.Move(oldpath, newpath);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
-            return DokanError.ErrorFileExists;
+            return DokanError.FileExists;
         }
 
         public DokanError SetEndOfFile(string fileName, long length, DokanFileInfo info)
@@ -375,11 +375,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream) (info.Context)).SetLength(length);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (IOException)
             {
-                return DokanError.ErrorDiskFull;
+                return DokanError.DiskFull;
             }
         }
 
@@ -388,11 +388,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream) (info.Context)).SetLength(length);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (IOException)
             {
-                return DokanError.ErrorDiskFull;
+                return DokanError.DiskFull;
             }
         }
 
@@ -401,11 +401,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream) (info.Context)).Lock(offset, length);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (IOException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
         }
 
@@ -414,11 +414,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream) (info.Context)).Unlock(offset, length);
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (IOException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
         }
 
@@ -430,7 +430,7 @@ namespace DokanNetMirror
             used = dinfo.AvailableFreeSpace;
             total = dinfo.TotalSize;
             free = dinfo.TotalFreeSpace;
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
@@ -445,7 +445,7 @@ namespace DokanNetMirror
                        FileSystemFeatures.UnicodeOnDisk;
 
 
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         public DokanError GetFileSecurity(string fileName, out FileSystemSecurity security,
@@ -456,12 +456,12 @@ namespace DokanNetMirror
                 security = info.IsDirectory
                                ? (FileSystemSecurity) Directory.GetAccessControl(GetPath(fileName))
                                : File.GetAccessControl(GetPath(fileName));
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (UnauthorizedAccessException)
             {
                 security = null;
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
         }
 
@@ -478,17 +478,17 @@ namespace DokanNetMirror
                 {
                     File.SetAccessControl(GetPath(fileName), (FileSecurity) security);
                 }
-                return DokanError.ErrorSuccess;
+                return DokanError.Success;
             }
             catch (UnauthorizedAccessException)
             {
-                return DokanError.ErrorAccessDenied;
+                return DokanError.AccessDenied;
             }
         }
 
         public DokanError Unmount(DokanFileInfo info)
         {
-            return DokanError.ErrorSuccess;
+            return DokanError.Success;
         }
 
         #endregion
