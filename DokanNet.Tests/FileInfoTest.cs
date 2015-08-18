@@ -2,11 +2,12 @@
 using System.IO;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
 {
     [TestClass]
-    public partial class FileInfoTest
+    public class FileInfoTest
     {
         private byte[] source;
 
@@ -57,15 +58,16 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.WRITE_FILESHARE, FileMode.OpenOrCreate);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.Append, AccessModes = new[] { System.IO.FileAccess.Write } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -80,16 +82,17 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] { DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.READ_FILEACCESS | DokanOperationsFixture.WRITE_FILEACCESS })
-                fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, access, DokanOperationsFixture.WRITE_FILESHARE, FileMode.Create);
-            fixture.SetupReadFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+                fixture.SetupCreateFile(path, access, WriteShare, FileMode.Create);
+            fixture.SetupReadFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.Create, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -104,16 +107,17 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] { DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.READ_FILEACCESS | DokanOperationsFixture.WRITE_FILEACCESS })
-                fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, access, DokanOperationsFixture.WRITE_FILESHARE, FileMode.CreateNew);
-            fixture.SetupReadFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+                fixture.SetupCreateFile(path, access, WriteShare, FileMode.CreateNew);
+            fixture.SetupReadFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -129,13 +133,14 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanResult.FileExists);
+            fixture.SetupCreateFileWithError(path, DokanResult.FileExists);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -146,17 +151,18 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.READ_FILEACCESS, DokanOperationsFixture.WRITE_FILESHARE, FileMode.Open);
-            foreach (var access in new[] { DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.READ_FILEACCESS | DokanOperationsFixture.WRITE_FILEACCESS })
-                fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, access, DokanOperationsFixture.WRITE_FILESHARE, FileMode.Open);
-            fixture.SetupReadFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            fixture.SetupCreateFile(path, ReadAccess, WriteShare, FileMode.Open);
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+                fixture.SetupCreateFile(path, access, WriteShare, FileMode.Open);
+            fixture.SetupReadFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -172,13 +178,14 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -189,22 +196,23 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.READ_FILEACCESS, DokanOperationsFixture.WRITE_FILESHARE, FileMode.OpenOrCreate);
-            foreach (var access in new[] { DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.READ_FILEACCESS | DokanOperationsFixture.WRITE_FILEACCESS })
-                fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, access, DokanOperationsFixture.WRITE_FILESHARE, FileMode.OpenOrCreate);
-            fixture.SetupReadFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            fixture.SetupCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate);
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess})
+                fixture.SetupCreateFile(path, access, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupReadFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
-#if LOGONLY
+#if !LOGONLY
             fixture.VerifyAll();
 #endif
         }
@@ -214,15 +222,16 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.WRITE_FILEACCESS, DokanOperationsFixture.WRITE_FILESHARE, FileMode.Open);
-            fixture.SetupSetAllocationSize(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, 0);
-            fixture.SetupWriteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, source, source.Length);
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open);
+            fixture.SetupSetAllocationSize(path, 0);
+            fixture.SetupWriteFile(path, source, source.Length);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             var parameters = new { Mode = FileMode.Truncate, AccessModes = new[] { System.IO.FileAccess.Write } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
@@ -237,15 +246,16 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.DELETE_FILEACCESS, DokanOperationsFixture.READWRITE_FILESHARE, FileMode.Open, true);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
-            fixture.SetupDeleteFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName);
+            fixture.SetupCreateFile(path, DeleteAccess, ReadWriteShare, FileMode.Open, deleteOnClose: true);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupDeleteFile(path);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             sut.Delete();
 
@@ -259,13 +269,14 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             sut.Delete();
 
@@ -279,14 +290,15 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.READATTRIBUTES_FILEACCESS, DokanOperationsFixture.READWRITE_FILESHARE, FileMode.Open);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             Assert.IsTrue(sut.Exists, "File should exist");
 
@@ -300,13 +312,14 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
             Assert.IsFalse(sut.Exists, "File should not exist");
 
@@ -320,22 +333,67 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupGetVolumeInformationByCreateFile(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.READ_FILEACCESS, DokanOperationsFixture.READ_FILESHARE, FileMode.Open);
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.READ_FILEACCESS, FileShare.Read, FileMode.Open);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileAttributes.Normal);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
+            fixture.SetupSetFileTime(destinationPath);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
-            sut.CopyTo(@DokanOperationsFixture.ROOT + DokanOperationsFixture.DestinationFileName);
+            sut.CopyTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
 
-#if LOGONLY
+#if !LOGONLY
             fixture.VerifyAll();
 #endif
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
+        public void CopyTo_WhereSourceDoesNotExists_Throws()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
+
+            sut.CopyTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
+        public void CopyTo_WhereTargetExists_Throws()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
+
+            sut.CopyTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
         }
 
         [TestMethod]
@@ -343,20 +401,22 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.MOVEFROM_FILEACCESS, DokanOperationsFixture.READWRITE_FILESHARE, FileMode.Open);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.DestinationFileName, DokanOperationsFixture.MOVETO_FILEACCESS, DokanOperationsFixture.MOVE_FILESHARE, FileMode.Open);
-            fixture.SetupMoveFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.ROOT + DokanOperationsFixture.DestinationFileName, false);
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFile(destinationPath, MoveToAccess, MoveShare, FileMode.Open);
+            fixture.SetupMoveFile(path, destinationPath, false);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
-            sut.MoveTo(DokanOperationsFixture.DestinationFilePath);
+            sut.MoveTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
 
-#if LOGONLY
+#if !LOGONLY
             fixture.VerifyAll();
 #endif
         }
@@ -367,15 +427,17 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
-            sut.MoveTo(DokanOperationsFixture.DestinationFilePath);
+            sut.MoveTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
         }
 
         [TestMethod]
@@ -384,17 +446,19 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName),
+                destinationPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationFileName);
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, DokanOperationsFixture.MOVEFROM_FILEACCESS, DokanOperationsFixture.READWRITE_FILESHARE, FileMode.Open);
-            fixture.SetupGetFileInformation(DokanOperationsFixture.ROOT + DokanOperationsFixture.FileName, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
-            fixture.SetupCreateFileWithError(DokanOperationsFixture.ROOT + DokanOperationsFixture.DestinationFileName, DokanResult.FileExists);
+            fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FilePath);
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
 
-            sut.MoveTo(DokanOperationsFixture.DestinationFilePath);
+            sut.MoveTo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.DestinationFileName));
         }
     }
 }

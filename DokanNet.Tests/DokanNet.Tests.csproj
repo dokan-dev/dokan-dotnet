@@ -61,6 +61,7 @@
     <Compile Include="DirectoryInfoTest.cs" />
     <Compile Include="DriveInfoTest.cs" />
     <Compile Include="DokanOperationsFixture.cs" />
+    <Compile Include="FileSettings.cs" />
     <Compile Include="LogExtensions.cs" />
     <Compile Include="Mounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
