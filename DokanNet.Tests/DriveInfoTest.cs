@@ -7,7 +7,7 @@ using static DokanNet.Tests.FileSettings;
 namespace DokanNet.Tests
 {
     [TestClass]
-    public class DriveInfoTest
+    public sealed class DriveInfoTest
     {
         [TestInitialize]
         public void Initialize()
@@ -22,6 +22,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetAvailableFreeSpace_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -45,6 +46,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetDriveFormat_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -68,6 +70,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetDriveType_CallsApiCorrectly()
         {
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -76,6 +79,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetIsReady_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -99,6 +103,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetName_CallsApiCorrectly()
         {
             string path = DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.RootName);
@@ -109,6 +114,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetRootDirectory_CallsApiCorrectly()
         {
             string path = DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.RootName);
@@ -128,6 +134,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetTotalFreeSpace_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -151,6 +158,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetTotalSize_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -174,6 +182,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod]
+        [TestCategory(TestCategories.Success)]
         public void GetVolumeLabel_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;

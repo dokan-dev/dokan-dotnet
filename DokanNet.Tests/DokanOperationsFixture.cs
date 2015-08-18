@@ -11,7 +11,7 @@ using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
 {
-    internal class DokanOperationsFixture
+    internal sealed class DokanOperationsFixture
     {
         private class Proxy : IDokanOperations
         {
@@ -48,13 +48,13 @@ namespace DokanNet.Tests
             public DokanResult FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
                 => Target.FindFiles(fileName, out files, info);
 
-            public DokanResult FlushFileBuffers(string fileName, DokanFileInfo info) 
+            public DokanResult FlushFileBuffers(string fileName, DokanFileInfo info)
                 => TryExecute(() => Target.FlushFileBuffers(fileName, info));
 
             public DokanResult GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes, DokanFileInfo info)
                 => Target.GetDiskFreeSpace(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, info);
 
-            public DokanResult GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info) 
+            public DokanResult GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info)
                 => Target.GetFileInformation(fileName, out fileInfo, info);
 
             public DokanResult GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections, DokanFileInfo info)
@@ -72,7 +72,7 @@ namespace DokanNet.Tests
             public DokanResult OpenDirectory(string fileName, DokanFileInfo info)
                 => TryExecute(() => Target.OpenDirectory(fileName, info));
 
-            public DokanResult ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info) 
+            public DokanResult ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info)
                 => Target.ReadFile(fileName, buffer, out bytesRead, offset, info);
 
             public DokanResult SetAllocationSize(string fileName, long length, DokanFileInfo info)
