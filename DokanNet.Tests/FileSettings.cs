@@ -23,6 +23,8 @@ namespace DokanNet.Tests
 
         public static FileAccess MoveDirectoryToAccess => FileAccess.AppendData | FileAccess.Synchronize;
 
+        public static FileShare AppendShare => FileShare.Read;
+
         public static FileShare ReadShare => FileShare.Read | FileShare.Delete;
 
         public static FileShare ReadWriteShare => FileShare.ReadWrite | FileShare.Delete;

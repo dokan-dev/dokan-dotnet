@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
 
@@ -103,7 +104,27 @@ namespace DokanNet.Tests
         [TestCategory(TestCategories.Success)]
         public void AppendText_CallsApiCorrectly()
         {
-            Assert.Inconclusive("Not yet implemented");
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.RootedPath(DokanOperationsFixture.FileName);
+            string value = $"TestValue for test {nameof(AppendText_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, AppendShare, FileMode.OpenOrCreate);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, DateTime.Now, DateTime.Now, DateTime.Now);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.FileName));
+
+            using (var writer = sut.AppendText()) {
+                writer.Write(value);
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
         }
 
         [TestMethod]
