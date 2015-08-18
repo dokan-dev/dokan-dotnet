@@ -77,10 +77,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DokanOptions.cs" />
+    <Compile Include="DokanResult.cs" />
     <Compile Include="FileSystemFeatures.cs" />
     <Compile Include="DokanException.cs" />
     <Compile Include="Native\BY_HANDLE_FILE_INFORMATION.cs" />
-    <Compile Include="DokanError.cs" />
     <Compile Include="DokanFileInfo.cs" />
     <Compile Include="Native\SECURITY_INFORMATION.cs" />
     <Compile Include="Native\DOKAN_OPERATIONS.cs" />
