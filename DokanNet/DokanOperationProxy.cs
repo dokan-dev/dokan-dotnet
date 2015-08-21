@@ -167,9 +167,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
-
+#else
                 return ERROR_FILE_NOT_FOUND;
+#endif
             }
         }
 
@@ -186,8 +186,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -204,8 +205,10 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
+
             }
         }
 
@@ -222,8 +225,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -240,8 +244,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -261,8 +266,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -282,8 +288,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -300,8 +307,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -353,8 +361,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -392,8 +401,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_HANDLE;
+#endif
             }
         }
 
@@ -444,8 +454,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -461,8 +472,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -480,8 +492,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -517,8 +530,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -534,8 +548,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -552,8 +567,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -572,8 +588,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -591,8 +608,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -611,8 +629,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -631,8 +650,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -669,8 +689,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -685,8 +706,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -743,8 +765,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 
@@ -788,8 +811,9 @@ namespace DokanNet
             {
 #if DEBUG
                 throw;
-#endif
+#else
                 return ERROR_INVALID_FUNCTION;
+#endif
             }
         }
 

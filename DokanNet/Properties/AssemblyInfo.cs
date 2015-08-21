@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DokanNet")]
-[assembly: AssemblyCopyright("Copyright (C) 2011")]
+[assembly: AssemblyCopyright("Copyright (C) 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
