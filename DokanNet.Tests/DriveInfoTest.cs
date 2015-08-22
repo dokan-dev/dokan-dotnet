@@ -106,7 +106,7 @@ namespace DokanNet.Tests
         [TestCategory(TestCategories.Success)]
         public void GetName_CallsApiCorrectly()
         {
-            string path = DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.RootName);
+            string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
 
@@ -117,7 +117,7 @@ namespace DokanNet.Tests
         [TestCategory(TestCategories.Success)]
         public void GetRootDirectory_CallsApiCorrectly()
         {
-            string path = DokanOperationsFixture.DriveBasedPath(DokanOperationsFixture.RootName);
+            string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
 
 #if LOGONLY
             fixture.SetupAny();
