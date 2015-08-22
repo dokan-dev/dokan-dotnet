@@ -436,9 +436,9 @@ namespace DokanNet.Tests
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupMoveFile(path, destinationPath, false);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
 
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenBlankDirectory();
@@ -839,10 +839,12 @@ namespace DokanNet.Tests
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
-            fixture.SetupCleanupFile(destinationBackupPath, /* ERROR: This should be false! */true);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
-            fixture.SetupCleanupFile(destinationPath, /* ERROR: This should be false! */true);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
 
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenBlankDirectory();

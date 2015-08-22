@@ -527,7 +527,7 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath, true);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath);
+            fixture.SetupCleanupFile(destinationPath/* This call is probably redundant. */);
 
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenBlankDirectory();
@@ -607,7 +607,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
             fixture.SetupGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity, AccessControlSections.Access);
 
-            // Why is this method called by Dokan.NET?
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithError(path.AsRootedPath() + Path.DirectorySeparatorChar, DokanResult.PathNotFound);
 #endif
 

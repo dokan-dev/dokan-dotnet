@@ -626,7 +626,6 @@ namespace DokanNet.Tests
 
         internal void SetupSetFileSecurity(string path, FileSystemSecurity security)
         {
-            Console.WriteLine($"-> {nameof(IDokanOperations.SetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{path}\", {security.AsString()}");
             operations
                 //.Setup(d => d.SetFileSecurity(path, security, AccessControlSections.Access, It.IsAny<DokanFileInfo>()))
                 .Setup(d => d.SetFileSecurity(path, It.IsAny<FileSystemSecurity>(), AccessControlSections.Access, It.IsAny<DokanFileInfo>()))
