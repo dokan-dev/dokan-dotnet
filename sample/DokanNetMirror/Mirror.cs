@@ -254,32 +254,35 @@ namespace DokanNetMirror
 
         public DokanResult FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
-            files = new DirectoryInfo(GetPath(fileName)).GetFileSystemInfos().Select(finfo => new FileInformation
-                                                                                                  {
-                                                                                                      Attributes =
-                                                                                                          finfo.
-                                                                                                          Attributes,
-                                                                                                      CreationTime =
-                                                                                                          finfo.
-                                                                                                          CreationTime,
-                                                                                                      LastAccessTime =
-                                                                                                          finfo.
-                                                                                                          LastAccessTime,
-                                                                                                      LastWriteTime =
-                                                                                                          finfo.
-                                                                                                          LastWriteTime,
-                                                                                                      Length =
-                                                                                                          (finfo is
-                                                                                                           FileInfo)
-                                                                                                              ? ((
-                                                                                                                 FileInfo
-                                                                                                                 ) finfo
-                                                                                                                ).
-                                                                                                                    Length
-                                                                                                              : 0,
-                                                                                                      FileName =
-                                                                                                          finfo.Name,
-                                                                                                  }).ToArray();
+            files = new DirectoryInfo(GetPath(fileName))
+                .GetFileSystemInfos()
+                .Select(finfo => new FileInformation
+                {
+                    Attributes =
+                        finfo.
+                        Attributes,
+                    CreationTime =
+                        finfo.
+                        CreationTime,
+                    LastAccessTime =
+                        finfo.
+                        LastAccessTime,
+                    LastWriteTime =
+                        finfo.
+                        LastWriteTime,
+                    Length =
+                        (finfo is
+                         FileInfo)
+                            ? ((
+                               FileInfo
+                               )finfo
+                              ).
+                                  Length
+                            : 0,
+                    FileName =
+                        finfo.Name,
+                }).ToArray();
+
             return DokanResult.Success;
         }
 

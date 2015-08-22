@@ -3,7 +3,7 @@
 namespace DokanNet
 {
     [Flags]
-    public enum FileAccess : uint
+    public enum FileAccess : long
     {
         GenericRead = 2147483648,
         GenericWrite = 1073741824,

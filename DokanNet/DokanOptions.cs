@@ -3,7 +3,7 @@
 namespace DokanNet
 {
     [Flags]
-    public enum DokanOptions : ulong
+    public enum DokanOptions : long
     {
         DebugMode = 1, // ouput debug message
         StderrOutput = 2, // ouput debug message to stderr
