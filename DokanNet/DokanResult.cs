@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Defines result status codes for Dokan operations.
 	/// </summary>
-	public enum DokanResult
+	public enum DokanResult : long
 	{
 		/// <summary>
 		/// The operation completed successfully.

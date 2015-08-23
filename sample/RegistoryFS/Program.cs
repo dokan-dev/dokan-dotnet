@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Win32;
 using DokanNet;
 using System.Security.AccessControl;
@@ -293,7 +292,7 @@ namespace RegistoryFS
             try
             {
                 RFS rfs = new RFS();
-                rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
+                rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput | DokanOptions.KeepAlive);
                 Console.WriteLine("Success");
             }
             catch (DokanException ex)

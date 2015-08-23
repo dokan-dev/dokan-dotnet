@@ -1,15 +1,13 @@
 using System;
 using DokanNet.Native;
 
-
 namespace DokanNet
 {
-    
     public static class Dokan
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 600; // ver 0.6.0
+        private const ushort DOKAN_VERSION = 740; // ver 0.7.4
       /*  private const uint DOKAN_OPTION_DEBUG = 1;
         private const uint DOKAN_OPTION_STDERR = 2;
         private const uint DOKAN_OPTION_ALT_STREAM = 4;
