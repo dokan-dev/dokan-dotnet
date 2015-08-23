@@ -1,12 +1,12 @@
+using DokanNet;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using Microsoft.Win32;
-using DokanNet;
 using System.Security.AccessControl;
 
 namespace RegistoryFS
 {
-    class RFS : IDokanOperations
+    internal class RFS : IDokanOperations
     {
         #region DokanOperations member
 
@@ -59,11 +59,10 @@ namespace RegistoryFS
             return DokanResult.Error;
         }
 
-
         private RegistryKey GetRegistoryEntry(string name)
         {
             Console.WriteLine("GetRegistoryEntry : {0}", name);
-            int top = name.IndexOf('\\', 1) -1;
+            int top = name.IndexOf('\\', 1) - 1;
             if (top < 0)
                 top = name.Length - 1;
 
@@ -75,7 +74,7 @@ namespace RegistoryFS
                 if (sub == -1)
                     return TopDirectory[topname];
                 else
-                    return TopDirectory[topname].OpenSubKey(name.Substring(sub+1));
+                    return TopDirectory[topname].OpenSubKey(name.Substring(sub + 1));
             }
             return null;
         }
@@ -135,7 +134,6 @@ namespace RegistoryFS
                 return DokanResult.Success;
             }
         }
-
 
         public DokanResult GetFileInformation(
             string filename,
@@ -282,12 +280,12 @@ namespace RegistoryFS
             return DokanResult.Error;
         }
 
-        #endregion
+        #endregion DokanOperations member
     }
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
@@ -216,7 +216,8 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
-            using (var writer = sut.AppendText()) {
+            using (var writer = sut.AppendText())
+            {
                 writer.Write(value);
             }
 
@@ -312,7 +313,8 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
-            using (var stream = sut.Create()) {
+            using (var stream = sut.Create())
+            {
                 stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
             }
 
@@ -496,12 +498,15 @@ namespace DokanNet.Tests
 
         private void OpenFile_InSpecifiedMode(FileInfo info, FileMode mode, System.IO.FileAccess[] accessModes)
         {
-            foreach (var access in accessModes) {
-                using (var stream = info.Open(mode, access)) {
+            foreach (var access in accessModes)
+            {
+                using (var stream = info.Open(mode, access))
+                {
 #if !LOGONLY
                     Assert.IsNotNull(stream, $"{nameof(info.Open)} {mode}/{access}");
 #endif
-                    if (access.HasFlag(System.IO.FileAccess.Write)) {
+                    if (access.HasFlag(System.IO.FileAccess.Write))
+                    {
                         Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                         stream.Write(source, 0, source.Length);
 #if !LOGONLY
@@ -512,7 +517,8 @@ namespace DokanNet.Tests
                     if (access.HasFlag(System.IO.FileAccess.ReadWrite))
                         stream.Seek(0, SeekOrigin.Begin);
 
-                    if (access.HasFlag(System.IO.FileAccess.Read)) {
+                    if (access.HasFlag(System.IO.FileAccess.Read))
+                    {
                         Assert.IsTrue(stream.CanRead, "Stream should be readable");
                         var target = new byte[4096];
                         int readBytes = stream.Read(target, 0, target.Length);
@@ -680,7 +686,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate);
-            foreach (var access in new[] { WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.OpenOrCreate);
             fixture.SetupReadFile(path, source, source.Length);
             fixture.SetupWriteFile(path, source, source.Length);
@@ -738,7 +744,8 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
-            using (var stream = sut.OpenRead()) {
+            using (var stream = sut.OpenRead())
+            {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[value.Length];
                 int readBytes = stream.Read(target, 0, target.Length);
@@ -771,7 +778,8 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
-            using (var reader = sut.OpenText()) {
+            using (var reader = sut.OpenText())
+            {
                 var target = new char[value.Length];
                 int readBytes = reader.ReadBlock(target, 0, target.Length);
 
@@ -803,7 +811,8 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
-            using (var stream = sut.OpenWrite()) {
+            using (var stream = sut.OpenWrite())
+            {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
 
@@ -813,7 +822,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-                fixture.VerifyAll();
+            fixture.VerifyAll();
 #endif
         }
 

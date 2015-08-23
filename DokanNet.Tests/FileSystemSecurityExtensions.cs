@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.AccessControl;
+﻿using System.Security.AccessControl;
 
 namespace DokanNet.Tests
 {

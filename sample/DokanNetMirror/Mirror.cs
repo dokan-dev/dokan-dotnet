@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DokanNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
-using DokanNet;
 using FileAccess = DokanNet.FileAccess;
 
 namespace DokanNetMirror
@@ -24,7 +24,6 @@ namespace DokanNetMirror
                                                    FileAccess.AppendData |
                                                    FileAccess.Delete |
                                                    FileAccess.GenericWrite;
-
 
         public Mirror(string path)
         {
@@ -52,7 +51,6 @@ namespace DokanNetMirror
 
             bool readAccess = (access & DataWriteAccess) == 0;
 
-
             try
             {
                 pathIsDirectory = File.GetAttributes(path).HasFlag(FileAttributes.Directory);
@@ -69,7 +67,7 @@ namespace DokanNetMirror
                     if (pathExists)
                     {
                         if (readWriteAttributes || pathIsDirectory)
-                            //check if only wants to read attributes,security info or open directory
+                        //check if only wants to read attributes,security info or open directory
                         {
                             info.IsDirectory = pathIsDirectory;
                             info.Context = new object();
@@ -83,15 +81,18 @@ namespace DokanNetMirror
                         return DokanResult.FileNotFound;
                     }
                     break;
+
                 case FileMode.CreateNew:
                     if (pathExists)
                         return DokanResult.AlreadyExists;
                     break;
+
                 case FileMode.Truncate:
                     if (!pathExists)
                         return DokanResult.FileNotFound;
 
                     break;
+
                 default:
                     break;
             }
@@ -103,11 +104,10 @@ namespace DokanNetMirror
                                                   ? System.IO.FileAccess.Read
                                                   : System.IO.FileAccess.ReadWrite, share, 4096, options);
             }
-            catch (UnauthorizedAccessException) // Don't have access rights 
+            catch (UnauthorizedAccessException) // Don't have access rights
             {
                 return DokanResult.AccessDenied;
             }
-
 
             return DokanResult.Success;
         }
@@ -241,14 +241,14 @@ namespace DokanNetMirror
                 finfo = new DirectoryInfo(path);
 
             fileInfo = new FileInformation
-                           {
-                               FileName = fileName,
-                               Attributes = finfo.Attributes,
-                               CreationTime = finfo.CreationTime,
-                               LastAccessTime = finfo.LastAccessTime,
-                               LastWriteTime = finfo.LastWriteTime,
-                               Length = (finfo is FileInfo) ? ((FileInfo) finfo).Length : 0,
-                           };
+            {
+                FileName = fileName,
+                Attributes = finfo.Attributes,
+                CreationTime = finfo.CreationTime,
+                LastAccessTime = finfo.LastAccessTime,
+                LastWriteTime = finfo.LastWriteTime,
+                Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
+            };
             return DokanResult.Success;
         }
 
@@ -377,7 +377,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).SetLength(length);
+                ((FileStream)(info.Context)).SetLength(length);
                 return DokanResult.Success;
             }
             catch (IOException)
@@ -390,7 +390,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).SetLength(length);
+                ((FileStream)(info.Context)).SetLength(length);
                 return DokanResult.Success;
             }
             catch (IOException)
@@ -403,7 +403,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).Lock(offset, length);
+                ((FileStream)(info.Context)).Lock(offset, length);
                 return DokanResult.Success;
             }
             catch (IOException)
@@ -416,7 +416,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).Unlock(offset, length);
+                ((FileStream)(info.Context)).Unlock(offset, length);
                 return DokanResult.Success;
             }
             catch (IOException)
@@ -447,7 +447,6 @@ namespace DokanNetMirror
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |
                        FileSystemFeatures.UnicodeOnDisk;
 
-
             return DokanResult.Success;
         }
 
@@ -457,7 +456,7 @@ namespace DokanNetMirror
             try
             {
                 security = info.IsDirectory
-                               ? (FileSystemSecurity) Directory.GetAccessControl(GetPath(fileName))
+                               ? (FileSystemSecurity)Directory.GetAccessControl(GetPath(fileName))
                                : File.GetAccessControl(GetPath(fileName));
                 return DokanResult.Success;
             }
@@ -475,11 +474,11 @@ namespace DokanNetMirror
             {
                 if (info.IsDirectory)
                 {
-                    Directory.SetAccessControl(GetPath(fileName), (DirectorySecurity) security);
+                    Directory.SetAccessControl(GetPath(fileName), (DirectorySecurity)security);
                 }
                 else
                 {
-                    File.SetAccessControl(GetPath(fileName), (FileSecurity) security);
+                    File.SetAccessControl(GetPath(fileName), (FileSecurity)security);
                 }
                 return DokanResult.Success;
             }
@@ -494,6 +493,6 @@ namespace DokanNetMirror
             return DokanResult.Success;
         }
 
-        #endregion
+        #endregion Implementation of IDokanOperations
     }
 }

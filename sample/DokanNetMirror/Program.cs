@@ -1,11 +1,11 @@
-using System;
 using DokanNet;
+using System;
 
 namespace DokanNetMirror
 {
-    class Programm
+    internal class Programm
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
