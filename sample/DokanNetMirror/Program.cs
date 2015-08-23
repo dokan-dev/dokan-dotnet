@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using DokanNet;
-using System.Collections.Generic;
-using System.Security.AccessControl;
 
 namespace DokanNetMirror
 {

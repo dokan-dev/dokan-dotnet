@@ -384,7 +384,7 @@ namespace DokanNet
 
               
                 Debug.Assert(files!=null);
-                if (ret == ERROR_SUCCESS&&files.Count!=0)
+                if (ret == ERROR_SUCCESS && files.Count != 0)
                 {
                     var fill =
                    (FILL_FIND_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_DATA));

@@ -427,8 +427,8 @@ namespace DokanNetMirror
 
         public DokanResult GetDiskFreeSpace(out long free, out long total, out long used, DokanFileInfo info)
         {
-            var dinfo =
-                DriveInfo.GetDrives().Where(di => di.RootDirectory.Name == Path.GetPathRoot(_path)).Single();
+            var dinfo = DriveInfo.GetDrives()
+                .Where(di => di.RootDirectory.Name == Path.GetPathRoot(_path + "\\")).Single();
 
             used = dinfo.AvailableFreeSpace;
             total = dinfo.TotalSize;
