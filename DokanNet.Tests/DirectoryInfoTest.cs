@@ -258,6 +258,8 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
             fixture.SetupFindFiles(path, new Collection<FileInformation>(new[] {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
                 new FileInformation() { FileName = subFileName, Attributes = FileAttributes.Normal, Length = 100, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             }));
             fixture.SetupCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open);
@@ -288,9 +290,10 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
-            // WARNING: This leads to a FileNotFoundException in System.IO.Directory.DeleteHelper().
-            // In what other way can the Dokan driver be informed about an empty directory?
-            fixture.SetupFindFiles(path, new Collection<FileInformation>());
+            fixture.SetupFindFiles(path, new Collection<FileInformation>(new[] {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+            }));
             fixture.SetupDeleteDirectory(path, true);
 #endif
 
