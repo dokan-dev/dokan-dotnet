@@ -108,7 +108,7 @@ namespace DokanNet.Tests
 
         public const string FILESYSTEM_NAME = "Dokan Test";
 
-        private const FileSystemFeatures fileSystemFeatures = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch | FileSystemFeatures.SupportsRemoteStorage | FileSystemFeatures.UnicodeOnDisk;
+        private const FileSystemFeatures fileSystemFeatures = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch | FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage | FileSystemFeatures.UnicodeOnDisk;
 
         private const FileMode readFileMode = FileMode.Open;
 
@@ -145,6 +145,7 @@ namespace DokanNet.Tests
         internal static string DestinationDirectoryName => "DestinationDir";
 
         internal static FileInformation[] RootDirectoryItems { get; } = {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 00:00:00"), LastWriteTime = ToDateTime("2015-01-04 10:11:12"), LastAccessTime = ToDateTime("2015-01-04 10:11:12") },
                 new FileInformation() { FileName = "SubDir", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
                 new FileInformation() { FileName = "SubDir2", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 13:14:15"), LastWriteTime = ToDateTime("2015-01-01 23:24:25"), LastAccessTime = ToDateTime("2015-01-01 23:24:25") },
                 new FileInformation() { FileName = "File.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-01-02 10:11:12"), LastWriteTime = ToDateTime("2015-01-02 20:21:22"), LastAccessTime = ToDateTime("2015-01-02 20:21:22") },
@@ -153,6 +154,8 @@ namespace DokanNet.Tests
             };
 
         internal static FileInformation[] SubDirectoryItems { get; } = {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 00:00:00"), LastWriteTime = ToDateTime("2015-01-04 10:11:12"), LastAccessTime = ToDateTime("2015-01-04 10:11:12") },
                 new FileInformation() { FileName = "SubSubDir", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
                 new FileInformation() { FileName = "SubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-02 10:11:12"), LastWriteTime = ToDateTime("2015-02-02 20:21:22"), LastAccessTime = ToDateTime("2015-02-02 20:21:22") },
                 new FileInformation() { FileName = "SecondSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-03 10:11:12"), LastWriteTime = ToDateTime("2015-02-03 20:21:22"), LastAccessTime = ToDateTime("2015-02-03 20:21:22") },
@@ -160,6 +163,8 @@ namespace DokanNet.Tests
             };
 
         internal static FileInformation[] SubDirectory2Items { get; } = {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 13:14:15"), LastWriteTime = ToDateTime("2015-01-01 23:24:25"), LastAccessTime = ToDateTime("2015-01-01 23:24:25") },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 00:00:00"), LastWriteTime = ToDateTime("2015-01-04 10:11:12"), LastAccessTime = ToDateTime("2015-01-04 10:11:12") },
                 new FileInformation() { FileName = "SubSubDir2", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
                 new FileInformation() { FileName = "SubFile2.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-02 10:11:12"), LastWriteTime = ToDateTime("2015-02-02 20:21:22"), LastAccessTime = ToDateTime("2015-02-02 20:21:22") },
                 new FileInformation() { FileName = "SecondSubFile2.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-03 10:11:12"), LastWriteTime = ToDateTime("2015-02-03 20:21:22"), LastAccessTime = ToDateTime("2015-02-03 20:21:22") },
@@ -167,6 +172,8 @@ namespace DokanNet.Tests
             };
 
         internal static FileInformation[] SubSubDirectoryItems { get; } = {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
                 new FileInformation() { FileName = "SubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-01 10:11:12"), LastWriteTime = ToDateTime("2015-03-01 20:21:22"), LastAccessTime = ToDateTime("2015-03-01 20:21:22") },
                 new FileInformation() { FileName = "SecondSubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-02 10:11:12"), LastWriteTime = ToDateTime("2015-03-02 20:21:22"), LastAccessTime = ToDateTime("2015-03-02 20:21:22") },
                 new FileInformation() { FileName = "ThirdSubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-03 10:11:12"), LastWriteTime = ToDateTime("2015-03-03 20:21:22"), LastAccessTime = ToDateTime("2015-03-03 20:21:22") }
@@ -218,6 +225,12 @@ namespace DokanNet.Tests
             DefaultFileSecurity.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.Write | FileSystemRights.Delete, AccessControlType.Deny));
         }
 
+        internal static IList<FileInformation> GetEmptyDirectoryFiles()
+            => new[] {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+            };
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
@@ -254,7 +267,7 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
 
-            var files = new Collection<FileInformation>() as IList<FileInformation>;
+            var files = GetEmptyDirectoryFiles();
             operations
                 .Setup(d => d.FindFiles(It.IsAny<string>(), out files, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)

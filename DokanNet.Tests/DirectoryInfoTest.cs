@@ -257,11 +257,9 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, new Collection<FileInformation>(new[] {
-                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
-                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryFiles().Concat(new[] {
                 new FileInformation() { FileName = subFileName, Attributes = FileAttributes.Normal, Length = 100, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
-            }));
+            }).ToArray());
             fixture.SetupCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path + subFilePath, FileAttributes.Normal);
             fixture.SetupDeleteFile(path + subFilePath);
@@ -290,10 +288,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, new Collection<FileInformation>(new[] {
-                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
-                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
-            }));
+            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryFiles());
             fixture.SetupDeleteDirectory(path, true);
 #endif
 
