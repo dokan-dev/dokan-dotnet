@@ -58,7 +58,7 @@ namespace DokanNet.Tests
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
-            var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture) + ":\\");
+            var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
 
 #if LOGONLY
             Assert.IsNotNull(sut.DriveFormat, nameof(sut.DriveFormat));
