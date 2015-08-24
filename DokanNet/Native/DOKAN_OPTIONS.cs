@@ -9,6 +9,8 @@ namespace DokanNet.Native
         public ushort ThreadCount; // number of threads to be used
         public uint Options;
         public ulong GlobalContext;
-        [MarshalAs(UnmanagedType.LPWStr)] public string MountPoint;
+
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string MountPoint;
     }
 }

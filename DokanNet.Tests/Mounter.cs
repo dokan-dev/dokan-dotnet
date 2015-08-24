@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DokanNet.Tests
 {
@@ -14,7 +13,7 @@ namespace DokanNet.Tests
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext context)
         {
-            (mounterThread = new Thread(new ThreadStart(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture), DokanOptions.NetworkDrive, 1)))).Start();
+            (mounterThread = new Thread(new ThreadStart(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture), DokanOptions.NetworkDrive | DokanOptions.KeepAlive, 1)))).Start();
             var drive = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
             while (!drive.IsReady)
                 Thread.Sleep(50);

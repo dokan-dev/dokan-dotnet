@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
@@ -573,21 +573,21 @@ namespace DokanNet.Tests
 
             string path = DokanOperationsFixture.DirectoryName.AsRootedPath(),
                 destinationPath = DokanOperationsFixture.DestinationDirectoryName.AsRootedPath();
-    #if LOGONLY
+#if LOGONLY
                 fixture.SetupAny();
-    #else
+#else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.AlreadyExists);
-    #endif
+#endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
 
             sut.MoveTo(DokanOperationsFixture.DestinationDirectoryName.AsDriveBasedPath());
 
-    #if !LOGONLY
+#if !LOGONLY
             fixture.VerifyAll();
-    #endif
+#endif
         }
 
         [TestMethod]

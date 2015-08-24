@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DokanNet.Tests
+﻿namespace DokanNet.Tests
 {
     internal static class LogExtensions
     {

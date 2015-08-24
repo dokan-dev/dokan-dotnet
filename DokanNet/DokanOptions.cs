@@ -11,6 +11,6 @@ namespace DokanNet
         KeepAlive = 8, // use auto unmount
         NetworkDrive = 16, // use network drive, you need to install Dokan network provider.
         RemovableDrive = 32, // use removable drive
-        FixedDrive=0,
+        FixedDrive = 0,
     }
 }

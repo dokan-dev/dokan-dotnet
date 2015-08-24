@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Moq;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
-using Moq;
 using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
@@ -18,12 +18,16 @@ namespace DokanNet.Tests
         {
             public IDokanOperations Target { get; set; }
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+                Justification = "Explicit Exception handler")]
             private static DokanResult TryExecute(Func<DokanResult> func)
             {
-                try {
+                try
+                {
                     return func();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Console.WriteLine($"**{ex.GetType().Name}**: {ex.Message}");
                     return DokanResult.ExceptionInService;
                 }
@@ -274,18 +278,27 @@ namespace DokanNet.Tests
                 .Callback((long _freeBytesAvailable, long _totalNumberOfBytes, long _totalNumberOfFreeBytes, DokanFileInfo info)
                     => Console.WriteLine($"{nameof(IDokanOperations.GetDiskFreeSpace)}[{Interlocked.Read(ref pendingFiles)}] (out {_freeBytesAvailable}, out {_totalNumberOfBytes}, out {_totalNumberOfFreeBytes}, {info.Log()})"));
 
-            var directoryInfo = new FileInformation() {
-                FileName = "DummyDir", Attributes = FileAttributes.Directory,
-                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0), LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0), LastAccessTime = new DateTime(2015, 5, 31, 12, 0, 0)
+            var directoryInfo = new FileInformation()
+            {
+                FileName = "DummyDir",
+                Attributes = FileAttributes.Directory,
+                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0),
+                LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0),
+                LastAccessTime = new DateTime(2015, 5, 31, 12, 0, 0)
             };
             operations
                 .Setup(d => d.GetFileInformation(It.IsAny<string>(), out directoryInfo, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileInformation _fileInfo, DokanFileInfo info)
                     => Console.WriteLine($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
-            var fileInfo = new FileInformation() {
-                FileName = "Dummy.ext", Attributes = FileAttributes.Normal, Length = 1024,
-                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0), LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0), LastAccessTime = new DateTime(2015, 5, 31, 12, 0, 0)
+            var fileInfo = new FileInformation()
+            {
+                FileName = "Dummy.ext",
+                Attributes = FileAttributes.Normal,
+                Length = 1024,
+                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0),
+                LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0),
+                LastAccessTime = new DateTime(2015, 5, 31, 12, 0, 0)
             };
             operations
                 .Setup(d => d.GetFileInformation(It.IsAny<string>(), out fileInfo, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
@@ -387,9 +400,13 @@ namespace DokanNet.Tests
                 .Setup(d => d.OpenDirectory(RootName, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
-            var fileInfo = new FileInformation() {
-                FileName = RootName, Attributes = FileAttributes.Directory,
-                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0), LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0), LastAccessTime = new DateTime(2015, 3, 31, 12, 0, 0)
+            var fileInfo = new FileInformation()
+            {
+                FileName = RootName,
+                Attributes = FileAttributes.Directory,
+                CreationTime = new DateTime(2015, 1, 1, 12, 0, 0),
+                LastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0),
+                LastAccessTime = new DateTime(2015, 3, 31, 12, 0, 0)
             };
             operations
                 .Setup(d => d.GetFileInformation(RootName, out fileInfo, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
@@ -440,9 +457,13 @@ namespace DokanNet.Tests
         internal void SetupGetFileInformation(string path, FileAttributes attributes, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null)
         {
             var defaultDateTime = DateTime.Now;
-            var fileInfo = new FileInformation() {
-                FileName = path, Attributes = attributes,
-                CreationTime = creationTime ?? defaultDateTime, LastWriteTime = lastWriteTime ?? defaultDateTime, LastAccessTime = lastAccessTime ?? defaultDateTime
+            var fileInfo = new FileInformation()
+            {
+                FileName = path,
+                Attributes = attributes,
+                CreationTime = creationTime ?? defaultDateTime,
+                LastWriteTime = lastWriteTime ?? defaultDateTime,
+                LastAccessTime = lastAccessTime ?? defaultDateTime
             };
             operations
                 .Setup(d => d.GetFileInformation(path, out fileInfo, It.IsAny<DokanFileInfo>()))
@@ -557,10 +578,11 @@ namespace DokanNet.Tests
                 .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
-                    => {
-                        buffer.CopyTo(_buffer, 0);
-                        Console.WriteLine($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, {_bytesRead}, {_offset}, {info.Log()})");
-                    });
+                    =>
+                {
+                    buffer.CopyTo(_buffer, 0);
+                    Console.WriteLine($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, {_bytesRead}, {_offset}, {info.Log()})");
+                });
         }
 
         internal void SetupWriteFile(string path, byte[] buffer, int bytesWritten)
@@ -639,7 +661,8 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.OpenDirectory(string.Empty, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => {
+                .Callback((string fileName, DokanFileInfo info) =>
+                {
                     Console.WriteLine("  *** WARNING: This is probably an error in the Dokan driver!");
                     Console.WriteLine($"  {nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                     Console.WriteLine("  ***");
@@ -648,7 +671,8 @@ namespace DokanNet.Tests
 
         internal void VerifyAll()
         {
-            for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i) {
+            for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
+            {
                 if (i > 5)
                     throw new TimeoutException("Cleanup wait cycles exceeded");
 
