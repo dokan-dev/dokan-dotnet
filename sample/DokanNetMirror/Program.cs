@@ -1,16 +1,16 @@
-using System;
 using DokanNet;
+using System;
 
 namespace DokanNetMirror
 {
-    class Programm
+    internal class Programm
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
                 Mirror mirror = new Mirror("C:");
-                mirror.Mount("n:\\", DokanOptions.DebugMode, 5);
+                mirror.Mount("n:\\", DokanOptions.DebugMode | DokanOptions.KeepAlive, 5);
 
                 Console.WriteLine("Success");
             }

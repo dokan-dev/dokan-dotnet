@@ -1,3 +1,4 @@
+using DokanNet.Native;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,15 +6,12 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
-using DokanNet.Native;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace DokanNet
 {
     internal sealed class DokanOperationProxy
     {
-     
-
         #region Delegates
 
         public delegate int CleanupDelegate(
@@ -64,7 +62,7 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo fileInfo);
 
         public delegate int GetFileSecurityDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,[In] ref SECURITY_INFORMATION rawRequestedInformation,
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, [In] ref SECURITY_INFORMATION rawRequestedInformation,
             IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
             ref uint rawSecurityDescriptorLengthNeeded,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
@@ -109,7 +107,7 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate int SetFileSecurityDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,[In] ref SECURITY_INFORMATION rawSecurityInformation,
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, [In] ref SECURITY_INFORMATION rawSecurityInformation,
             IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
@@ -131,24 +129,22 @@ namespace DokanNet
             ref int rawNumberOfBytesWritten, long rawOffset,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        #endregion
+        #endregion Delegates
+
         private const int ERROR_FILE_NOT_FOUND = -2;
         private const int ERROR_INVALID_FUNCTION = -1;
         private const int ERROR_SUCCESS = 0;
         private const int ERROR_INSUFFICIENT_BUFFER = -122;
         private const int ERROR_INVALID_HANDLE = -6;
 
-      
         private readonly IDokanOperations _operations;
 
         private readonly uint _serialNumber;
-        
 
         public DokanOperationProxy(IDokanOperations operations)
         {
             _operations = operations;
-            _serialNumber = (uint) _operations.GetHashCode();
-
+            _serialNumber = (uint)_operations.GetHashCode();
         }
 
         public int CreateFileProxy(string rawFileName, uint rawAccessMode,
@@ -157,10 +153,10 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.CreateFile(rawFileName, (FileAccess) rawAccessMode, (FileShare) rawShare,
-                                                    (FileMode) rawCreationDisposition,
-                                                    (FileOptions) (rawFlagsAndAttributes & 0xffffc000), //& 0xffffc000
-                                                    (FileAttributes) (rawFlagsAndAttributes & 0x3fff), rawFileInfo);
+                return (int)_operations.CreateFile(rawFileName, (FileAccess)rawAccessMode, (FileShare)rawShare,
+                                                    (FileMode)rawCreationDisposition,
+                                                    (FileOptions)(rawFlagsAndAttributes & 0xffffc000), //& 0xffffc000
+                                                    (FileAttributes)(rawFlagsAndAttributes & 0x3fff), rawFileInfo);
                 //& 0x3ffflower 14 bits i think are file atributes and rest are file options WRITE_TROUGH etc.
             }
             catch
@@ -180,7 +176,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.OpenDirectory(rawFileName, rawFileInfo);
+                return (int)_operations.OpenDirectory(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -199,7 +195,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.CreateDirectory(rawFileName, rawFileInfo);
+                return (int)_operations.CreateDirectory(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -208,7 +204,6 @@ namespace DokanNet
 #else
                 return ERROR_INVALID_FUNCTION;
 #endif
-
             }
         }
 
@@ -219,7 +214,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.Cleanup(rawFileName, rawFileInfo);
+                return (int)_operations.Cleanup(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -238,7 +233,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.CloseFile(rawFileName, rawFileInfo);
+                return (int)_operations.CloseFile(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -252,14 +247,13 @@ namespace DokanNet
 
         ////
 
-
         public int ReadFileProxy(string rawFileName, byte[] rawBuffer,
                                  uint rawBufferLength, ref int rawReadLength, long rawOffset,
                                  DokanFileInfo rawFileInfo)
         {
             try
             {
-                return (int) _operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset,
+                return (int)_operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset,
                                                   rawFileInfo);
             }
             catch
@@ -280,7 +274,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.WriteFile(rawFileName, rawBuffer,
+                return (int)_operations.WriteFile(rawFileName, rawBuffer,
                                                    out rawNumberOfBytesWritten, rawOffset,
                                                    rawFileInfo);
             }
@@ -301,7 +295,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.FlushFileBuffers(rawFileName, rawFileInfo);
+                return (int)_operations.FlushFileBuffers(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -319,40 +313,40 @@ namespace DokanNet
                                            ref BY_HANDLE_FILE_INFORMATION rawHandleFileInformation,
                                            DokanFileInfo rawFileInfo)
         {
-            FileInformation fi ;
+            FileInformation fi;
             try
             {
-                int ret = (int) _operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
+                int ret = (int)_operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
 
                 if (ret == ERROR_SUCCESS)
                 {
-                    Debug.Assert(fi.FileName!=null);
-                    rawHandleFileInformation.dwFileAttributes = (uint) fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
+                    Debug.Assert(fi.FileName != null);
+                    rawHandleFileInformation.dwFileAttributes = (uint)fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
 
                     long ctime = fi.CreationTime.ToFileTime();
                     long atime = fi.LastAccessTime.ToFileTime();
                     long mtime = fi.LastWriteTime.ToFileTime();
-                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int) (ctime >> 32);
+                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int)(ctime >> 32);
                     rawHandleFileInformation.ftCreationTime.dwLowDateTime =
-                        (int) (ctime & 0xffffffff);
+                        (int)(ctime & 0xffffffff);
 
                     rawHandleFileInformation.ftLastAccessTime.dwHighDateTime =
-                        (int) (atime >> 32);
+                        (int)(atime >> 32);
                     rawHandleFileInformation.ftLastAccessTime.dwLowDateTime =
-                        (int) (atime & 0xffffffff);
+                        (int)(atime & 0xffffffff);
 
                     rawHandleFileInformation.ftLastWriteTime.dwHighDateTime =
-                        (int) (mtime >> 32);
+                        (int)(mtime >> 32);
                     rawHandleFileInformation.ftLastWriteTime.dwLowDateTime =
-                        (int) (mtime & 0xffffffff);
+                        (int)(mtime & 0xffffffff);
 
                     rawHandleFileInformation.dwVolumeSerialNumber = _serialNumber;
 
-                    rawHandleFileInformation.nFileSizeLow = (uint) (fi.Length & 0xffffffff);
-                    rawHandleFileInformation.nFileSizeHigh = (uint) (fi.Length >> 32);
+                    rawHandleFileInformation.nFileSizeLow = (uint)(fi.Length & 0xffffffff);
+                    rawHandleFileInformation.nFileSizeHigh = (uint)(fi.Length >> 32);
                     rawHandleFileInformation.dwNumberOfLinks = 1;
                     rawHandleFileInformation.nFileIndexHigh = 0;
-                    rawHandleFileInformation.nFileIndexLow = (uint) fi.FileName.GetHashCode();
+                    rawHandleFileInformation.nFileIndexLow = (uint)fi.FileName.GetHashCode();
                 }
 
                 return ret;
@@ -369,28 +363,24 @@ namespace DokanNet
 
         ////
 
-
-
         public int FindFilesProxy(string rawFileName, IntPtr rawFillFindData,
                                   // function pointer
                                   DokanFileInfo rawFileInfo)
         {
             try
             {
-                IList<FileInformation> files ;
+                IList<FileInformation> files;
 
+                int ret = (int)_operations.FindFiles(rawFileName, out files, rawFileInfo);
 
-                int ret = (int) _operations.FindFiles(rawFileName, out files, rawFileInfo);
-
-              
-                Debug.Assert(files!=null);
+                Debug.Assert(files != null);
                 if (ret == ERROR_SUCCESS && files.Count != 0)
                 {
                     var fill =
                    (FILL_FIND_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_DATA));
                     // Used a single entry call to speed up the "enumeration" of the list
                     for (int index = 0; index < files.Count; index++)
-                     
+
                     {
                         Addto(fill, rawFileInfo, files[index]);
                     }
@@ -407,7 +397,6 @@ namespace DokanNet
             }
         }
 
-
         private static void Addto(FILL_FIND_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
@@ -415,27 +404,27 @@ namespace DokanNet
             long atime = fi.LastAccessTime.ToFileTime();
             long mtime = fi.LastWriteTime.ToFileTime();
             var data = new WIN32_FIND_DATA
-                           {
-                               dwFileAttributes = fi.Attributes,
-                               ftCreationTime =
+            {
+                dwFileAttributes = fi.Attributes,
+                ftCreationTime =
                                    {
                                        dwHighDateTime = (int) (ctime >> 32),
                                        dwLowDateTime = (int) (ctime & 0xffffffff)
                                    },
-                               ftLastAccessTime =
+                ftLastAccessTime =
                                    {
                                        dwHighDateTime = (int) (atime >> 32),
                                        dwLowDateTime = (int) (atime & 0xffffffff)
                                    },
-                               ftLastWriteTime =
+                ftLastWriteTime =
                                    {
                                        dwHighDateTime = (int) (mtime >> 32),
                                        dwLowDateTime = (int) (mtime & 0xffffffff)
                                    },
-                               nFileSizeLow = (uint) (fi.Length & 0xffffffff),
-                               nFileSizeHigh = (uint) (fi.Length >> 32),
-                               cFileName = fi.FileName
-                           };
+                nFileSizeLow = (uint)(fi.Length & 0xffffffff),
+                nFileSizeHigh = (uint)(fi.Length >> 32),
+                cFileName = fi.FileName
+            };
             //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
 
             fill(ref data, rawFileInfo);
@@ -448,7 +437,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
+                return (int)_operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
             }
             catch
             {
@@ -459,14 +448,13 @@ namespace DokanNet
 #endif
             }
         }
-
 
         public int SetAllocationSizeProxy(string rawFileName, long rawLength,
                                           DokanFileInfo rawFileInfo)
         {
             try
             {
-                return (int) _operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
+                return (int)_operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
             }
             catch
             {
@@ -477,7 +465,6 @@ namespace DokanNet
 #endif
             }
         }
-
 
         ////
 
@@ -486,7 +473,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.SetFileAttributes(rawFileName, (FileAttributes) rawAttributes, rawFileInfo);
+                return (int)_operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
             }
             catch
             {
@@ -506,24 +493,22 @@ namespace DokanNet
                                    ref FILETIME rawLastWriteTime,
                                     DokanFileInfo rawFileInfo)
         {
-            
-            var ctime = ( rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) && (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
-                            ? DateTime.FromFileTime(((long) rawCreationTime.dwHighDateTime << 32) |
-                                                    (uint) rawCreationTime.dwLowDateTime)
-                                  : (DateTime?) null;
-            var atime =(rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) && (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
-                                  ? DateTime.FromFileTime(((long) rawLastAccessTime.dwHighDateTime << 32) |
-                                                          (uint) rawLastAccessTime.dwLowDateTime)
-                                  : (DateTime?) null;
+            var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) && (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
+                            ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) |
+                                                    (uint)rawCreationTime.dwLowDateTime)
+                                  : (DateTime?)null;
+            var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) && (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
+                                  ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) |
+                                                          (uint)rawLastAccessTime.dwLowDateTime)
+                                  : (DateTime?)null;
             var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) && (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
-                                  ? DateTime.FromFileTime(((long) rawLastWriteTime.dwHighDateTime << 32) |
-                                                          (uint) rawLastWriteTime.dwLowDateTime)
-                                  : (DateTime?) null;
-
+                                  ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) |
+                                                          (uint)rawLastWriteTime.dwLowDateTime)
+                                  : (DateTime?)null;
 
             try
             {
-                return (int) _operations.SetFileTime(rawFileName, ctime, atime,
+                return (int)_operations.SetFileTime(rawFileName, ctime, atime,
                                                      mtime, rawFileInfo);
             }
             catch
@@ -542,7 +527,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.DeleteFile(rawFileName, rawFileInfo);
+                return (int)_operations.DeleteFile(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -561,7 +546,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.DeleteDirectory(rawFileName, rawFileInfo);
+                return (int)_operations.DeleteDirectory(rawFileName, rawFileInfo);
             }
             catch
             {
@@ -581,7 +566,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting,
+                return (int)_operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting,
                                                   rawFileInfo);
             }
             catch
@@ -602,7 +587,7 @@ namespace DokanNet
             try
             {
                 return
-                    (int) _operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
+                    (int)_operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
             }
             catch
             {
@@ -642,7 +627,7 @@ namespace DokanNet
         {
             try
             {
-                return (int) _operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
+                return (int)_operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
                                                           out rawTotalNumberOfFreeBytes,
                                                           rawFileInfo);
             }
@@ -670,8 +655,7 @@ namespace DokanNet
             string name;
             try
             {
-               
-                int ret = (int) _operations.GetVolumeInformation(out label,
+                int ret = (int)_operations.GetVolumeInformation(out label,
                                                                  out rawFileSystemFlags, out name,
                                                                  fileInfo);
 
@@ -681,7 +665,6 @@ namespace DokanNet
                     Debug.Assert(!String.IsNullOrEmpty(label));
                     rawVolumeNameBuffer.Append(label);
                     rawFileSystemNameBuffer.Append(name);
-                   
                 }
                 return ret;
             }
@@ -695,12 +678,11 @@ namespace DokanNet
             }
         }
 
-
         public int UnmountProxy(DokanFileInfo rawFileInfo)
         {
             try
             {
-                return (int) _operations.Unmount(rawFileInfo);
+                return (int)_operations.Unmount(rawFileInfo);
             }
             catch
             {
@@ -718,7 +700,7 @@ namespace DokanNet
                                         DokanFileInfo rawFileInfo)
         {
             FileSystemSecurity sec;
-           
+
             var sect = AccessControlSections.None;
             if (rawRequestedInformation.HasFlag(SECURITY_INFORMATION.OWNER_SECURITY_INFORMATION))
             {
@@ -742,22 +724,18 @@ namespace DokanNet
             }
             try
             {
-
-                int ret = (int) _operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
+                int ret = (int)_operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
                 if (ret == ERROR_SUCCESS /*&& sec != null*/)
                 {
-                    Debug.Assert(sec!=null);
+                    Debug.Assert(sec != null);
                     var buffer = sec.GetSecurityDescriptorBinaryForm();
                     rawSecurityDescriptorLengthNeeded = (uint)buffer.Length;
                     if (buffer.Length > rawSecurityDescriptorLength)
                     {
-                       
                         return ERROR_INSUFFICIENT_BUFFER;
                     }
-                 
-                    Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
 
-                   
+                    Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
                 }
                 return ret;
             }
@@ -801,11 +779,11 @@ namespace DokanNet
             var buffer = new byte[rawSecurityDescriptorLength];
             try
             {
-                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int) rawSecurityDescriptorLength);
-                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity) new DirectorySecurity() : new FileSecurity();
+                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int)rawSecurityDescriptorLength);
+                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity)new DirectorySecurity() : new FileSecurity();
                 sec.SetSecurityDescriptorBinaryForm(buffer);
 
-                return (int) _operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
+                return (int)_operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
             }
             catch
             {
@@ -822,6 +800,6 @@ namespace DokanNet
         private delegate int FILL_FIND_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-        #endregion
+        #endregion Nested type: FILL_FIND_DATA
     }
 }

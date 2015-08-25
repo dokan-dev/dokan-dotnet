@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Globalization;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
