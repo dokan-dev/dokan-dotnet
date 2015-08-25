@@ -34,7 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>DokanNet.Tests.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
@@ -77,6 +77,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DokanNet.Tests.ruleset" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
