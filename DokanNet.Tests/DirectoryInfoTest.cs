@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -257,7 +255,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryFiles().Concat(new[] {
+            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[] {
                 new FileInformation() { FileName = subFileName, Attributes = FileAttributes.Normal, Length = 100, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             }).ToArray());
             fixture.SetupCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open);
@@ -288,7 +286,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryFiles());
+            fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
             fixture.SetupDeleteDirectory(path, true);
 #endif
 
@@ -340,7 +338,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -370,7 +368,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -400,7 +398,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.RootName.AsDriveBasedPath());
@@ -430,7 +428,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -460,7 +458,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -490,7 +488,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupOpenDirectory(path);
-            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems as IList<FileInformation>);
+            fixture.SetupFindFiles(path, DokanOperationsFixture.RootDirectoryItems);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
