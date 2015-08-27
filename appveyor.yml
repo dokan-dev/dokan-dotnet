@@ -23,6 +23,7 @@ test:
   categories:
     except:
       - Manual
+      - Timing
 notifications:
 - provider: Email
   to:
