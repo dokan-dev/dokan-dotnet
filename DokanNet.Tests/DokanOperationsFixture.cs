@@ -146,31 +146,37 @@ namespace DokanNet.Tests
 
         internal static string DirectoryName => "Dir";
 
+        internal static string Directory2Name => "Dir2";
+
         internal static string DestinationDirectoryName => "DestinationDir";
 
+        internal static string SubDirectoryName => "SubDir";
+
+        internal static string SubDirectory2Name => "SubDir2";
+
         internal static FileInformation[] RootDirectoryItems { get; } = {
-                new FileInformation() { FileName = "SubDir", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
-                new FileInformation() { FileName = "SubDir2", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 13:14:15"), LastWriteTime = ToDateTime("2015-01-01 23:24:25"), LastAccessTime = ToDateTime("2015-01-01 23:24:25") },
-                new FileInformation() { FileName = "File.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-01-02 10:11:12"), LastWriteTime = ToDateTime("2015-01-02 20:21:22"), LastAccessTime = ToDateTime("2015-01-02 20:21:22") },
+                new FileInformation() { FileName = DirectoryName, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
+                new FileInformation() { FileName = Directory2Name, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 13:14:15"), LastWriteTime = ToDateTime("2015-01-01 23:24:25"), LastAccessTime = ToDateTime("2015-01-01 23:24:25") },
+                new FileInformation() { FileName = FileName, Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-01-02 10:11:12"), LastWriteTime = ToDateTime("2015-01-02 20:21:22"), LastAccessTime = ToDateTime("2015-01-02 20:21:22") },
                 new FileInformation() { FileName = "SecondFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-01-03 10:11:12"), LastWriteTime = ToDateTime("2015-01-03 20:21:22"), LastAccessTime = ToDateTime("2015-01-03 20:21:22") },
                 new FileInformation() { FileName = "ThirdFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-01-04 10:11:12"), LastWriteTime = ToDateTime("2015-01-04 20:21:22"), LastAccessTime = ToDateTime("2015-01-04 20:21:22") }
             };
 
-        internal static FileInformation[] SubDirectoryItems { get; } = {
-                new FileInformation() { FileName = "SubSubDir", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
+        internal static FileInformation[] DirectoryItems { get; } = {
+                new FileInformation() { FileName = SubDirectoryName, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
                 new FileInformation() { FileName = "SubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-02 10:11:12"), LastWriteTime = ToDateTime("2015-02-02 20:21:22"), LastAccessTime = ToDateTime("2015-02-02 20:21:22") },
                 new FileInformation() { FileName = "SecondSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-03 10:11:12"), LastWriteTime = ToDateTime("2015-02-03 20:21:22"), LastAccessTime = ToDateTime("2015-02-03 20:21:22") },
                 new FileInformation() { FileName = "ThirdSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-04 10:11:12"), LastWriteTime = ToDateTime("2015-02-04 20:21:22"), LastAccessTime = ToDateTime("2015-02-04 20:21:22") }
             };
 
-        internal static FileInformation[] SubDirectory2Items { get; } = {
-                new FileInformation() { FileName = "SubSubDir2", Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
+        internal static FileInformation[] Directory2Items { get; } = {
+                new FileInformation() { FileName = SubDirectory2Name, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-02-01 10:11:12"), LastWriteTime = ToDateTime("2015-02-01 20:21:22"), LastAccessTime = ToDateTime("2015-02-01 20:21:22") },
                 new FileInformation() { FileName = "SubFile2.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-02 10:11:12"), LastWriteTime = ToDateTime("2015-02-02 20:21:22"), LastAccessTime = ToDateTime("2015-02-02 20:21:22") },
                 new FileInformation() { FileName = "SecondSubFile2.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-03 10:11:12"), LastWriteTime = ToDateTime("2015-02-03 20:21:22"), LastAccessTime = ToDateTime("2015-02-03 20:21:22") },
                 new FileInformation() { FileName = "ThirdSubFile2.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-02-04 10:11:12"), LastWriteTime = ToDateTime("2015-02-04 20:21:22"), LastAccessTime = ToDateTime("2015-02-04 20:21:22") }
             };
 
-        internal static FileInformation[] SubSubDirectoryItems { get; } = {
+        internal static FileInformation[] SubDirectoryItems { get; } = {
                 new FileInformation() { FileName = "SubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-01 10:11:12"), LastWriteTime = ToDateTime("2015-03-01 20:21:22"), LastAccessTime = ToDateTime("2015-03-01 20:21:22") },
                 new FileInformation() { FileName = "SecondSubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-02 10:11:12"), LastWriteTime = ToDateTime("2015-03-02 20:21:22"), LastAccessTime = ToDateTime("2015-03-02 20:21:22") },
                 new FileInformation() { FileName = "ThirdSubSubFile.ext", Attributes = FileAttributes.Normal, CreationTime = ToDateTime("2015-03-03 10:11:12"), LastWriteTime = ToDateTime("2015-03-03 20:21:22"), LastAccessTime = ToDateTime("2015-03-03 20:21:22") }
@@ -179,6 +185,8 @@ namespace DokanNet.Tests
         internal static DirectorySecurity DefaultDirectorySecurity { get; private set; }
 
         internal static FileSecurity DefaultFileSecurity { get; private set; }
+
+        internal static TimeSpan IODelay = TimeSpan.FromSeconds(19);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static DokanOperationsFixture()
@@ -427,6 +435,10 @@ namespace DokanNet.Tests
                 .Setup(d => d.CloseFile(RootName, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+
+            operations
+                .Setup(d => d.CreateFile(It.Is<string>(s => s.Equals(@"\Desktop.ini", StringComparison.OrdinalIgnoreCase) || s.Equals(@"\Autorun.inf", StringComparison.OrdinalIgnoreCase)), ReadAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Returns(DokanResult.FileNotFound);
         }
 
         internal void SetupDiskFreeSpace(long freeBytesAvailable = 0, long totalNumberOfBytes = 0, long totalNumberOfFreeBytes = 0)
@@ -591,6 +603,20 @@ namespace DokanNet.Tests
                 });
         }
 
+        internal void SetupReadFileWithDelay(string path, byte[] buffer, int bytesRead, TimeSpan delay)
+        {
+            operations
+                .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
+                .Callback(() => Thread.Sleep(delay))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
+                    =>
+                {
+                    buffer.CopyTo(_buffer, 0);
+                    Console.WriteLine($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, {_bytesRead}, {_offset}, {info.Log()})");
+                });
+        }
+
         internal void SetupReadFileInChunks(string path, byte[] buffer, int chunkSize)
         {
             for (int offset = 0; offset < buffer.Length; offset += chunkSize)
@@ -612,6 +638,16 @@ namespace DokanNet.Tests
         {
             operations
                 .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(buffer)), out bytesWritten, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, byte[] _buffer, int _bytesWritten, long offset, DokanFileInfo info)
+                    => Console.WriteLine($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_bytesWritten}, {offset}, {info.Log()})"));
+        }
+
+        internal void SetupWriteFileWithDelay(string path, byte[] buffer, int bytesWritten, TimeSpan delay)
+        {
+            operations
+                .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(buffer)), out bytesWritten, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
+                .Callback(() => Thread.Sleep(delay))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, byte[] _buffer, int _bytesWritten, long offset, DokanFileInfo info)
                     => Console.WriteLine($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_bytesWritten}, {offset}, {info.Log()})"));
