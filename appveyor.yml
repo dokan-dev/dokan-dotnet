@@ -13,14 +13,12 @@ install:
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
-
+ 
 before_build:
   - nuget restore
 build:
   project: DokanNet.sln
   verbosity: minimal
-test_script:
-  - vstest.console /logger:Appveyor /settings:"C:\projects\dokan-dotnet\DokanNet.runSettings" "C:\projects\dokan-dotnet\DokanNet.Tests\bin\Debug\DokanNet.Tests.dll"
 notifications:
 - provider: Email
   to:
