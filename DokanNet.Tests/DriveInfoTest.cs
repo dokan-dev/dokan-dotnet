@@ -47,6 +47,7 @@ namespace DokanNet.Tests
 
         [TestMethod]
         [TestCategory(TestCategories.Success)]
+        [TestCategory(TestCategories.Manual)]
         public void GetDriveFormat_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -184,6 +185,7 @@ namespace DokanNet.Tests
 
         [TestMethod]
         [TestCategory(TestCategories.Success)]
+        [TestCategory(TestCategories.Manual)]
         public void GetVolumeLabel_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;

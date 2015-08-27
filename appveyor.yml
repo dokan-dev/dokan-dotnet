@@ -13,12 +13,16 @@ install:
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
- 
+
 before_build:
   - nuget restore
 build:
   project: DokanNet.sln
   verbosity: minimal
+test:
+  categories:
+    except:
+      - Manual
 notifications:
 - provider: Email
   to:
