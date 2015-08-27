@@ -47,6 +47,7 @@ namespace DokanNet.Tests
 
         [TestMethod]
         [TestCategory(TestCategories.Success)]
+        [TestCategory(TestCategories.Manual)]
         public void GetDriveFormat_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -65,6 +66,7 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.DriveFormat);
 #else
             Assert.AreEqual(DokanOperationsFixture.FILESYSTEM_NAME, sut.DriveFormat, nameof(sut.DriveFormat));
+
             fixture.VerifyAll();
 #endif
         }
@@ -183,6 +185,7 @@ namespace DokanNet.Tests
 
         [TestMethod]
         [TestCategory(TestCategories.Success)]
+        [TestCategory(TestCategories.Manual)]
         public void GetVolumeLabel_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
