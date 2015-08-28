@@ -31,6 +31,11 @@
         AccessDenied = -5,
 
         /// <summary>
+        /// The handle is invalid.
+        /// </summary>
+        InvalidHandle = -6,
+
+        /// <summary>
         /// The device is not ready.
         /// </summary>
         NotReady = -21,
@@ -54,6 +59,11 @@
         /// This function is not supported on this system.
         /// </summary>
         NotImplemented = -120,
+
+        /// <summary>
+        /// The data area passed to a system call is too small.
+        /// </summary>
+        InsufficientBuffer = -122,
 
         /// <summary>
         /// The filename, directory name, or volume label syntax is incorrect.
