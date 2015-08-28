@@ -629,7 +629,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void MoveTo_CallsApiCorrectly()
+        public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -640,18 +640,46 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath, true);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupCleanupFile(destinationPath/* This call is probably redundant. */);
-
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenBlankDirectory();
 #endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
 
             sut.MoveTo(DokanOperationsFixture.DestinationDirectoryName.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string origin = Path.Combine(DokanOperationsFixture.DirectoryName, DokanOperationsFixture.SubDirectoryName),
+                destination = Path.Combine(DokanOperationsFixture.DestinationDirectoryName, DokanOperationsFixture.DestinationSubDirectoryName),
+                path = origin.AsRootedPath(),
+                destinationPath = destination.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Directory);
+            fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
+            fixture.SetupMoveFile(path, destinationPath, false);
+            fixture.SetupCleanupFile(destinationPath, true);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath/* This call is probably redundant. */);
+#endif
+
+            var sut = new DirectoryInfo(origin.AsDriveBasedPath());
+
+            sut.MoveTo(destination.AsDriveBasedPath());
 
 #if !LOGONLY
             fixture.VerifyAll();
@@ -721,7 +749,8 @@ namespace DokanNet.Tests
             fixture.SetupGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity, AccessControlSections.Access);
 
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenDirectoryWithError(path.AsRootedPath() + Path.DirectorySeparatorChar, DokanResult.PathNotFound);
+            fixture.SetupOpenDirectory(path.AsRootedPath() + Path.DirectorySeparatorChar);
+            fixture.SetupGetFileInformation(path.AsRootedPath() + Path.DirectorySeparatorChar, FileAttributes.Directory);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());

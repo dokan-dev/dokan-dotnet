@@ -154,6 +154,8 @@ namespace DokanNet.Tests
 
         internal static string SubDirectory2Name => "SubDir2";
 
+        internal static string DestinationSubDirectoryName => "DestinationSubDir";
+
         internal static FileInformation[] RootDirectoryItems { get; } = {
                 new FileInformation() { FileName = DirectoryName, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 10:11:12"), LastWriteTime = ToDateTime("2015-01-01 20:21:22"), LastAccessTime = ToDateTime("2015-01-01 20:21:22") },
                 new FileInformation() { FileName = Directory2Name, Attributes = FileAttributes.Directory, CreationTime = ToDateTime("2015-01-01 13:14:15"), LastWriteTime = ToDateTime("2015-01-01 23:24:25"), LastAccessTime = ToDateTime("2015-01-01 23:24:25") },
@@ -437,7 +439,10 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
 
             operations
-                .Setup(d => d.CreateFile(It.Is<string>(s => s.Equals(@"\Desktop.ini", StringComparison.OrdinalIgnoreCase) || s.Equals(@"\Autorun.inf", StringComparison.OrdinalIgnoreCase)), ReadAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Setup(d => d.CreateFile(@"\Desktop.ini", ReadAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Returns(DokanResult.FileNotFound);
+            operations
+                .Setup(d => d.CreateFile(@"\Autorun.inf", ReadAttributesAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
                 .Returns(DokanResult.FileNotFound);
         }
 
@@ -514,6 +519,14 @@ namespace DokanNet.Tests
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+        }
+
+        internal void SetupOpenDirectoryWithoutCleanup(string path)
+        {
+            operations
+                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, DokanFileInfo info) => Console.WriteLine($"{nameof(IDokanOperations.OpenDirectory)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
         internal void SetupOpenDirectoryWithError(string path, DokanResult result)
@@ -727,19 +740,6 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileSystemSecurity _security, AccessControlSections access, DokanFileInfo info)
                     => Console.WriteLine($"{nameof(IDokanOperations.SetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_security.AsString()}, {access}, {info.Log()})"));
-        }
-
-        internal void SetupOpenBlankDirectory()
-        {
-            operations
-                .Setup(d => d.OpenDirectory(string.Empty, It.Is<DokanFileInfo>(i => i.IsDirectory)))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) =>
-                {
-                    Console.WriteLine("  *** WARNING: This is probably an error in the Dokan driver!");
-                    Console.WriteLine($"  {nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
-                    Console.WriteLine("  ***");
-                });
         }
 
         internal void VerifyAll()
