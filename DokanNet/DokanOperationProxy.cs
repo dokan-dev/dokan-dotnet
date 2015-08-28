@@ -167,7 +167,7 @@ namespace DokanNet
                                                     (FileAttributes)(rawFlagsAndAttributes & 0x3fff), rawFileInfo);
                 //& 0x3ffflower 14 bits i think are file atributes and rest are file options WRITE_TROUGH etc.
 
-                DbgPrint("\nCreateFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("CreateFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -175,7 +175,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nCreateFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("CreateFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -194,7 +194,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.OpenDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("\nOpenDirectoryProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("OpenDirectoryProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -202,7 +202,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nOpenDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("OpenDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.Error;
@@ -221,7 +221,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.CreateDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("\nCreateDirectoryProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("CreateDirectoryProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -229,7 +229,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nCreateDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("CreateDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.Error;
@@ -248,7 +248,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.Cleanup(rawFileName, rawFileInfo);
 
-                DbgPrint("\nCleanupProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("CleanupProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -256,7 +256,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nCleanupProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("CleanupProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -275,7 +275,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.CloseFile(rawFileName, rawFileInfo);
 
-                DbgPrint("\nCloseFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("CloseFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -283,7 +283,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nCloseFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("CloseFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -306,7 +306,7 @@ namespace DokanNet
                 DokanResult result = _operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset,
                                                   rawFileInfo);
 
-                DbgPrint("\nReadFileProxy : " + rawFileName
+                DbgPrint("ReadFileProxy : " + rawFileName
                     + " Return :  " + result
                     + " ReadLength : " + rawReadLength);
                 return (int)result;
@@ -316,7 +316,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nReadFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("ReadFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -340,7 +340,7 @@ namespace DokanNet
                                                    out rawNumberOfBytesWritten, rawOffset,
                                                    rawFileInfo);
 
-                DbgPrint("\nWriteFileProxy : " + rawFileName
+                DbgPrint("WriteFileProxy : " + rawFileName
                         + " Return :  " + result
                         + " NumberOfBytesWritten : " + rawNumberOfBytesWritten);
                 return (int)result;
@@ -350,7 +350,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nWriteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("WriteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -369,7 +369,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.FlushFileBuffers(rawFileName, rawFileInfo);
 
-                DbgPrint("\nFlushFileBuffersProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("FlushFileBuffersProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -377,7 +377,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nFlushFileBuffersProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("FlushFileBuffersProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -436,7 +436,7 @@ namespace DokanNet
                     rawHandleFileInformation.nFileIndexLow = (uint)fi.FileName.GetHashCode();
                 }
 
-                DbgPrint("\nGetFileInformationProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("GetFileInformationProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -444,7 +444,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nGetFileInformationProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("GetFileInformationProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -491,7 +491,7 @@ namespace DokanNet
                     }
                 }
 
-                DbgPrint("\nFindFilesProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("FindFilesProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -499,7 +499,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nFindFilesProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("FindFilesProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.InvalidHandle;
@@ -552,7 +552,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
 
-                DbgPrint("\nSetEndOfFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("SetEndOfFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -560,7 +560,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nSetEndOfFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("SetEndOfFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -578,7 +578,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
 
-                DbgPrint("\nSetAllocationSizeProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("SetAllocationSizeProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -586,7 +586,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nSetAllocationSizeProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("SetAllocationSizeProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -606,7 +606,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
 
-                DbgPrint("\nSetFileAttributesProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("SetFileAttributesProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -614,7 +614,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nSetFileAttributesProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("SetFileAttributesProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -653,7 +653,7 @@ namespace DokanNet
                 DokanResult result = _operations.SetFileTime(rawFileName, ctime, atime,
                                                      mtime, rawFileInfo);
 
-                DbgPrint("\nSetFileTimeProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("SetFileTimeProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -661,7 +661,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nSetFileTimeProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("SetFileTimeProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -679,7 +679,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.DeleteFile(rawFileName, rawFileInfo);
 
-                DbgPrint("\nDeleteFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("DeleteFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -687,7 +687,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nDeleteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("DeleteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -706,7 +706,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.DeleteDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("\nDeleteDirectoryProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("DeleteDirectoryProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -714,7 +714,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nDeleteDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("DeleteDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -737,7 +737,7 @@ namespace DokanNet
                 DokanResult result = _operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting,
                                                   rawFileInfo);
 
-                DbgPrint("\nMoveFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("MoveFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -745,7 +745,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nMoveFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("MoveFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -766,7 +766,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                DbgPrint("\nLockFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("LockFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -774,7 +774,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nLockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("LockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -795,7 +795,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                DbgPrint("\nUnlockFileProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("UnlockFileProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -803,7 +803,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nUnlockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("UnlockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -827,7 +827,7 @@ namespace DokanNet
                 DbgPrint("\tFreeBytesAvailable :  " + rawFreeBytesAvailable);
                 DbgPrint("\tTotalNumberOfBytes :  " + rawTotalNumberOfBytes);
                 DbgPrint("\tTotalNumberOfFreeBytes :  " + rawTotalNumberOfFreeBytes);
-                DbgPrint("\nGetDiskFreeSpaceProxy Return :  " + result);
+                DbgPrint("GetDiskFreeSpaceProxy Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -835,7 +835,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nGetDiskFreeSpaceProxy Throw :  " + ex.Message);
+                DbgPrint("GetDiskFreeSpaceProxy Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -875,7 +875,7 @@ namespace DokanNet
                     DbgPrint("\tFileSystemFlags :  " + rawFileSystemFlags);
                 }
 
-                DbgPrint("\nGetVolumeInformationProxy Return :  " + result);
+                DbgPrint("GetVolumeInformationProxy Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -883,7 +883,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nGetVolumeInformationProxy Throw :  " + ex.Message);
+                DbgPrint("GetVolumeInformationProxy Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -899,7 +899,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.Unmount(rawFileInfo);
 
-                DbgPrint("\nOpenDirectoryProxy Return :  " + result);
+                DbgPrint("UnmountProxy Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -907,7 +907,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nOpenDirectoryProxy Throw :  " + ex.Message);
+                DbgPrint("UnmountProxy Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -961,7 +961,7 @@ namespace DokanNet
                     Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
                 }
 
-                DbgPrint("\nGetFileSecurityProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("GetFileSecurityProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -969,7 +969,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nGetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("GetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
@@ -1017,7 +1017,7 @@ namespace DokanNet
 
                 DokanResult result = _operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
 
-                DbgPrint("\nSetFileSecurityProxy : " + rawFileName + " Return :  " + result);
+                DbgPrint("SetFileSecurityProxy : " + rawFileName + " Return :  " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
@@ -1025,7 +1025,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
 #if DEBUG
-                DbgPrint("\nSetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
+                DbgPrint("SetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;
