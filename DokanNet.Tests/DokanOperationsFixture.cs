@@ -50,6 +50,13 @@ namespace DokanNet.Tests
             public DokanResult DeleteFile(string fileName, DokanFileInfo info)
                 => TryExecute(() => Target.DeleteFile(fileName, info));
 
+            public DokanResult EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
+            {
+                streamName = string.Empty;
+                streamSize = 0;
+                return DokanResult.NotImplemented;
+            }
+
             public DokanResult FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
                 => Target.FindFiles(fileName, out files, info);
 
