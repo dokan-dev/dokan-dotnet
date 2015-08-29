@@ -493,6 +493,13 @@ namespace DokanNetMirror
             return DokanResult.Success;
         }
 
+        public DokanResult EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
+        {
+            streamName = String.Empty;
+            streamSize = 0;
+            return DokanResult.Error;
+        }
+
         #endregion Implementation of IDokanOperations
     }
 }
