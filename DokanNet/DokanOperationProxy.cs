@@ -129,6 +129,14 @@ namespace DokanNet
             ref int rawNumberOfBytesWritten, long rawOffset,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
+        public delegate int EnumerateNamedStreamsDelegate(
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
+            IntPtr rawEnumContext,
+            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName,
+            ref uint rawStreamNameLength,
+            ref long rawStreamSize,
+            [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+
         #endregion Delegates
 
         private readonly IDokanOperations _operations;
@@ -1026,6 +1034,42 @@ namespace DokanNet
             {
 #if DEBUG
                 DbgPrint("SetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
+                throw ex;
+#else
+                return (int)DokanResult.FileNotFound;
+#endif
+            }
+        }
+
+        public int EnumerateNamedStreamsProxy(
+            string rawFileName,
+            IntPtr rawEnumContext,
+            StringBuilder rawStreamName,
+            ref uint rawStreamNameLength,
+            ref long rawStreamSize,
+            DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                DbgPrint("\tEnumerateNamedStreamsProxy : " + rawFileName);
+
+                string name;
+                DokanResult result = _operations.EnumerateNamedStreams(rawFileName, rawEnumContext, out name, out rawStreamSize , rawFileInfo);
+                if (result == DokanResult.Success)
+                {
+                    rawStreamName.Append(name);
+                    rawStreamNameLength = (uint)name.Length;
+                }
+
+                DbgPrint("EnumerateNamedStreamsProxy : " + rawFileName + " Return :  " + result);
+                return (int)result;
+            }
+#pragma warning disable 0168
+            catch (Exception ex)
+#pragma warning restore 0168
+            {
+#if DEBUG
+                DbgPrint("EnumerateNamedStreamsProxy : " + rawFileName + " Throw :  " + ex.Message);
                 throw ex;
 #else
                 return (int)DokanResult.FileNotFound;

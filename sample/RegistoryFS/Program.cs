@@ -280,6 +280,13 @@ namespace RegistoryFS
             return DokanResult.Error;
         }
 
+        public DokanResult EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
+        {
+            streamName = String.Empty;
+            streamSize = 0;
+            return DokanResult.Error;
+        }
+
         #endregion DokanOperations member
     }
 
