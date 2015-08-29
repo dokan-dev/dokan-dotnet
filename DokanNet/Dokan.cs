@@ -90,6 +90,7 @@ namespace DokanNet
                 Unmount = dokanOperationProxy.UnmountProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
+                EnumerateNamedStreams = dokanOperationProxy.EnumerateNamedStreamsProxy,
             };
 
             int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);

@@ -62,5 +62,8 @@ namespace DokanNet
                                    DokanFileInfo info);
 
         DokanResult Unmount(DokanFileInfo info);
+
+        DokanResult EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize,
+            DokanFileInfo info);
     }
 }
