@@ -441,7 +441,7 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -471,7 +471,7 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());
@@ -850,6 +850,44 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFileUsingContext_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, context: largeData);
+            fixture.SetupReadFileInChunksUsingContext(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+                do
+                {
+                    int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                    Assert.IsTrue(readBytes > 0, "Unexpected empty read");
+                    totalReadBytes += readBytes;
+                } while (totalReadBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenText_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -980,6 +1018,42 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFileUsingContext_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, context: largeData);
+            fixture.SetupWriteFileInChunksUsingContext(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                int totalWrittenBytes = 0;
+                do
+                {
+                    int writtenBytes = Math.Min(4096, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
+                    totalWrittenBytes += writtenBytes;
+                } while (totalWrittenBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Replace_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1002,11 +1076,11 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1044,11 +1118,11 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
+            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());
