@@ -784,7 +784,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenRead_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -956,7 +956,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenWrite_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1045,6 +1045,39 @@ namespace DokanNet.Tests
 
 #if !LOGONLY
                 Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithFlush_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_WithFlush_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupFlushFileBuffers(path);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                stream.Flush(true);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
 #endif
             }
 

@@ -594,6 +594,18 @@ namespace DokanNet.Tests
                 });
         }
 
+        internal void SetupCreateFileWithError(string path, DokanResult result)
+        {
+            if (result == DokanResult.Success)
+                throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
+
+            operations
+                .Setup(d => d.CreateFile(path, It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<DokanFileInfo>()))
+                .Returns(result)
+                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", **{result}** [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"));
+        }
+
         internal void SetupCleanupFile(string path, object context = null, bool isDirectory = false)
         {
             operations
@@ -611,16 +623,13 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
-        internal void SetupCreateFileWithError(string path, DokanResult result)
+        internal void SetupFlushFileBuffers(string path)
         {
-            if (result == DokanResult.Success)
-                throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
-
             operations
-                .Setup(d => d.CreateFile(path, It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<DokanFileInfo>()))
-                .Returns(result)
-                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", **{result}** [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"));
+                .Setup(d => d.FlushFileBuffers(path, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.FlushFileBuffers)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
         internal void SetupReadFile(string path, byte[] buffer, int bytesRead)
