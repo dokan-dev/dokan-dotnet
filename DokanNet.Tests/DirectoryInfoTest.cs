@@ -642,7 +642,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
-            fixture.SetupCleanupFile(destinationPath, true);
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupCleanupFile(destinationPath/* This call is probably redundant. */);
 #endif
@@ -672,7 +672,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
             fixture.SetupMoveFile(path, destinationPath, false);
-            fixture.SetupCleanupFile(destinationPath, true);
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupCleanupFile(destinationPath/* This call is probably redundant. */);
 #endif
