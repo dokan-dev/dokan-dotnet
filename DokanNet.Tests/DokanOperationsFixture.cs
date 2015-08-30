@@ -516,6 +516,14 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.FindFiles)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_files.Count}], {info.Log()})"));
         }
 
+        internal void SetupOpenDirectoryWithoutCleanup(string path)
+        {
+            operations
+                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+        }
+
         internal void SetupOpenDirectory(string path)
         {
             operations
@@ -530,14 +538,6 @@ namespace DokanNet.Tests
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
-        }
-
-        internal void SetupOpenDirectoryWithoutCleanup(string path)
-        {
-            operations
-                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
         internal void SetupOpenDirectoryWithError(string path, DokanResult result)
@@ -630,6 +630,18 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.FlushFileBuffers)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+        }
+
+        internal void SetupLockUnlockFile(string path, long offset, long length)
+        {
+            operations
+                .Setup(d => d.LockFile(path, offset, length, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, long _offset, long _length, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.LockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_offset}, {_length}, {info.Log()})"));
+            operations
+                .Setup(d => d.UnlockFile(path, offset, length, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, long _offset, long _length, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.UnlockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_offset}, {_length}, {info.Log()})"));
         }
 
         internal void SetupReadFile(string path, byte[] buffer, int bytesRead)
