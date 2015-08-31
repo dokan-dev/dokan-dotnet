@@ -784,7 +784,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenRead_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -888,6 +888,42 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupLockUnlockFile(path, 0, value.Length);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[value.Length];
+                stream.Lock(0, target.Length);
+                int readBytes = stream.Read(target, 0, target.Length);
+                stream.Unlock(0, target.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
+                Assert.AreEqual(value, Encoding.UTF8.GetString(target), "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenText_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -956,7 +992,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenWrite_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1045,6 +1081,73 @@ namespace DokanNet.Tests
 
 #if !LOGONLY
                 Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithFlush_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_WithFlush_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupFlushFileBuffers(path);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                stream.Flush(true);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupLockUnlockFile(path, 0, value.Length);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Lock(0, value.Length);
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                stream.Unlock(0, value.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
 #endif
             }
 
