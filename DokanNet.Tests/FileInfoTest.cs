@@ -526,6 +526,7 @@ namespace DokanNet.Tests
         {
             foreach (var access in accessModes)
             {
+                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
                 using (var stream = info.Open(mode, access))
                 {
 #if !LOGONLY
@@ -554,7 +555,6 @@ namespace DokanNet.Tests
 #endif
                     }
                 }
-                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
             }
         }
 
