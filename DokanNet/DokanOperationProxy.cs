@@ -179,12 +179,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("CreateFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -207,12 +203,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("OpenDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.Error;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -235,12 +227,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("CreateDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.Error;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -263,12 +251,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("CleanupProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -291,12 +275,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("CloseFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -323,12 +303,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("ReadFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -356,12 +332,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("WriteFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -384,12 +356,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("FlushFileBuffersProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -447,12 +415,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("GetFileInformationProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -503,12 +467,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("FindFilesProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.InvalidHandle;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -565,12 +525,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("SetEndOfFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -592,12 +548,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("SetAllocationSizeProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -621,12 +573,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("SetFileAttributesProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -663,12 +611,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("SetFileTimeProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -691,12 +635,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("DeleteFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -719,12 +659,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("DeleteDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -751,12 +687,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("MoveFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -782,12 +714,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("LockFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -813,12 +741,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("UnlockFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -846,12 +770,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("GetDiskFreeSpaceProxy Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -891,12 +811,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("GetVolumeInformationProxy Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -916,12 +832,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("UnmountProxy Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -980,12 +892,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("GetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -1035,12 +943,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("SetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -1070,12 +974,8 @@ namespace DokanNet
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
                 DbgPrint("EnumerateNamedStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
-                throw;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
