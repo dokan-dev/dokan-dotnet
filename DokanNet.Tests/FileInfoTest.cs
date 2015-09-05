@@ -43,7 +43,9 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
@@ -437,6 +439,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath);
@@ -514,7 +517,11 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1175,6 +1182,7 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);

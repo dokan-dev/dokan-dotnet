@@ -21,7 +21,9 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
@@ -211,7 +213,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path.AsRootedPath(), DokanResult.FileExists);
+            fixture.SetupCreateFile(path.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
             fixture.SetupOpenDirectory(DokanOperationsFixture.RootName);
             fixture.SetupFindFiles(DokanOperationsFixture.RootName, new[] {
                 new FileInformation() { FileName = path, Attributes = FileAttributes.Normal, Length = 0, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
@@ -233,7 +236,9 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path.AsRootedPath(), DokanResult.PathNotFound);
+            fixture.SetupCreateFileWithError(path.AsRootedPath(), DokanResult.FileNotFound);
+            fixture.SetupCreateFile(basePath.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(basePath.AsRootedPath(), FileAttributes.Directory);
             fixture.SetupCreateDirectory(path.AsRootedPath());
 #endif
 
@@ -290,12 +295,11 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path.AsRootedPath(), DokanResult.FileExists);
-            fixture.SetupOpenDirectory(basePath.AsRootedPath());
-            fixture.SetupFindFiles(basePath.AsRootedPath(), new[] {
-                new FileInformation() { FileName = DokanOperationsFixture.SubDirectoryName, Attributes = FileAttributes.Normal, Length = 0, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
-            });
-            fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Directory);
+            fixture.SetupCreateFile(path.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
+            fixture.SetupCreateFile(basePath.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(basePath.AsRootedPath(), FileAttributes.Directory);
+            fixture.SetupCreateDirectoryWithError(path.AsRootedPath(), DokanResult.AlreadyExists);
 #endif
 
             var sut = new DirectoryInfo(basePath.AsDriveBasedPath());
@@ -735,6 +739,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
             fixture.SetupCleanupFile(destinationPath, isDirectory: true);
@@ -813,7 +818,11 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.AlreadyExists);
-    #endif
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
+#endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
 
