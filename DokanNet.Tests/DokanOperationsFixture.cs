@@ -31,6 +31,9 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute(DokanFileInfo info, Func<DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                    return DokanResult.AccessDenied;
+
                 try
                 {
                     return func(info);
@@ -48,6 +51,9 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute(string fileName, DokanFileInfo info, Func<string, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                    return DokanResult.AccessDenied;
+
                 try
                 {
                     return func(fileName, info);
@@ -65,6 +71,9 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute<T>(string fileName, T arg, DokanFileInfo info, Func<string, T, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                    return DokanResult.AccessDenied;
+
                 try
                 {
                     return func(fileName, arg, info);
@@ -82,6 +91,9 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute<T1, T2>(string fileName, T1 arg1, T2 arg2, DokanFileInfo info, Func<string, T1, T2, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                    return DokanResult.AccessDenied;
+
                 try
                 {
                     return func(fileName, arg1, arg2, info);
@@ -99,6 +111,9 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute<T1, T2, T3>(string fileName, T1 arg1, T2 arg2, T3 arg3, DokanFileInfo info, Func<string, T1, T2, T3, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                    return DokanResult.AccessDenied;
+
                 try
                 {
                     return func(fileName, arg1, arg2, arg3, info);
@@ -114,18 +129,23 @@ namespace DokanNet.Tests
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
-            private DokanResult TryExecute<TOut>(string fileName, out TOut outParameter, DokanFileInfo info, FuncOut2<string, TOut, DokanFileInfo, DokanResult> func, string funcName)
+            private DokanResult TryExecute<TOut>(string fileName, out TOut argOut, DokanFileInfo info, FuncOut2<string, TOut, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                    argOut = default(TOut);
+                    return DokanResult.AccessDenied;
+                }
+
                 try
                 {
-                    return func(fileName, out outParameter, info);
+                    return func(fileName, out argOut, info);
                 }
                 catch (Exception ex)
                 {
                     Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
-                    outParameter = default(TOut);
+                    argOut = default(TOut);
                     return DokanResult.ExceptionInService;
                 }
             }
@@ -134,6 +154,11 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute<TOut, TIn>(string fileName, out TOut argOut, TIn argIn, DokanFileInfo info, FuncOut2<string, TOut, TIn, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                    argOut = default(TOut);
+                    return DokanResult.AccessDenied;
+                }
+
                 try
                 {
                     return func(fileName, out argOut, argIn, info);
@@ -152,6 +177,11 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private DokanResult TryExecute<TIn1, TOut, TIn2>(string fileName, TIn1 argIn1, out TOut argOut, TIn2 argIn2, DokanFileInfo info, FuncOut3<string, TIn1, TOut, TIn2, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                    argOut = default(TOut);
+                    return DokanResult.AccessDenied;
+                }
+
                 try
                 {
                     return func(fileName, argIn1, out argOut, argIn2, info);
@@ -168,20 +198,27 @@ namespace DokanNet.Tests
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
-            private DokanResult TryExecute<TOut1, TOut2, TOut3>(out TOut1 outParameter1, out TOut2 outParameter2, out TOut3 outParameter3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, DokanResult> func, string funcName)
+            private DokanResult TryExecute<TOut1, TOut2, TOut3>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, DokanResult> func, string funcName)
             {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    argOut3 = default(TOut3);
+                    return DokanResult.AccessDenied;
+                }
+
                 try
                 {
-                    return func(out outParameter1, out outParameter2, out outParameter3, info);
+                    return func(out argOut1, out argOut2, out argOut3, info);
                 }
                 catch (Exception ex)
                 {
                     Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
-                    outParameter1 = default(TOut1);
-                    outParameter2 = default(TOut2);
-                    outParameter3 = default(TOut3);
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    argOut3 = default(TOut3);
                     return DokanResult.ExceptionInService;
                 }
             }
@@ -782,6 +819,14 @@ namespace DokanNet.Tests
                     info.Context = null;
                     Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 });
+            operations
+                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+        }
+
+        internal void SetupCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        {
             operations
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
                 .Returns(DokanResult.Success)
