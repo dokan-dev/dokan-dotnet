@@ -642,13 +642,6 @@ namespace DokanNet.Tests
                 .Setup(d => d.CloseFile(RootName, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
-
-            operations
-                .Setup(d => d.CreateFile(@"\Desktop.ini", ReadAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
-                .Returns(DokanResult.FileNotFound);
-            operations
-                .Setup(d => d.CreateFile(@"\Autorun.inf", ReadAttributesAccess, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
-                .Returns(DokanResult.FileNotFound);
         }
 
         internal void SetupDiskFreeSpace(long freeBytesAvailable = 0, long totalNumberOfBytes = 0, long totalNumberOfFreeBytes = 0)
@@ -819,10 +812,8 @@ namespace DokanNet.Tests
                     info.Context = null;
                     Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 });
-            operations
-                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+
+            SetupCloseFile(path, context, isDirectory, deleteOnClose);
         }
 
         internal void SetupCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
