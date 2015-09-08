@@ -43,7 +43,9 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
@@ -236,7 +238,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void CopyTo_CallsApiCorrectly()
+        public void CopyTo_WhereSourceIsEmpty_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -250,6 +252,69 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
+            fixture.SetupSetFileTime(destinationPath);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath(),
+                destinationPath = DokanOperationsFixture.DestinationFileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: value.Length);
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupSetEndOfFile(destinationPath, value.Length);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, false);
+            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, false);
+            fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
+            fixture.SetupSetFileTime(destinationPath);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Manual)]
+        public void CopyTo_WhereSourceIsLargeFile_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath(),
+                destinationPath = DokanOperationsFixture.DestinationFileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
+            fixture.SetupReadFileInChunks(path, largeData, 4096, false);
+            fixture.SetupWriteFileInChunks(destinationPath, largeData, 4096, false);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 #endif
@@ -437,11 +502,12 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
-            fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCleanupFile(destinationPath);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -469,9 +535,9 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
             fixture.SetupMoveFile(path, destinationPath, false);
-            fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCleanupFile(destinationPath);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());
@@ -514,7 +580,11 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -526,6 +596,7 @@ namespace DokanNet.Tests
         {
             foreach (var access in accessModes)
             {
+                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
                 using (var stream = info.Open(mode, access))
                 {
 #if !LOGONLY
@@ -554,7 +625,6 @@ namespace DokanNet.Tests
 #endif
                     }
                 }
-                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
             }
         }
 
@@ -1175,15 +1245,16 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1221,11 +1292,11 @@ namespace DokanNet.Tests
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());

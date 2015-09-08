@@ -18,7 +18,9 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]

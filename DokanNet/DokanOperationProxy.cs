@@ -2,6 +2,7 @@ using DokanNet.Native;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -43,7 +44,7 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        /*     public delegate int FindFilesWithPatternDelegate(
+        /*public delegate int FindFilesWithPatternDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPWStr)] string rawSearchPattern,
             IntPtr rawFillFindData, // function pointer
@@ -53,9 +54,9 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        public delegate int GetDiskFreeSpaceDelegate(ref long rawFreeBytesAvailable, ref long rawTotalNumberOfBytes,
-                                                     ref long rawTotalNumberOfFreeBytes,
-                                                     [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+        public delegate int GetDiskFreeSpaceDelegate(
+            ref long rawFreeBytesAvailable, ref long rawTotalNumberOfBytes, ref long rawTotalNumberOfFreeBytes,
+            [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         public delegate int GetFileInformationDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string fileName, ref BY_HANDLE_FILE_INFORMATION handleFileInfo,
@@ -69,8 +70,7 @@ namespace DokanNet
 
         public delegate int GetVolumeInformationDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawVolumeNameBuffer, uint rawVolumeNameSize,
-            ref uint rawVolumeSerialNumber,
-            ref uint rawMaximumComponentLength, ref FileSystemFeatures rawFileSystemFlags,
+            ref uint rawVolumeSerialNumber, ref uint rawMaximumComponentLength, ref FileSystemFeatures rawFileSystemFlags,
             [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawFileSystemNameBuffer,
             uint rawFileSystemNameSize, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
@@ -113,15 +113,15 @@ namespace DokanNet
 
         public delegate int SetFileTimeDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
-            ref FILETIME rawCreationTime,
-            ref FILETIME rawLastAccessTime,
-            ref FILETIME rawLastWriteTime, [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
+            ref FILETIME rawCreationTime, ref FILETIME rawLastAccessTime, ref FILETIME rawLastWriteTime,
+            [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate int UnlockFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, long rawByteOffset, long rawLength,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        public delegate int UnmountDelegate([MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+        public delegate int UnmountDelegate(
+            [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         public delegate int WriteFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
@@ -130,64 +130,68 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate int EnumerateNamedStreamsDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
-            IntPtr rawEnumContext,
-            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName,
-            ref uint rawStreamNameLength,
-            ref long rawStreamSize,
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawEnumContext,
+            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref uint rawStreamNameLength, ref long rawStreamSize,
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         #endregion Delegates
 
-        private readonly IDokanOperations _operations;
+        private readonly IDokanOperations operations;
 
-        private readonly uint _serialNumber;
+        private readonly uint serialNumber;
 
         public DokanOperationProxy(IDokanOperations operations)
         {
-            _operations = operations;
-            _serialNumber = (uint)_operations.GetHashCode();
+            this.operations = operations;
+            serialNumber = (uint)this.operations.GetHashCode();
         }
 
-        private void DbgPrint(string message)
+        private void Trace(string message)
         {
-#if DEBUG
+#if TRACE
             Console.WriteLine(message);
 #endif
         }
 
-        public int CreateFileProxy(string rawFileName, uint rawAccessMode,
-                                   uint rawShare, uint rawCreationDisposition, uint rawFlagsAndAttributes,
+        private string ToTrace(DokanFileInfo info)
+        {
+            var context = info.Context != null ? info.Context.GetType().Name : "<null>";
+
+            return string.Format(CultureInfo.InvariantCulture, "{{{0}, {1}, {2}, {3}, {4}, #{5}, {6}, {7}}}",
+                context, info.DeleteOnClose, info.IsDirectory, info.NoCache, info.PagingIo, info.ProcessId, info.SynchronousIo, info.WriteToEndOfFile);
+        }
+
+        public int CreateFileProxy(string rawFileName,
+                                   uint rawAccessMode, uint rawShare, uint rawCreationDisposition, uint rawFlagsAndAttributes,
                                    DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nCreateFileProxy :  " + rawFileName);
-                DbgPrint("\tCreationDisposition " + (FileMode)rawCreationDisposition);
-                DbgPrint("\tFileShare " + (FileShare)rawShare);
-                DbgPrint("\tFileAccess " + (FileAccess)rawAccessMode);
-                DbgPrint("\tFileOptions " + (FileOptions)(rawFlagsAndAttributes & 0xffffc000));
-                DbgPrint("\tFileAttributes " + (FileAttributes)(rawFlagsAndAttributes & 0x3fff));
+                Trace("\nCreateFileProxy : " + rawFileName);
+                Trace("\tCreationDisposition\t" + (FileMode)rawCreationDisposition);
+                Trace("\tFileAccess\t" + (FileAccess)rawAccessMode);
+                Trace("\tFileShare\t" + (FileShare)rawShare);
+                Trace("\tFileOptions\t" + (FileOptions)(rawFlagsAndAttributes & 0xffffc000));
+                Trace("\tFileAttributes\t" + (FileAttributes)(rawFlagsAndAttributes & 0x3fff));
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.CreateFile(rawFileName, (FileAccess)rawAccessMode, (FileShare)rawShare,
+                DokanResult result = operations.CreateFile(rawFileName,
+                                                    (FileAccess)rawAccessMode,
+                                                    (FileShare)rawShare,
                                                     (FileMode)rawCreationDisposition,
-                                                    (FileOptions)(rawFlagsAndAttributes & 0xffffc000), //& 0xffffc000
-                                                    (FileAttributes)(rawFlagsAndAttributes & 0x3fff), rawFileInfo);
-                //& 0x3ffflower 14 bits i think are file atributes and rest are file options WRITE_TROUGH etc.
+                                                    (FileOptions)(rawFlagsAndAttributes & 0xffffc000),
+                                                    (FileAttributes)(rawFlagsAndAttributes & 0x3fff),
+                                                    rawFileInfo);
 
-                DbgPrint("CreateFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("CreateFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("CreateFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("CreateFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -198,23 +202,20 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nOpenDirectoryProxy :  " + rawFileName);
+                Trace("\nOpenDirectoryProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.OpenDirectory(rawFileName, rawFileInfo);
+                DokanResult result = operations.OpenDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("OpenDirectoryProxy : " + rawFileName + " Return :  " + result);
+                Trace("OpenDirectoryProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("OpenDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.Error;
-#endif
+                Trace("OpenDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -225,50 +226,44 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nCreateDirectoryProxy :  " + rawFileName);
+                Trace("\nCreateDirectoryProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.CreateDirectory(rawFileName, rawFileInfo);
+                DokanResult result = operations.CreateDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("CreateDirectoryProxy : " + rawFileName + " Return :  " + result);
+                Trace("CreateDirectoryProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("CreateDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.Error;
-#endif
+                Trace("CreateDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
         public int CleanupProxy(string rawFileName,
-                               DokanFileInfo rawFileInfo)
+                                DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nCleanupProxy :  " + rawFileName);
+                Trace("\nCleanupProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.Cleanup(rawFileName, rawFileInfo);
+                DokanResult result = operations.Cleanup(rawFileName, rawFileInfo);
 
-                DbgPrint("CleanupProxy : " + rawFileName + " Return :  " + result);
+                Trace("CleanupProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("CleanupProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("CleanupProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -279,90 +274,74 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nCloseFileProxy :  " + rawFileName);
+                Trace("\nCloseFileProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.CloseFile(rawFileName, rawFileInfo);
+                DokanResult result = operations.CloseFile(rawFileName, rawFileInfo);
 
-                DbgPrint("CloseFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("CloseFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("CloseFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("CloseFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int ReadFileProxy(string rawFileName, byte[] rawBuffer,
-                                 uint rawBufferLength, ref int rawReadLength, long rawOffset,
+        public int ReadFileProxy(string rawFileName,
+                                 byte[] rawBuffer, uint rawBufferLength, ref int rawReadLength, long rawOffset,
                                  DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nReadFileProxy :  " + rawFileName);
-                DbgPrint("\tBufferLength :  " + rawBufferLength);
-                DbgPrint("\tOffset :  " + rawOffset);
+                Trace("\nReadFileProxy : " + rawFileName);
+                Trace("\tBufferLength\t" + rawBufferLength);
+                Trace("\tOffset\t" + rawOffset);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset,
-                                                  rawFileInfo);
+                DokanResult result = operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset, rawFileInfo);
 
-                DbgPrint("ReadFileProxy : " + rawFileName
-                    + " Return :  " + result
-                    + " ReadLength : " + rawReadLength);
+                Trace("ReadFileProxy : " + rawFileName + " Return : " + result + " ReadLength : " + rawReadLength);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("ReadFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("ReadFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int WriteFileProxy(string rawFileName, byte[] rawBuffer,
-                                  uint rawNumberOfBytesToWrite, ref int rawNumberOfBytesWritten, long rawOffset,
+        public int WriteFileProxy(string rawFileName,
+                                  byte[] rawBuffer, uint rawNumberOfBytesToWrite, ref int rawNumberOfBytesWritten, long rawOffset,
                                   DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nWriteFileProxy :  " + rawFileName);
-                DbgPrint("\tNumberOfBytesToWrite :  " + rawNumberOfBytesToWrite);
-                DbgPrint("\tOffset :  " + rawOffset);
+                Trace("\nWriteFileProxy : " + rawFileName);
+                Trace("\tNumberOfBytesToWrite\t" + rawNumberOfBytesToWrite);
+                Trace("\tOffset\t" + rawOffset);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.WriteFile(rawFileName, rawBuffer,
-                                                   out rawNumberOfBytesWritten, rawOffset,
-                                                   rawFileInfo);
+                DokanResult result = operations.WriteFile(rawFileName, rawBuffer, out rawNumberOfBytesWritten, rawOffset, rawFileInfo);
 
-                DbgPrint("WriteFileProxy : " + rawFileName
-                        + " Return :  " + result
-                        + " NumberOfBytesWritten : " + rawNumberOfBytesWritten);
+                Trace("WriteFileProxy : " + rawFileName + " Return : " + result + " NumberOfBytesWritten : " + rawNumberOfBytesWritten);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("WriteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("WriteFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -373,23 +352,20 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nFlushFileBuffersProxy :  " + rawFileName);
+                Trace("\nFlushFileBuffersProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.FlushFileBuffers(rawFileName, rawFileInfo);
+                DokanResult result = operations.FlushFileBuffers(rawFileName, rawFileInfo);
 
-                DbgPrint("FlushFileBuffersProxy : " + rawFileName + " Return :  " + result);
+                Trace("FlushFileBuffersProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("FlushFileBuffersProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("FlushFileBuffersProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -402,19 +378,20 @@ namespace DokanNet
             FileInformation fi;
             try
             {
-                DbgPrint("\nGetFileInformationProxy :  " + rawFileName);
+                Trace("\nGetFileInformationProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
+                DokanResult result = operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
                     Debug.Assert(fi.FileName != null);
-                    DbgPrint("\tFileName :  " + fi.FileName);
-                    DbgPrint("\tAttributes :  " + fi.Attributes);
-                    DbgPrint("\tCreationTime :  " + fi.CreationTime);
-                    DbgPrint("\tLastAccessTime :  " + fi.LastAccessTime);
-                    DbgPrint("\tLastWriteTime :  " + fi.LastWriteTime);
-                    DbgPrint("\tLength :  " + fi.Length);
+                    Trace("\tFileName\t" + fi.FileName);
+                    Trace("\tAttributes\t" + fi.Attributes);
+                    Trace("\tCreationTime\t" + fi.CreationTime);
+                    Trace("\tLastAccessTime\t" + fi.LastAccessTime);
+                    Trace("\tLastWriteTime\t" + fi.LastWriteTime);
+                    Trace("\tLength\t" + fi.Length);
 
                     rawHandleFileInformation.dwFileAttributes = (uint)fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
 
@@ -422,20 +399,15 @@ namespace DokanNet
                     long atime = fi.LastAccessTime.ToFileTime();
                     long mtime = fi.LastWriteTime.ToFileTime();
                     rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int)(ctime >> 32);
-                    rawHandleFileInformation.ftCreationTime.dwLowDateTime =
-                        (int)(ctime & 0xffffffff);
+                    rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int)(ctime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime =
-                        (int)(atime >> 32);
-                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime =
-                        (int)(atime & 0xffffffff);
+                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime = (int)(atime >> 32);
+                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime = (int)(atime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime =
-                        (int)(mtime >> 32);
-                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime =
-                        (int)(mtime & 0xffffffff);
+                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime = (int)(mtime >> 32);
+                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime = (int)(mtime & 0xffffffff);
 
-                    rawHandleFileInformation.dwVolumeSerialNumber = _serialNumber;
+                    rawHandleFileInformation.dwVolumeSerialNumber = serialNumber;
 
                     rawHandleFileInformation.nFileSizeLow = (uint)(fi.Length & 0xffffffff);
                     rawHandleFileInformation.nFileSizeHigh = (uint)(fi.Length >> 32);
@@ -444,74 +416,64 @@ namespace DokanNet
                     rawHandleFileInformation.nFileIndexLow = (uint)fi.FileName.GetHashCode();
                 }
 
-                DbgPrint("GetFileInformationProxy : " + rawFileName + " Return :  " + result);
+                Trace("GetFileInformationProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("GetFileInformationProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("GetFileInformationProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int FindFilesProxy(string rawFileName, IntPtr rawFillFindData,
-                                  // function pointer
+        public int FindFilesProxy(string rawFileName,
+                                  IntPtr rawFillFindData,
                                   DokanFileInfo rawFileInfo)
         {
             try
             {
                 IList<FileInformation> files;
 
-                DbgPrint("\nFindFilesProxy :  " + rawFileName);
+                Trace("\nFindFilesProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.FindFiles(rawFileName, out files, rawFileInfo);
+                DokanResult result = operations.FindFiles(rawFileName, out files, rawFileInfo);
 
                 Debug.Assert(files != null);
                 if (result == DokanResult.Success && files.Count != 0)
                 {
-#if DEBUG
                     foreach (FileInformation fi in files)
                     {
-                        DbgPrint("\n\tFileName :  " + fi.FileName);
-                        DbgPrint("\tAttributes :  " + fi.Attributes);
-                        DbgPrint("\tCreationTime :  " + fi.CreationTime);
-                        DbgPrint("\tLastAccessTime :  " + fi.LastAccessTime);
-                        DbgPrint("\tLastWriteTime :  " + fi.LastWriteTime);
-                        DbgPrint("\tLength :  " + fi.Length);
+                        Trace("\n\tFileName\t" + fi.FileName);
+                        Trace("\tAttributes\t" + fi.Attributes);
+                        Trace("\tCreationTime\t" + fi.CreationTime);
+                        Trace("\tLastAccessTime\t" + fi.LastAccessTime);
+                        Trace("\tLastWriteTime\t" + fi.LastWriteTime);
+                        Trace("\tLength\t" + fi.Length);
                     }
-#endif
 
-                    var fill =
+                var fill =
                    (FILL_FIND_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_DATA));
-                    // Used a single entry call to speed up the "enumeration" of the list
+                    // used a single entry call to speed up the "enumeration" of the list
                     for (int index = 0; index < files.Count; index++)
-
                     {
                         Addto(fill, rawFileInfo, files[index]);
                     }
                 }
 
-                DbgPrint("FindFilesProxy : " + rawFileName + " Return :  " + result);
+                Trace("FindFilesProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("FindFilesProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.InvalidHandle;
-#endif
+                Trace("FindFilesProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -525,20 +487,20 @@ namespace DokanNet
             {
                 dwFileAttributes = fi.Attributes,
                 ftCreationTime =
-                                   {
-                                       dwHighDateTime = (int) (ctime >> 32),
-                                       dwLowDateTime = (int) (ctime & 0xffffffff)
-                                   },
+                {
+                    dwHighDateTime = (int) (ctime >> 32),
+                    dwLowDateTime = (int) (ctime & 0xffffffff)
+                },
                 ftLastAccessTime =
-                                   {
-                                       dwHighDateTime = (int) (atime >> 32),
-                                       dwLowDateTime = (int) (atime & 0xffffffff)
-                                   },
+                {
+                    dwHighDateTime = (int) (atime >> 32),
+                    dwLowDateTime = (int) (atime & 0xffffffff)
+                },
                 ftLastWriteTime =
-                                   {
-                                       dwHighDateTime = (int) (mtime >> 32),
-                                       dwLowDateTime = (int) (mtime & 0xffffffff)
-                                   },
+                {
+                    dwHighDateTime = (int) (mtime >> 32),
+                    dwLowDateTime = (int) (mtime & 0xffffffff)
+                },
                 nFileSizeLow = (uint)(fi.Length & 0xffffffff),
                 nFileSizeHigh = (uint)(fi.Length >> 32),
                 cFileName = fi.FileName
@@ -550,29 +512,27 @@ namespace DokanNet
 
         ////
 
-        public int SetEndOfFileProxy(string rawFileName, long rawByteOffset,
+        public int SetEndOfFileProxy(string rawFileName,
+                                     long rawByteOffset,
                                      DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nSetEndOfFileProxy :  " + rawFileName);
-                DbgPrint("\tByteOffset :  " + rawByteOffset);
+                Trace("\nSetEndOfFileProxy : " + rawFileName);
+                Trace("\tByteOffset\t" + rawByteOffset);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
+                DokanResult result = operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
 
-                DbgPrint("SetEndOfFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("SetEndOfFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("SetEndOfFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("SetEndOfFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -581,125 +541,109 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nSetAllocationSizeProxy :  " + rawFileName);
-                DbgPrint("\tLength :  " + rawLength);
+                Trace("\nSetAllocationSizeProxy : " + rawFileName);
+                Trace("\tLength\t" + rawLength);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
+                DokanResult result = operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
 
-                DbgPrint("SetAllocationSizeProxy : " + rawFileName + " Return :  " + result);
+                Trace("SetAllocationSizeProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("SetAllocationSizeProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("SetAllocationSizeProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int SetFileAttributesProxy(string rawFileName, uint rawAttributes,
+        public int SetFileAttributesProxy(string rawFileName,
+                                          uint rawAttributes,
                                           DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nSetAllocationSizeProxy :  " + rawFileName);
-                DbgPrint("\tAttributes :  " + (FileAttributes)rawAttributes);
+                Trace("\nSetFileAttributesProxy : " + rawFileName);
+                Trace("\tAttributes\t" + (FileAttributes)rawAttributes);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
+                DokanResult result = operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
 
-                DbgPrint("SetFileAttributesProxy : " + rawFileName + " Return :  " + result);
+                Trace("SetFileAttributesProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("SetFileAttributesProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("SetFileAttributesProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
         public int SetFileTimeProxy(string rawFileName,
-                                   ref FILETIME rawCreationTime,
-                                   ref FILETIME rawLastAccessTime,
-                                   ref FILETIME rawLastWriteTime,
+                                    ref FILETIME rawCreationTime, ref FILETIME rawLastAccessTime, ref FILETIME rawLastWriteTime,
                                     DokanFileInfo rawFileInfo)
         {
             var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) && (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
-                            ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) |
-                                                    (uint)rawCreationTime.dwLowDateTime)
-                                  : (DateTime?)null;
+                ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) | (uint)rawCreationTime.dwLowDateTime)
+                : (DateTime?)null;
             var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) && (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
-                                  ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) |
-                                                          (uint)rawLastAccessTime.dwLowDateTime)
-                                  : (DateTime?)null;
+                ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) | (uint)rawLastAccessTime.dwLowDateTime)
+                : (DateTime?)null;
             var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) && (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
-                                  ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) |
-                                                          (uint)rawLastWriteTime.dwLowDateTime)
-                                  : (DateTime?)null;
+                ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) | (uint)rawLastWriteTime.dwLowDateTime)
+                : (DateTime?)null;
 
             try
             {
-                DbgPrint("\nSetFileTimeProxy :  " + rawFileName);
-                DbgPrint("\tCreateTime :  " + ctime);
-                DbgPrint("\tAccessTime :  " + atime);
-                DbgPrint("\tWriteTime :  " + mtime);
+                Trace("\nSetFileTimeProxy : " + rawFileName);
+                Trace("\tCreateTime\t" + ctime);
+                Trace("\tAccessTime\t" + atime);
+                Trace("\tWriteTime\t" + mtime);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.SetFileTime(rawFileName, ctime, atime,
-                                                     mtime, rawFileInfo);
+                DokanResult result = operations.SetFileTime(rawFileName, ctime, atime, mtime, rawFileInfo);
 
-                DbgPrint("SetFileTimeProxy : " + rawFileName + " Return :  " + result);
+                Trace("SetFileTimeProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("SetFileTimeProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("SetFileTimeProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int DeleteFileProxy(string rawFileName, DokanFileInfo rawFileInfo)
+        public int DeleteFileProxy(string rawFileName,
+                                   DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nDeleteFileProxy :  " + rawFileName);
+                Trace("\nDeleteFileProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.DeleteFile(rawFileName, rawFileInfo);
+                DokanResult result = operations.DeleteFile(rawFileName, rawFileInfo);
 
-                DbgPrint("DeleteFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("DeleteFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("DeleteFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("DeleteFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -710,23 +654,20 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nDeleteDirectoryProxy :  " + rawFileName);
+                Trace("\nDeleteDirectoryProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.DeleteDirectory(rawFileName, rawFileInfo);
+                DokanResult result = operations.DeleteDirectory(rawFileName, rawFileInfo);
 
-                DbgPrint("DeleteDirectoryProxy : " + rawFileName + " Return :  " + result);
+                Trace("DeleteDirectoryProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("DeleteDirectoryProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("DeleteDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -738,137 +679,121 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nMoveFileProxy :  " + rawFileName);
-                DbgPrint("\tNewFileName :  " + rawNewFileName);
-                DbgPrint("\tReplaceIfExisting :  " + rawReplaceIfExisting);
+                Trace("\nMoveFileProxy : " + rawFileName);
+                Trace("\tNewFileName\t" + rawNewFileName);
+                Trace("\tReplaceIfExisting\t" + rawReplaceIfExisting);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting,
-                                                  rawFileInfo);
+                DokanResult result = operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting, rawFileInfo);
 
-                DbgPrint("MoveFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("MoveFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("MoveFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("MoveFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int LockFileProxy(string rawFileName, long rawByteOffset,
-                                 long rawLength, DokanFileInfo rawFileInfo)
+        public int LockFileProxy(string rawFileName,
+                                 long rawByteOffset, long rawLength,
+                                 DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nLockFileProxy :  " + rawFileName);
-                DbgPrint("\tByteOffset :  " + rawByteOffset);
-                DbgPrint("\tLength :  " + rawLength);
+                Trace("\nLockFileProxy : " + rawFileName);
+                Trace("\tByteOffset\t" + rawByteOffset);
+                Trace("\tLength\t" + rawLength);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
+                DokanResult result = operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                DbgPrint("LockFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("LockFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("LockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("LockFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int UnlockFileProxy(string rawFileName, long rawByteOffset,
-                                   long rawLength, DokanFileInfo rawFileInfo)
+        public int UnlockFileProxy(string rawFileName,
+                                   long rawByteOffset, long rawLength,
+                                   DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nUnlockFileProxy :  " + rawFileName);
-                DbgPrint("\tByteOffset :  " + rawByteOffset);
-                DbgPrint("\tLength :  " + rawLength);
+                Trace("\nUnlockFileProxy : " + rawFileName);
+                Trace("\tByteOffset\t" + rawByteOffset);
+                Trace("\tLength\t" + rawLength);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
+                DokanResult result = operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                DbgPrint("UnlockFileProxy : " + rawFileName + " Return :  " + result);
+                Trace("UnlockFileProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("UnlockFileProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("UnlockFileProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
         ////
 
-        public int GetDiskFreeSpaceProxy(ref long rawFreeBytesAvailable, ref long rawTotalNumberOfBytes,
-                                         ref long rawTotalNumberOfFreeBytes, DokanFileInfo rawFileInfo)
+        public int GetDiskFreeSpaceProxy(ref long rawFreeBytesAvailable, ref long rawTotalNumberOfBytes, ref long rawTotalNumberOfFreeBytes,
+                                         DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\nGetDiskFreeSpaceProxy");
+                Trace("\nGetDiskFreeSpaceProxy");
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
-                                                          out rawTotalNumberOfFreeBytes,
-                                                          rawFileInfo);
+                DokanResult result = operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes, out rawTotalNumberOfFreeBytes, rawFileInfo);
 
-                DbgPrint("\tFreeBytesAvailable :  " + rawFreeBytesAvailable);
-                DbgPrint("\tTotalNumberOfBytes :  " + rawTotalNumberOfBytes);
-                DbgPrint("\tTotalNumberOfFreeBytes :  " + rawTotalNumberOfFreeBytes);
-                DbgPrint("GetDiskFreeSpaceProxy Return :  " + result);
+                Trace("\tFreeBytesAvailable\t" + rawFreeBytesAvailable);
+                Trace("\tTotalNumberOfBytes\t" + rawTotalNumberOfBytes);
+                Trace("\tTotalNumberOfFreeBytes\t" + rawTotalNumberOfFreeBytes);
+                Trace("GetDiskFreeSpaceProxy Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("GetDiskFreeSpaceProxy Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("GetDiskFreeSpaceProxy Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
-        public int GetVolumeInformationProxy(StringBuilder rawVolumeNameBuffer,
-                                             uint rawVolumeNameSize,
-                                             ref uint rawVolumeSerialNumber,
-                                             ref uint rawMaximumComponentLength, ref FileSystemFeatures rawFileSystemFlags,
-                                             StringBuilder rawFileSystemNameBuffer,
-                                             uint rawFileSystemNameSize,
-                                             DokanFileInfo fileInfo)
+        public int GetVolumeInformationProxy(StringBuilder rawVolumeNameBuffer, uint rawVolumeNameSize,
+                                             ref uint rawVolumeSerialNumber, ref uint rawMaximumComponentLength, ref FileSystemFeatures rawFileSystemFlags,
+                                             StringBuilder rawFileSystemNameBuffer, uint rawFileSystemNameSize,
+                                             DokanFileInfo rawFileInfo)
         {
             rawMaximumComponentLength = 256;
-            rawVolumeSerialNumber = _serialNumber;
+            rawVolumeSerialNumber = serialNumber;
             string label;
             string name;
             try
             {
-                DbgPrint("\nGetVolumeInformationProxy");
-                DokanResult result = _operations.GetVolumeInformation(out label,
-                                                                 out rawFileSystemFlags, out name,
-                                                                 fileInfo);
+                Trace("\nGetVolumeInformationProxy");
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
+
+                DokanResult result = operations.GetVolumeInformation(out label, out rawFileSystemFlags, out name, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
@@ -877,25 +802,21 @@ namespace DokanNet
                     rawVolumeNameBuffer.Append(label);
                     rawFileSystemNameBuffer.Append(name);
 
-                    DbgPrint("\tVolumeNameBuffer :  " + rawVolumeNameBuffer);
-                    DbgPrint("\tFileSystemNameBuffer :  " + rawFileSystemNameBuffer);
-                    DbgPrint("\tVolumeSerialNumber :  " + rawVolumeSerialNumber);
-                    DbgPrint("\tFileSystemFlags :  " + rawFileSystemFlags);
+                    Trace("\tVolumeNameBuffer\t" + rawVolumeNameBuffer);
+                    Trace("\tFileSystemNameBuffer\t" + rawFileSystemNameBuffer);
+                    Trace("\tVolumeSerialNumber\t" + rawVolumeSerialNumber);
+                    Trace("\tFileSystemFlags\t" + rawFileSystemFlags);
                 }
 
-                DbgPrint("GetVolumeInformationProxy Return :  " + result);
+                Trace("GetVolumeInformationProxy Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("GetVolumeInformationProxy Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("GetVolumeInformationProxy Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
@@ -903,27 +824,25 @@ namespace DokanNet
         {
             try
             {
-                DbgPrint("\nUnmountProxy");
+                Trace("\nUnmountProxy");
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.Unmount(rawFileInfo);
+                DokanResult result = operations.Unmount(rawFileInfo);
 
-                DbgPrint("UnmountProxy Return :  " + result);
+                Trace("UnmountProxy Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("UnmountProxy Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("UnmountProxy Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
-        public int GetFileSecurityProxy(string rawFileName, ref SECURITY_INFORMATION rawRequestedInformation,
+        public int GetFileSecurityProxy(string rawFileName,
+                                        ref SECURITY_INFORMATION rawRequestedInformation,
                                         IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
                                         ref uint rawSecurityDescriptorLengthNeeded,
                                         DokanFileInfo rawFileInfo)
@@ -953,14 +872,15 @@ namespace DokanNet
             }
             try
             {
-                DbgPrint("\nGetFileSecurityProxy : " + rawFileName);
-                DbgPrint("\tFileSystemSecurity :  " + sect);
+                Trace("\nGetFileSecurityProxy : " + rawFileName);
+                Trace("\tFileSystemSecurity\t" + sect);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
+                DokanResult result = operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
                 if (result == DokanResult.Success /*&& sec != null*/)
                 {
                     Debug.Assert(sec != null);
-                    DbgPrint("\tFileSystemSecurity Result :  " + sec);
+                    Trace("\tFileSystemSecurity Result : " + sec);
                     var buffer = sec.GetSecurityDescriptorBinaryForm();
                     rawSecurityDescriptorLengthNeeded = (uint)buffer.Length;
                     if (buffer.Length > rawSecurityDescriptorLength)
@@ -969,27 +889,21 @@ namespace DokanNet
                     Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
                 }
 
-                DbgPrint("GetFileSecurityProxy : " + rawFileName + " Return :  " + result);
+                Trace("GetFileSecurityProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("GetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("GetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
-        public int SetFileSecurityProxy(
-            string rawFileName, ref SECURITY_INFORMATION rawSecurityInformation,
-            IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
-            DokanFileInfo rawFileInfo)
-
+        public int SetFileSecurityProxy(string rawFileName,
+                                        ref SECURITY_INFORMATION rawSecurityInformation, IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
+                                        DokanFileInfo rawFileInfo)
         {
             var sect = AccessControlSections.None;
             if (rawSecurityInformation.HasFlag(SECURITY_INFORMATION.OWNER_SECURITY_INFORMATION))
@@ -1019,61 +933,53 @@ namespace DokanNet
                 var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity)new DirectorySecurity() : new FileSecurity();
                 sec.SetSecurityDescriptorBinaryForm(buffer);
 
-                DbgPrint("\nSetFileSecurityProxy : " + rawFileName);
-                DbgPrint("\tAccessControlSections :  " + sect);
-                DbgPrint("\tFileSystemSecurity :  " + sec);
+                Trace("\nSetFileSecurityProxy : " + rawFileName);
+                Trace("\tAccessControlSections\t" + sect);
+                Trace("\tFileSystemSecurity\t" + sec);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                DokanResult result = _operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
+                DokanResult result = operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
 
-                DbgPrint("SetFileSecurityProxy : " + rawFileName + " Return :  " + result);
+                Trace("SetFileSecurityProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("SetFileSecurityProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("SetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
-        public int EnumerateNamedStreamsProxy(
-            string rawFileName,
-            IntPtr rawEnumContext,
-            StringBuilder rawStreamName,
-            ref uint rawStreamNameLength,
-            ref long rawStreamSize,
-            DokanFileInfo rawFileInfo)
+        public int EnumerateNamedStreamsProxy(string rawFileName,
+                                              IntPtr rawEnumContext,
+                                              StringBuilder rawStreamName, ref uint rawStreamNameLength,
+                                              ref long rawStreamSize,
+                                              DokanFileInfo rawFileInfo)
         {
             try
             {
-                DbgPrint("\tEnumerateNamedStreamsProxy : " + rawFileName);
+                Trace("\tEnumerateNamedStreamsProxy : " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
 
                 string name;
-                DokanResult result = _operations.EnumerateNamedStreams(rawFileName, rawEnumContext, out name, out rawStreamSize , rawFileInfo);
+                DokanResult result = operations.EnumerateNamedStreams(rawFileName, rawEnumContext, out name, out rawStreamSize, rawFileInfo);
                 if (result == DokanResult.Success)
                 {
                     rawStreamName.Append(name);
                     rawStreamNameLength = (uint)name.Length;
                 }
 
-                DbgPrint("EnumerateNamedStreamsProxy : " + rawFileName + " Return :  " + result);
+                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);
                 return (int)result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-#if DEBUG
-                DbgPrint("EnumerateNamedStreamsProxy : " + rawFileName + " Throw :  " + ex.Message);
-                throw ex;
-#else
-                return (int)DokanResult.FileNotFound;
-#endif
+                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
+                return (int)DokanResult.ExceptionInService;
             }
         }
 
