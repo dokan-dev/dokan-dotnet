@@ -297,7 +297,7 @@ namespace RegistoryFS
             try
             {
                 RFS rfs = new RFS();
-                rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput | DokanOptions.KeepAlive);
+                rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
                 Console.WriteLine("Success");
             }
             catch (DokanException ex)

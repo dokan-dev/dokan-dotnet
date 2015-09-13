@@ -10,7 +10,7 @@ namespace DokanNetMirror
             try
             {
                 Mirror mirror = new Mirror("C:");
-                mirror.Mount("n:\\", DokanOptions.DebugMode | DokanOptions.KeepAlive, 5);
+                mirror.Mount("n:\\", DokanOptions.DebugMode, 5);
 
                 Console.WriteLine("Success");
             }
