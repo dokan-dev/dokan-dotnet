@@ -7,5 +7,7 @@
         public const string Failure = "Failure";
 
         public const string Timing = "Timing";
+
+        public const string Manual = "Manual";
     }
 }

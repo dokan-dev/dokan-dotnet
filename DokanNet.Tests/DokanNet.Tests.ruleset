@@ -1,15 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="DokanNet.Tests" ToolsVersion="14.0">
-  <Include Path="basiccorrectnessrules.ruleset" Action="Default" />
+<RuleSet Name="Rules for DokanNet.Tests" Description="Code analysis rules for DokanNet.Tests.csproj." ToolsVersion="14.0">
   <Include Path="basicdesignguidelinerules.ruleset" Action="Default" />
-  <Include Path="extendedcorrectnessrules.ruleset" Action="Default" />
-  <Include Path="extendeddesignguidelinerules.ruleset" Action="Default" />
-  <Include Path="managedminimumrules.ruleset" Action="Default" />
-  <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
-    <Rule Id="CA1303" Action="None" />
-    <Rule Id="CA1704" Action="None" />
-    <Rule Id="CA1707" Action="None" />
-    <Rule Id="CA2204" Action="None" />
+    <Rule Id="CA1020" Action="Warning" />
+    <Rule Id="CA1021" Action="Warning" />
+    <Rule Id="CA1040" Action="Warning" />
+    <Rule Id="CA1045" Action="Warning" />
+    <Rule Id="CA1062" Action="Warning" />
+    <Rule Id="CA1501" Action="Warning" />
+    <Rule Id="CA1504" Action="Warning" />
+    <Rule Id="CA1505" Action="Warning" />
+    <Rule Id="CA1506" Action="Warning" />
+    <Rule Id="CA1700" Action="Warning" />
+    <Rule Id="CA1701" Action="Warning" />
+    <Rule Id="CA1702" Action="Warning" />
+    <Rule Id="CA1703" Action="Warning" />
+    <Rule Id="CA1709" Action="Warning" />
+    <Rule Id="CA1710" Action="Warning" />
+    <Rule Id="CA1711" Action="Warning" />
+    <Rule Id="CA1712" Action="Warning" />
+    <Rule Id="CA1713" Action="Warning" />
+    <Rule Id="CA1714" Action="Warning" />
+    <Rule Id="CA1715" Action="Warning" />
+    <Rule Id="CA1717" Action="Warning" />
+    <Rule Id="CA1719" Action="Warning" />
+    <Rule Id="CA1720" Action="Warning" />
+    <Rule Id="CA1721" Action="Warning" />
+    <Rule Id="CA1722" Action="Warning" />
+    <Rule Id="CA1724" Action="Warning" />
+    <Rule Id="CA1725" Action="Warning" />
+    <Rule Id="CA1726" Action="Warning" />
   </Rules>
 </RuleSet>

@@ -1,5 +1,7 @@
 # Dokan.NET Binding
 [![Build status](https://ci.appveyor.com/api/projects/status/w707j7xlu21jf3qa?svg=true)](https://ci.appveyor.com/project/Liryna/dokan-dotnet)
+[![NuGet downloads](https://img.shields.io/nuget/dt/DokanNet.svg)](https://www.nuget.org/packages/DokanNet)
+[![Version](https://img.shields.io/nuget/v/DokanNet.svg)](https://www.nuget.org/packages/DokanNet)
 
 ## What is Dokan.NET Binding
 By using Dokan library, you can create your own file systems very easily

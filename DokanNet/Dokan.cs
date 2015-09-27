@@ -6,7 +6,7 @@ namespace DokanNet
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 740; // ver 0.7.4
+        private const ushort DOKAN_VERSION = 800; // ver 0.7.4
         /*
         private const uint DOKAN_OPTION_DEBUG = 1;
         private const uint DOKAN_OPTION_STDERR = 2;
@@ -90,6 +90,7 @@ namespace DokanNet
                 Unmount = dokanOperationProxy.UnmountProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
+                EnumerateNamedStreams = dokanOperationProxy.EnumerateNamedStreamsProxy,
             };
 
             int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);

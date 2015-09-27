@@ -3,3 +3,4 @@
 *.nupkg
 bin
 obj
+packages

@@ -1,4 +1,4 @@
-version: 0.7.4-{build}
+version: 0.8.0-{build}
 configuration:
 - Release
 - Debug
@@ -13,12 +13,17 @@ install:
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
- 
+
 before_build:
   - nuget restore
 build:
   project: DokanNet.sln
   verbosity: minimal
+test:
+  categories:
+    except:
+      - Manual
+      - Timing
 notifications:
 - provider: Email
   to:

@@ -18,11 +18,12 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetAvailableFreeSpace_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -45,8 +46,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success), TestCategory(TestCategories.Manual)]
         public void GetDriveFormat_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -65,12 +65,12 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.DriveFormat);
 #else
             Assert.AreEqual(DokanOperationsFixture.FILESYSTEM_NAME, sut.DriveFormat, nameof(sut.DriveFormat));
+
             fixture.VerifyAll();
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetDriveType_CallsApiCorrectly()
         {
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -78,8 +78,7 @@ namespace DokanNet.Tests
             Assert.AreEqual(DriveType.Network, sut.DriveType, nameof(sut.DriveType));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetIsReady_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -102,8 +101,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetName_CallsApiCorrectly()
         {
             string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
@@ -113,8 +111,7 @@ namespace DokanNet.Tests
             Assert.AreEqual(path, sut.Name, nameof(sut.Name));
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetRootDirectory_CallsApiCorrectly()
         {
             string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
@@ -133,8 +130,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetTotalFreeSpace_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -157,8 +153,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetTotalSize_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -181,8 +176,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success), TestCategory(TestCategories.Manual)]
         public void GetVolumeLabel_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;

@@ -11,26 +11,44 @@ namespace DokanNet.Tests
     [TestClass]
     public sealed class FileInfoTest
     {
-        private byte[] source;
+        private static byte[] smallData;
+
+        private static byte[] largeData;
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            smallData = new byte[4096];
+            for (int i = 0; i < smallData.Length; ++i)
+                smallData[i] = (byte)(i % 256);
+
+            largeData = new byte[66560];
+            for (int i = 0; i < largeData.Length; ++i)
+                largeData[i] = (byte)(i % 251);
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            largeData = null;
+            smallData = null;
+        }
 
         [TestInitialize]
         public void Initialize()
         {
             DokanOperationsFixture.InitInstance();
-
-            source = new byte[4096];
-            for (int i = 0; i < source.Length; ++i)
-                source[i] = (byte)(i % 256);
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            DokanOperationsFixture.ClearInstance();
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetAttributes_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -67,8 +85,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetDirectory_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -87,8 +104,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetExists_WhereFileExists_ReturnsCorrectResult()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -110,8 +126,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         public void GetExists_WhereFileDoesNotExist_ReturnsCorrectResult()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -132,8 +147,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetExtension_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -152,8 +166,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetIsReadOnly_WhereFileIsReadOnly_ReturnsCorrectResult()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -175,8 +188,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetIsReadOnly_WhereFileIsReadWrite_ReturnsCorrectResult()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -198,8 +210,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void AppendText_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -226,9 +237,8 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
-        public void CopyTo_CallsApiCorrectly()
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void CopyTo_WhereSourceIsEmpty_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -255,8 +265,70 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath(),
+                destinationPath = DokanOperationsFixture.DestinationFileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: value.Length);
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupSetEndOfFile(destinationPath, value.Length);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, false);
+            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, false);
+            fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
+            fixture.SetupSetFileTime(destinationPath);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Manual)]
+        public void CopyTo_WhereSourceIsLargeFile_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath(),
+                destinationPath = DokanOperationsFixture.DestinationFileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
+            fixture.SetupReadFileInChunks(path, largeData, 4096, false);
+            fixture.SetupWriteFileInChunks(destinationPath, largeData, 4096, false);
+            fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
+            fixture.SetupSetFileTime(destinationPath);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void CopyTo_WhereSourceDoesNotExists_Throws()
         {
@@ -274,8 +346,7 @@ namespace DokanNet.Tests
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void CopyTo_WhereTargetExists_Throws()
         {
@@ -296,8 +367,7 @@ namespace DokanNet.Tests
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Create_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -323,8 +393,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void CreateText_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -350,8 +419,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Delete_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -374,8 +442,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         public void Delete_WhereFileDoesNotExists_IgnoresResult()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -396,25 +463,24 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void GetAccessControl_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName;
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path.AsRootedPath(), ReadAttributesPermissionsAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
-            fixture.SetupGetFileSecurity(path.AsRootedPath(), DokanOperationsFixture.DefaultFileSecurity);
+            fixture.SetupCreateFile(path, ReadAttributesPermissionsAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            fixture.SetupGetFileSecurity(path, DokanOperationsFixture.DefaultFileSecurity);
             fixture.SetupCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
             fixture.SetupGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity);
 #endif
 
-            var sut = new FileInfo(path.AsDriveBasedPath());
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
             var security = sut.GetAccessControl();
 
 #if !LOGONLY
@@ -424,9 +490,8 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
-        public void MoveTo_CallsApiCorrectly()
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -437,13 +502,12 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(path, destinationPath, false);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupCleanupFile(destinationPath);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
-
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenBlankDirectory();
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -455,8 +519,37 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string origin = Path.Combine(DokanOperationsFixture.DirectoryName, DokanOperationsFixture.FileName),
+                destination = Path.Combine(DokanOperationsFixture.DestinationDirectoryName, DokanOperationsFixture.DestinationFileName),
+                path = origin.AsRootedPath(),
+                destinationPath = destination.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
+            fixture.SetupMoveFile(path, destinationPath, false);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupCleanupFile(destinationPath);
+#endif
+
+            var sut = new FileInfo(origin.AsDriveBasedPath());
+
+            sut.MoveTo(destination.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void MoveTo_WhereSourceDoesNotExists_Throws()
         {
@@ -474,8 +567,7 @@ namespace DokanNet.Tests
             sut.MoveTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void MoveTo_WhereTargetExists_Throws()
         {
@@ -488,7 +580,11 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCleanupFile(destinationPath, isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -500,6 +596,7 @@ namespace DokanNet.Tests
         {
             foreach (var access in accessModes)
             {
+                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
                 using (var stream = info.Open(mode, access))
                 {
 #if !LOGONLY
@@ -508,9 +605,9 @@ namespace DokanNet.Tests
                     if (access.HasFlag(System.IO.FileAccess.Write))
                     {
                         Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                        stream.Write(source, 0, source.Length);
+                        stream.Write(smallData, 0, smallData.Length);
 #if !LOGONLY
-                        Assert.AreEqual(source.Length, stream.Position, "Unexpected write count");
+                        Assert.AreEqual(smallData.Length, stream.Position, "Unexpected write count");
 #endif
                     }
 
@@ -524,16 +621,14 @@ namespace DokanNet.Tests
                         int readBytes = stream.Read(target, 0, target.Length);
 #if !LOGONLY
                         Assert.AreEqual(target.Length, readBytes, "Unexpected read count");
-                        CollectionAssert.AreEquivalent(source, target, "Unexpected result content");
+                        CollectionAssert.AreEquivalent(smallData, target, "Unexpected result content");
 #endif
                     }
                 }
-                Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
             }
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsAppend_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -544,7 +639,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -557,8 +652,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsCreate_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -569,8 +663,8 @@ namespace DokanNet.Tests
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.Create);
-            fixture.SetupReadFile(path, source, source.Length);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupReadFile(path, smallData, smallData.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -583,8 +677,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsCreateNew_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -595,8 +688,8 @@ namespace DokanNet.Tests
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.CreateNew);
-            fixture.SetupReadFile(path, source, source.Length);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupReadFile(path, smallData, smallData.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -609,8 +702,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void Open_WhereFileModeIsCreateNew_AndFileExists_Throws()
         {
@@ -629,8 +721,7 @@ namespace DokanNet.Tests
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsOpen_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -641,8 +732,8 @@ namespace DokanNet.Tests
 #else
             foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.Open);
-            fixture.SetupReadFile(path, source, source.Length);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupReadFile(path, smallData, smallData.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -655,8 +746,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void Open_WhereFileModeIsOpen_AndFileDoesNotExists_Throws()
         {
@@ -675,8 +765,7 @@ namespace DokanNet.Tests
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsOpenOrCreate_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -688,8 +777,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate);
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.OpenOrCreate);
-            fixture.SetupReadFile(path, source, source.Length);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupReadFile(path, smallData, smallData.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -702,8 +791,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsTruncate_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -714,7 +802,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open);
             fixture.SetupSetAllocationSize(path, 0);
-            fixture.SetupWriteFile(path, source, source.Length);
+            fixture.SetupWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -727,8 +815,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -761,8 +848,152 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Timing)]
+        public void OpenRead_WithDelay_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenRead_WithDelay_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open);
+            fixture.SetupReadFileWithDelay(path, Encoding.UTF8.GetBytes(value), value.Length, DokanOperationsFixture.IODelay);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[value.Length];
+                int readBytes = stream.Read(target, 0, target.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
+                Assert.AreEqual(value, Encoding.UTF8.GetString(target), "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod,TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFile_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open);
+            fixture.SetupReadFileInChunks(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+                do
+                {
+                    int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                    Assert.IsTrue(readBytes > 0, "Unexpected empty read");
+                    totalReadBytes += readBytes;
+                } while (totalReadBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFileUsingContext_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, context: largeData);
+            fixture.SetupReadFileInChunksUsingContext(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+                do
+                {
+                    int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                    Assert.IsTrue(readBytes > 0, "Unexpected empty read");
+                    totalReadBytes += readBytes;
+                } while (totalReadBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupLockUnlockFile(path, 0, value.Length);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[value.Length];
+                stream.Lock(0, target.Length);
+                int readBytes = stream.Read(target, 0, target.Length);
+                stream.Unlock(0, target.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
+                Assert.AreEqual(value, Encoding.UTF8.GetString(target), "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenText_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -794,8 +1025,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -826,15 +1056,184 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
-        public void Replace_CallsApiCorrectly()
+        [TestMethod, TestCategory(TestCategories.Timing)]
+        public void OpenWrite_WithDelay_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_WithDelay_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFileWithDelay(path, Encoding.UTF8.GetBytes(value), value.Length, DokanOperationsFixture.IODelay);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFile_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFileInChunks(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                int totalWrittenBytes = 0;
+                do
+                {
+                    int writtenBytes = Math.Min(4096, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
+                    totalWrittenBytes += writtenBytes;
+                } while (totalWrittenBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFileUsingContext_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, context: largeData);
+            fixture.SetupWriteFileInChunksUsingContext(path, largeData, 4096);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                int totalWrittenBytes = 0;
+                do
+                {
+                    int writtenBytes = Math.Min(4096, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
+                    totalWrittenBytes += writtenBytes;
+                } while (totalWrittenBytes < largeData.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithFlush_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_WithFlush_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupFlushFileBuffers(path);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                stream.Flush(true);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupLockUnlockFile(path, 0, value.Length);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                stream.Lock(0, value.Length);
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+                stream.Unlock(0, value.Length);
+
+#if !LOGONLY
+                Assert.AreEqual(value.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void Replace_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
                 destinationPath = DokanOperationsFixture.DestinationFileName.AsRootedPath(),
-                destinationBackupPath = DokanOperationsFixture.RootedPath(DokanOperationsFixture.DestinationBackupFileName);
+                destinationBackupPath = DokanOperationsFixture.DestinationBackupFileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -846,17 +1245,16 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationBackupPath, /* This call is probably redundant. */true);
+            fixture.SetupCloseFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
             fixture.SetupMoveFile(path, destinationPath, true);
             fixture.SetupCleanupFile(destinationPath);
             // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupCleanupFile(destinationPath, /* This call is probably redundant. */true);
-
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenBlankDirectory();
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -868,8 +1266,49 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod]
-        [TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void Replace_WhereParentIsDirectory_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string origin = Path.Combine(DokanOperationsFixture.DirectoryName, DokanOperationsFixture.FileName),
+                destination = Path.Combine(DokanOperationsFixture.DestinationDirectoryName, DokanOperationsFixture.DestinationFileName),
+                destinationBackup = Path.Combine(DokanOperationsFixture.DestinationDirectoryName, DokanOperationsFixture.DestinationBackupFileName),
+                path = origin.AsRootedPath(),
+                destinationPath = destination.AsRootedPath(),
+                destinationBackupPath = destinationBackup.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(destinationPath, (FileAccess)18022539, ReadWriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
+            fixture.SetupGetFileInformation(path, FileAttributes.Normal);
+            fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
+            fixture.SetupSetFileTime(path);
+            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
+            fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
+            fixture.SetupCleanupFile(destinationBackupPath);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCloseFile(destinationBackupPath, /* This call is probably redundant. */isDirectory: true);
+            fixture.SetupMoveFile(path, destinationPath, true);
+            fixture.SetupCleanupFile(destinationPath);
+            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupCloseFile(destinationPath, /* This call is probably redundant. */isDirectory: true);
+#endif
+
+            var sut = new FileInfo(origin.AsDriveBasedPath());
+
+            sut.Replace(destination.AsDriveBasedPath(), destinationBackup.AsDriveBasedPath());
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void SetAccessControl_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
