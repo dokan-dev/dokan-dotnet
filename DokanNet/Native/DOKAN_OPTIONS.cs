@@ -12,5 +12,6 @@ namespace DokanNet.Native
 
         [MarshalAs(UnmanagedType.LPWStr)]
         public string MountPoint;
+        public uint Timeout;
     }
 }

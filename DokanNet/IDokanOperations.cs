@@ -7,63 +7,63 @@ namespace DokanNet
 {
     public interface IDokanOperations
     {
-        DokanResult CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
+        NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
                               FileOptions options, FileAttributes attributes, DokanFileInfo info);
 
-        DokanResult OpenDirectory(string fileName, DokanFileInfo info);
+        NtStatus OpenDirectory(string fileName, DokanFileInfo info);
 
-        DokanResult CreateDirectory(string fileName, DokanFileInfo info);
+        NtStatus CreateDirectory(string fileName, DokanFileInfo info);
 
-        DokanResult Cleanup(string fileName, DokanFileInfo info);
+        void Cleanup(string fileName, DokanFileInfo info);
 
-        DokanResult CloseFile(string fileName, DokanFileInfo info);
+        void CloseFile(string fileName, DokanFileInfo info);
 
-        DokanResult ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset,
+        NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset,
                             DokanFileInfo info);
 
-        DokanResult WriteFile(string fileName, byte[] buffer, out int bytesWritten,
+        NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten,
                              long offset, DokanFileInfo info);
 
-        DokanResult FlushFileBuffers(string fileName, DokanFileInfo info);
+        NtStatus FlushFileBuffers(string fileName, DokanFileInfo info);
 
-        DokanResult GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info);
+        NtStatus GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info);
 
-        DokanResult FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info);
+        NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info);
 
-        DokanResult SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info);
+        NtStatus SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info);
 
-        DokanResult SetFileTime(string fileName, DateTime? creationTime, DateTime? lastAccessTime,
+        NtStatus SetFileTime(string fileName, DateTime? creationTime, DateTime? lastAccessTime,
                                DateTime? lastWriteTime, DokanFileInfo info);
 
-        DokanResult DeleteFile(string fileName, DokanFileInfo info);
+        NtStatus DeleteFile(string fileName, DokanFileInfo info);
 
-        DokanResult DeleteDirectory(string fileName, DokanFileInfo info);
+        NtStatus DeleteDirectory(string fileName, DokanFileInfo info);
 
-        DokanResult MoveFile(string oldName, string newName, bool replace, DokanFileInfo info);
+        NtStatus MoveFile(string oldName, string newName, bool replace, DokanFileInfo info);
 
-        DokanResult SetEndOfFile(string fileName, long length, DokanFileInfo info);
+        NtStatus SetEndOfFile(string fileName, long length, DokanFileInfo info);
 
-        DokanResult SetAllocationSize(string fileName, long length, DokanFileInfo info);
+        NtStatus SetAllocationSize(string fileName, long length, DokanFileInfo info);
 
-        DokanResult LockFile(string fileName, long offset, long length, DokanFileInfo info);
+        NtStatus LockFile(string fileName, long offset, long length, DokanFileInfo info);
 
-        DokanResult UnlockFile(string fileName, long offset, long length, DokanFileInfo info);
+        NtStatus UnlockFile(string fileName, long offset, long length, DokanFileInfo info);
 
-        DokanResult GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes,
+        NtStatus GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes,
                                     DokanFileInfo info);
 
-        DokanResult GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
+        NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
                                         out string fileSystemName, DokanFileInfo info);
 
-        DokanResult GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
+        NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
                                    DokanFileInfo info);
 
-        DokanResult SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
+        NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
                                    DokanFileInfo info);
 
-        DokanResult Unmount(DokanFileInfo info);
+        NtStatus Unmount(DokanFileInfo info);
 
-        DokanResult EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize,
+        NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize,
             DokanFileInfo info);
     }
 }
