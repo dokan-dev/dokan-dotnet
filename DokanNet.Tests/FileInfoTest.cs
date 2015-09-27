@@ -135,7 +135,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameNotFound);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -338,7 +338,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameNotFound);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -359,7 +359,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
+            fixture.SetupCreateFileWithError(destinationPath, NtStatus.ObjectNameCollision);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -451,7 +451,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameNotFound);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -559,7 +559,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameNotFound);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -580,7 +580,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, NtStatus.ObjectNameCollision);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             // WARNING: This is probably an error in the Dokan driver!
@@ -712,7 +712,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileExists);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameCollision);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -756,7 +756,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.SetupCreateFileWithError(path, NtStatus.ObjectNameNotFound);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
