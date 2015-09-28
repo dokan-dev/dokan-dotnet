@@ -3,7 +3,7 @@
 namespace DokanNet
 {
     [Flags]
-    public enum FileSystemFeatures : long
+    public enum FileSystemFeatures : uint
     {
         None = 0,
         CaseSensitiveSearch = 1,
