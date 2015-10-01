@@ -1074,7 +1074,7 @@ namespace DokanNet.Tests
             long streamSize = streamName.Length;
             operations
                 .Setup(d => d.EnumerateNamedStreams(path, It.IsAny<IntPtr>(), out streamName, out streamSize, It.IsAny<DokanFileInfo>()))
-                .Returns(NtStatus.Success)
+                .Returns(NtStatus.NotImplemented)
                 .Callback((string fileName, IntPtr _enumContext, string _streamName, long _streamSize, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.EnumerateNamedStreams)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_enumContext}, out {_streamName}, out {_streamSize}, {info.Log()})"));
         }
