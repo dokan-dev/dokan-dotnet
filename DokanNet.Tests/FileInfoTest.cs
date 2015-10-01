@@ -1243,14 +1243,13 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
             fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupCreateFile(path, SetOwnershipAccess, WriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupEnumerateNamedStreams(destinationPath, string.Empty);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
@@ -1287,14 +1286,13 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
             fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupCreateFile(path, SetOwnershipAccess, WriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupEnumerateNamedStreams(destinationPath, string.Empty);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);
