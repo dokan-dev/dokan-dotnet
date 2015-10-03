@@ -25,6 +25,8 @@ namespace DokanNet.Tests
 
             private delegate TResult FuncOut123<T1, T2, T3, in T4, out TResult>(out T1 arg1, out T2 arg2, out T3 arg3, T4 arg4);
 
+            private delegate TResult FuncOut23<in T1, in T2, T3, T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, out T4 arg4, T5 arg5);
+
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
@@ -217,6 +219,32 @@ namespace DokanNet.Tests
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
+            private NtStatus TryExecute<TIn, TOut1, TOut2>(string fileName, TIn argIn, out TOut1 argOut1, out TOut2 argOut2, DokanFileInfo info, FuncOut23<string, TIn, TOut1, TOut2, DokanFileInfo, NtStatus> func, string funcName)
+            {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    return NtStatus.AccessDenied;
+                }
+
+                try
+                {
+                    return func(fileName, argIn, out argOut1, out argOut2, info);
+                }
+                catch (Exception ex)
+                {
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    if (ex is MockException)
+                        HasUnmatchedInvocations = true;
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    return NtStatus.InvalidParameter;
+                }
+            }
+
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+                Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut1, TOut2, TOut3>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
@@ -261,12 +289,7 @@ namespace DokanNet.Tests
                 => TryExecute(fileName, info, (f, i) => Target.DeleteFile(f, i), nameof(DeleteFile));
 
             public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
-            {
-                streamName = string.Empty;
-                streamSize = 0;
-                Trace($"{nameof(EnumerateNamedStreams)} (\"{fileName}\", {enumContext}) -> {NtStatus.NotImplemented}");
-                return NtStatus.NotImplemented;
-            }
+                => TryExecute(fileName, enumContext, out streamName, out streamSize, info, (string f, IntPtr e, out string sn, out long ss, DokanFileInfo i) => Target.EnumerateNamedStreams(f, e, out sn, out ss, i), nameof(EnumerateNamedStreams));
 
             public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
                 => TryExecute(fileName, out files, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindFiles(f, out o, i), nameof(FindFiles));
@@ -883,11 +906,13 @@ namespace DokanNet.Tests
 
         internal void SetupReadFileInChunks(string path, byte[] buffer, int chunkSize, bool synchronousIo = true)
         {
-            for (int offset = 0; offset < buffer.Length; offset += chunkSize)
+            var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
+            for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
+                offsets[index] = offset;
                 int bytesRead = Math.Min(chunkSize, buffer.Length - offset);
                 operations
-                    .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, offset, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                    .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, offsets[index], It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(NtStatus.Success)
                     .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                         =>
@@ -936,12 +961,14 @@ namespace DokanNet.Tests
 
         internal void SetupWriteFileInChunks(string path, byte[] buffer, int chunkSize, bool synchronousIo = true)
         {
-            for (int offset = 0; offset < buffer.Length; offset += chunkSize)
+            var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
+            for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
+                offsets[index] = offset;
                 int bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
                 var chunk = buffer.Skip(offset).Take(bytesWritten);
                 operations
-                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offset, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(NtStatus.Success)
                     .Callback((string fileName, byte[] _buffer, int _bytesWritten, long _offset, DokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {_offset}, {info.Log()})"));
@@ -1040,6 +1067,16 @@ namespace DokanNet.Tests
                 .Returns(NtStatus.Success)
                 .Callback((string fileName, FileSystemSecurity _security, AccessControlSections access, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.SetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_security.AsString()}, {access}, {info.Log()})"));
+        }
+
+        internal void SetupEnumerateNamedStreams(string path, string streamName)
+        {
+            long streamSize = streamName.Length;
+            operations
+                .Setup(d => d.EnumerateNamedStreams(path, It.IsAny<IntPtr>(), out streamName, out streamSize, It.IsAny<DokanFileInfo>()))
+                .Returns(NtStatus.NotImplemented)
+                .Callback((string fileName, IntPtr _enumContext, string _streamName, long _streamSize, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.EnumerateNamedStreams)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_enumContext}, out {_streamName}, out {_streamSize}, {info.Log()})"));
         }
 
         internal void VerifyAll()

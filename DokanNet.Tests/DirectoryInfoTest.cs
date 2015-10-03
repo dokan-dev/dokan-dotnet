@@ -847,14 +847,11 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path.AsRootedPath(), ChangePermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Directory);
             fixture.SetupGetFileSecurity(path.AsRootedPath(), DokanOperationsFixture.DefaultDirectorySecurity);
+            fixture.SetupOpenDirectory(path.AsRootedPath());
             fixture.SetupSetFileSecurity(path.AsRootedPath(), security);
             fixture.SetupCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
             fixture.SetupGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity, AccessControlSections.Access);
-
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenDirectory(path.AsRootedPath() + Path.DirectorySeparatorChar);
-            fixture.SetupGetFileInformation(path.AsRootedPath() + Path.DirectorySeparatorChar, FileAttributes.Directory);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
