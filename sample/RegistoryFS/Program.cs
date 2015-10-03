@@ -139,6 +139,8 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             fileinfo = new FileInformation();
+            fileinfo.FileName = filename;
+
             if (filename == "\\")
             {
                 fileinfo.Attributes = System.IO.FileAttributes.Directory;
