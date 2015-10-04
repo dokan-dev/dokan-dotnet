@@ -106,23 +106,23 @@ namespace DokanNetMirror
                             info.Context = new object();
                             // must set it to someting if you return DokanError.Success
 
-                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.Success);
+                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
                         }
                     }
                     else
                     {
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.ObjectNameNotFound);
+                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
                     }
                     break;
 
                 case FileMode.CreateNew:
                     if (pathExists)
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.ObjectNameCollision);
+                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
                     break;
 
                 case FileMode.Truncate:
                     if (!pathExists)
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.ObjectNameNotFound);
+                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
                     break;
 
                 default:
@@ -135,10 +135,10 @@ namespace DokanNetMirror
             }
             catch (UnauthorizedAccessException) // don't have access rights
             {
-                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.AccessDenied);
+                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
             }
 
-            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.Success);
+            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
         }
 
         public NtStatus OpenDirectory(string fileName, DokanFileInfo info)
@@ -146,7 +146,7 @@ namespace DokanNetMirror
             string path = GetPath(fileName);
             if (!Directory.Exists(path))
             {
-                return Trace("OpenDirectory", fileName, info, NtStatus.ObjectPathNotFound);
+                return Trace("OpenDirectory", fileName, info, DokanResult.PathNotFound);
             }
 
             try
@@ -155,24 +155,24 @@ namespace DokanNetMirror
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace("OpenDirectory", fileName, info, NtStatus.AccessDenied);
+                return Trace("OpenDirectory", fileName, info, DokanResult.AccessDenied);
             }
-            return Trace("OpenDirectory", fileName, info, NtStatus.Success);
+            return Trace("OpenDirectory", fileName, info, DokanResult.Success);
         }
 
         public NtStatus CreateDirectory(string fileName, DokanFileInfo info)
         {
             if (Directory.Exists(GetPath(fileName)))
-                return Trace("CreateDirectory", fileName, info, NtStatus.ObjectNameCollision);
+                return Trace("CreateDirectory", fileName, info, DokanResult.FileExists);
 
             try
             {
                 Directory.CreateDirectory(GetPath(fileName));
-                return Trace("CreateDirectory", fileName, info, NtStatus.Success);
+                return Trace("CreateDirectory", fileName, info, DokanResult.Success);
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace("CreateDirectory", fileName, info, NtStatus.AccessDenied);
+                return Trace("CreateDirectory", fileName, info, DokanResult.AccessDenied);
             }
         }
 
@@ -201,7 +201,7 @@ namespace DokanNetMirror
                     File.Delete(GetPath(fileName));
                 }
             }
-            Trace("Cleanup", fileName, info, NtStatus.Success);
+            Trace("Cleanup", fileName, info, DokanResult.Success);
         }
 
         public void CloseFile(string fileName, DokanFileInfo info)
@@ -217,7 +217,7 @@ namespace DokanNetMirror
                 (info.Context as FileStream).Dispose();
             }
             info.Context = null;
-            Trace("CloseFile", fileName, info, NtStatus.Success); // could recreate cleanup code here but this is not called sometimes
+            Trace("CloseFile", fileName, info, DokanResult.Success); // could recreate cleanup code here but this is not called sometimes
         }
 
         public NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info)
@@ -236,7 +236,7 @@ namespace DokanNetMirror
                 stream.Position = offset;
                 bytesRead = stream.Read(buffer, 0, buffer.Length);
             }
-            return Trace("ReadFile", fileName, info, NtStatus.Success, "out " + bytesRead.ToString(), offset.ToString(CultureInfo.InvariantCulture));
+            return Trace("ReadFile", fileName, info, DokanResult.Success, "out " + bytesRead.ToString(), offset.ToString(CultureInfo.InvariantCulture));
         }
 
         public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, DokanFileInfo info)
@@ -256,7 +256,7 @@ namespace DokanNetMirror
                 stream.Write(buffer, 0, buffer.Length);
                 bytesWritten = buffer.Length;
             }
-            return Trace("WriteFile", fileName, info, NtStatus.Success, "out " + bytesWritten.ToString(), offset.ToString(CultureInfo.InvariantCulture));
+            return Trace("WriteFile", fileName, info, DokanResult.Success, "out " + bytesWritten.ToString(), offset.ToString(CultureInfo.InvariantCulture));
         }
 
         public NtStatus FlushFileBuffers(string fileName, DokanFileInfo info)
@@ -264,11 +264,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).Flush();
-                return Trace("FlushFileBuffers", fileName, info, NtStatus.Success);
+                return Trace("FlushFileBuffers", fileName, info, DokanResult.Success);
             }
             catch (IOException)
             {
-                return Trace("FlushFileBuffers", fileName, info, NtStatus.DiskFull);
+                return Trace("FlushFileBuffers", fileName, info, DokanResult.DiskFull);
             }
         }
 
@@ -289,7 +289,7 @@ namespace DokanNetMirror
                 LastWriteTime = finfo.LastWriteTime,
                 Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
             };
-            return Trace("GetFileInformation", fileName, info, NtStatus.Success);
+            return Trace("GetFileInformation", fileName, info, DokanResult.Success);
         }
 
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
@@ -306,7 +306,7 @@ namespace DokanNetMirror
                     FileName = finfo.Name
                 }).ToArray();
 
-            return Trace("FindFiles", fileName, info, NtStatus.Success);
+            return Trace("FindFiles", fileName, info, DokanResult.Success);
         }
 
         public NtStatus SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info)
@@ -314,19 +314,19 @@ namespace DokanNetMirror
             try
             {
                 File.SetAttributes(GetPath(fileName), attributes);
-                return Trace("SetFileAttributes", fileName, info, NtStatus.Success, attributes.ToString());
+                return Trace("SetFileAttributes", fileName, info, DokanResult.Success, attributes.ToString());
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace("SetFileAttributes", fileName, info, NtStatus.AccessDenied, attributes.ToString());
+                return Trace("SetFileAttributes", fileName, info, DokanResult.AccessDenied, attributes.ToString());
             }
             catch (FileNotFoundException)
             {
-                return Trace("SetFileAttributes", fileName, info, NtStatus.ObjectNameNotFound, attributes.ToString());
+                return Trace("SetFileAttributes", fileName, info, DokanResult.FileNotFound, attributes.ToString());
             }
             catch (DirectoryNotFoundException)
             {
-                return Trace("SetFileAttributes", fileName, info, NtStatus.ObjectPathNotFound, attributes.ToString());
+                return Trace("SetFileAttributes", fileName, info, DokanResult.PathNotFound, attributes.ToString());
             }
         }
 
@@ -344,27 +344,27 @@ namespace DokanNetMirror
                 if (lastWriteTime.HasValue)
                     File.SetLastWriteTime(path, lastWriteTime.Value);
 
-                return Trace("SetFileTime", fileName, info, NtStatus.Success, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace("SetFileTime", fileName, info, DokanResult.Success, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace("SetFileTime", fileName, info, NtStatus.AccessDenied, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace("SetFileTime", fileName, info, DokanResult.AccessDenied, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
             }
             catch (FileNotFoundException)
             {
-                return Trace("SetFileTime", fileName, info, NtStatus.ObjectNameNotFound, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace("SetFileTime", fileName, info, DokanResult.FileNotFound, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
             }
         }
 
         public NtStatus DeleteFile(string fileName, DokanFileInfo info)
         {
-            return Trace("DeleteFile", fileName, info, File.Exists(GetPath(fileName)) ? NtStatus.Success : NtStatus.ObjectNameNotFound);
+            return Trace("DeleteFile", fileName, info, File.Exists(GetPath(fileName)) ? DokanResult.Success : DokanResult.FileNotFound);
             // we just check here if we could delete the file - the true deletion is in Cleanup
         }
 
         public NtStatus DeleteDirectory(string fileName, DokanFileInfo info)
         {
-            return Trace("DeleteDirectory", fileName, info, Directory.EnumerateFileSystemEntries(GetPath(fileName)).Any() ? NtStatus.DirectoryNotEmpty : NtStatus.Success);
+            return Trace("DeleteDirectory", fileName, info, Directory.EnumerateFileSystemEntries(GetPath(fileName)).Any() ? DokanResult.DirectoryNotEmpty : DokanResult.Success);
             // if dir is not empty it can't be deleted
         }
 
@@ -377,7 +377,7 @@ namespace DokanNetMirror
                 info.Context = null;
 
                 File.Move(oldpath, newpath);
-                return Trace("MoveFile", oldName, info, NtStatus.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
+                return Trace("MoveFile", oldName, info, DokanResult.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
             }
             else if (replace)
             {
@@ -386,9 +386,9 @@ namespace DokanNetMirror
                 if (!info.IsDirectory)
                     File.Delete(newpath);
                 File.Move(oldpath, newpath);
-                return Trace("MoveFile", oldName, info, NtStatus.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
+                return Trace("MoveFile", oldName, info, DokanResult.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
             }
-            return Trace("MoveFile", oldName, info, NtStatus.ObjectNameCollision, newName, replace.ToString(CultureInfo.InvariantCulture));
+            return Trace("MoveFile", oldName, info, DokanResult.FileExists, newName, replace.ToString(CultureInfo.InvariantCulture));
         }
 
         public NtStatus SetEndOfFile(string fileName, long length, DokanFileInfo info)
@@ -396,11 +396,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).SetLength(length);
-                return Trace("SetEndOfFile", fileName, info, NtStatus.Success, length.ToString(CultureInfo.InvariantCulture));
+                return Trace("SetEndOfFile", fileName, info, DokanResult.Success, length.ToString(CultureInfo.InvariantCulture));
             }
             catch (IOException)
             {
-                return Trace("SetEndOfFile", fileName, info, NtStatus.DiskFull, length.ToString(CultureInfo.InvariantCulture));
+                return Trace("SetEndOfFile", fileName, info, DokanResult.DiskFull, length.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -409,11 +409,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).SetLength(length);
-                return Trace("SetAllocationSize", fileName, info, NtStatus.Success, length.ToString(CultureInfo.InvariantCulture));
+                return Trace("SetAllocationSize", fileName, info, DokanResult.Success, length.ToString(CultureInfo.InvariantCulture));
             }
             catch (IOException)
             {
-                return Trace("SetAllocationSize", fileName, info, NtStatus.DiskFull, length.ToString(CultureInfo.InvariantCulture));
+                return Trace("SetAllocationSize", fileName, info, DokanResult.DiskFull, length.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -422,11 +422,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).Lock(offset, length);
-                return Trace("LockFile", fileName, info, NtStatus.Success, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
+                return Trace("LockFile", fileName, info, DokanResult.Success, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
             catch (IOException)
             {
-                return Trace("LockFile", fileName, info, NtStatus.AccessDenied, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
+                return Trace("LockFile", fileName, info, DokanResult.AccessDenied, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -435,11 +435,11 @@ namespace DokanNetMirror
             try
             {
                 ((FileStream)(info.Context)).Unlock(offset, length);
-                return Trace("UnlockFile", fileName, info, NtStatus.Success, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
+                return Trace("UnlockFile", fileName, info, DokanResult.Success, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
             catch (IOException)
             {
-                return Trace("UnlockFile", fileName, info, NtStatus.AccessDenied, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
+                return Trace("UnlockFile", fileName, info, DokanResult.AccessDenied, offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -450,7 +450,7 @@ namespace DokanNetMirror
             used = dinfo.AvailableFreeSpace;
             total = dinfo.TotalSize;
             free = dinfo.TotalFreeSpace;
-            return Trace("GetDiskFreeSpace", null, info, NtStatus.Success, "out " + free.ToString(), "out " + total.ToString(), "out " + used.ToString());
+            return Trace("GetDiskFreeSpace", null, info, DokanResult.Success, "out " + free.ToString(), "out " + total.ToString(), "out " + used.ToString());
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
@@ -463,7 +463,7 @@ namespace DokanNetMirror
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |
                        FileSystemFeatures.UnicodeOnDisk;
 
-            return Trace("GetVolumeInformation", null, info, NtStatus.Success, "out " + volumeLabel, "out " + features.ToString(), "out " + fileSystemName);
+            return Trace("GetVolumeInformation", null, info, DokanResult.Success, "out " + volumeLabel, "out " + features.ToString(), "out " + fileSystemName);
         }
 
         public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections, DokanFileInfo info)
@@ -473,12 +473,12 @@ namespace DokanNetMirror
                 security = info.IsDirectory
                                ? (FileSystemSecurity)Directory.GetAccessControl(GetPath(fileName))
                                : File.GetAccessControl(GetPath(fileName));
-                return Trace("GetFileSecurity", fileName, info, NtStatus.Success, sections.ToString());
+                return Trace("GetFileSecurity", fileName, info, DokanResult.Success, sections.ToString());
             }
             catch (UnauthorizedAccessException)
             {
                 security = null;
-                return Trace("GetFileSecurity", fileName, info, NtStatus.AccessDenied, sections.ToString());
+                return Trace("GetFileSecurity", fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
         }
 
@@ -494,24 +494,24 @@ namespace DokanNetMirror
                 {
                     File.SetAccessControl(GetPath(fileName), (FileSecurity)security);
                 }
-                return Trace("SetFileSecurity", fileName, info, NtStatus.Success, sections.ToString());
+                return Trace("SetFileSecurity", fileName, info, DokanResult.Success, sections.ToString());
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace("SetFileSecurity", fileName, info, NtStatus.AccessDenied, sections.ToString());
+                return Trace("SetFileSecurity", fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
         }
 
         public NtStatus Unmount(DokanFileInfo info)
         {
-            return Trace("Unmount", null, info, NtStatus.Success);
+            return Trace("Unmount", null, info, DokanResult.Success);
         }
 
         public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
             streamName = String.Empty;
             streamSize = 0;
-            return Trace("EnumerateNamedStreams", fileName, info, NtStatus.Error, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.Error, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
         }
 
         #endregion Implementation of IDokanOperations
