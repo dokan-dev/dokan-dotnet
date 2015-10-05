@@ -372,11 +372,20 @@ namespace DokanNetMirror
         {
             string oldpath = GetPath(oldName);
             string newpath = GetPath(newName);
-            if (!File.Exists(newpath))
+
+            bool exist = false;
+            if (info.IsDirectory)
+                exist = Directory.Exists(newpath);
+            else
+                exist = File.Exists(newpath);
+
+            if (!exist)
             {
                 info.Context = null;
-
-                File.Move(oldpath, newpath);
+                if (info.IsDirectory)
+                    Directory.Move(oldpath, newpath);
+                else
+                    File.Move(oldpath, newpath);
                 return Trace("MoveFile", oldName, info, DokanResult.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
             }
             else if (replace)
@@ -385,7 +394,13 @@ namespace DokanNetMirror
 
                 if (!info.IsDirectory)
                     File.Delete(newpath);
-                File.Move(oldpath, newpath);
+                else
+                    Directory.Delete(newpath, true);
+
+                if (info.IsDirectory)
+                    Directory.Move(oldpath, newpath);
+                else
+                    File.Move(oldpath, newpath);
                 return Trace("MoveFile", oldName, info, DokanResult.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
             }
             return Trace("MoveFile", oldName, info, DokanResult.FileExists, newName, replace.ToString(CultureInfo.InvariantCulture));
