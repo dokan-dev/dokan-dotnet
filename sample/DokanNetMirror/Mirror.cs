@@ -526,7 +526,7 @@ namespace DokanNetMirror
         {
             streamName = String.Empty;
             streamSize = 0;
-            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.Error, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
         }
 
         #endregion Implementation of IDokanOperations
