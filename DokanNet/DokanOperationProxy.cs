@@ -150,7 +150,7 @@ namespace DokanNet
         {
 #if TRACE
             Console.WriteLine(message);
-            Thread.Sleep(500):
+            Thread.Sleep(500);
 #endif
         }
 
