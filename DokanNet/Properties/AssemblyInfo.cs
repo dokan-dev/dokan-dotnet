@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 //
 
 [assembly: AssemblyTitle("DokanNet")]
-[assembly: AssemblyDescription(".NET wraper for dokan - user mode filesystem")]
+[assembly: AssemblyDescription(".NET wrapper for dokan - user mode filesystem")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DokanNet")]
