@@ -9,7 +9,7 @@
         <projectUrl>https://github.com/dokan-dev/dokan-dotnet</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>DotNet Wrapper for Dokan, user mode file system for windows</description>
-        <copyright>Copyright (C)  2007</copyright>
+        <copyright>Copyright (C) 2015</copyright>
     </metadata>
     <files>
         <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
