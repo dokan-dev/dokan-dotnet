@@ -11,6 +11,7 @@ using static DokanNet.Tests.FileSettings;
 
 namespace DokanNet.Tests
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
     internal sealed class DokanOperationsFixture
     {
         private class Proxy : IDokanOperations
