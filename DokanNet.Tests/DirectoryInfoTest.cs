@@ -219,7 +219,7 @@ namespace DokanNet.Tests
             fixture.SetupFindFiles(DokanOperationsFixture.RootName, new[] {
                 new FileInformation() { FileName = path, Attributes = FileAttributes.Normal, Length = 0, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             });
-            fixture.SetupCreateDirectoryWithError(path.AsRootedPath(), DokanResult.AlreadyExists);
+            fixture.SetupCreateDirectoryWithError(path.AsRootedPath(), DokanResult.FileExists);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -299,7 +299,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
             fixture.SetupCreateFile(basePath.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(basePath.AsRootedPath(), FileAttributes.Directory);
-            fixture.SetupCreateDirectoryWithError(path.AsRootedPath(), DokanResult.AlreadyExists);
+            fixture.SetupCreateDirectoryWithError(path.AsRootedPath(), DokanResult.FileExists);
 #endif
 
             var sut = new DirectoryInfo(basePath.AsDriveBasedPath());
@@ -442,6 +442,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetDirectories_OnSubDirectory_CallsApiCorrectly()
         {
@@ -528,6 +529,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetFiles_OnSubDirectory_CallsApiCorrectly()
         {
@@ -614,6 +616,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetFileSystemInfos_OnSubDirectory_CallsApiCorrectly()
         {
@@ -756,6 +759,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
@@ -817,10 +821,10 @@ namespace DokanNet.Tests
     #else
             fixture.SetupCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
-            fixture.SetupCreateFileWithError(destinationPath, DokanResult.AlreadyExists);
+            fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
-            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.AlreadyExists);
+            fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.FileExists);
             fixture.SetupCleanupFile(destinationPath, isDirectory: true);
 #endif
 
@@ -847,14 +851,11 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path.AsRootedPath(), ChangePermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Directory);
             fixture.SetupGetFileSecurity(path.AsRootedPath(), DokanOperationsFixture.DefaultDirectorySecurity);
+            fixture.SetupOpenDirectory(path.AsRootedPath());
             fixture.SetupSetFileSecurity(path.AsRootedPath(), security);
             fixture.SetupCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
             fixture.SetupGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity, AccessControlSections.Access);
-
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.SetupOpenDirectory(path.AsRootedPath() + Path.DirectorySeparatorChar);
-            fixture.SetupGetFileInformation(path.AsRootedPath() + Path.DirectorySeparatorChar, FileAttributes.Directory);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());

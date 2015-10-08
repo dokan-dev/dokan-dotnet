@@ -1,95 +1,113 @@
-﻿namespace DokanNet
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace DokanNet
 {
     /// <summary>
     /// Defines result status codes for Dokan operations.
     /// </summary>
-    public enum DokanResult : long
+    public static class DokanResult
     {
         /// <summary>
         /// The operation completed successfully.
         /// </summary>
-        Success = 0,
+        public const NtStatus Success = NtStatus.Success;
 
         /// <summary>
         /// Incorrect function.
         /// </summary>
-        Error = -1,
+        public const NtStatus Error = NtStatus.Error;
 
         /// <summary>
         /// The system cannot find the file specified.
         /// </summary>
-        FileNotFound = -2,
+        public const NtStatus FileNotFound = NtStatus.ObjectNameNotFound;
 
         /// <summary>
         /// The system cannot find the path specified.
         /// </summary>
-        PathNotFound = -3,
+        public const NtStatus PathNotFound = NtStatus.ObjectPathNotFound;
 
         /// <summary>
         /// Access is denied.
         /// </summary>
-        AccessDenied = -5,
+        public const NtStatus AccessDenied = NtStatus.AccessDenied;
 
         /// <summary>
         /// The handle is invalid.
         /// </summary>
-        InvalidHandle = -6,
+        public const NtStatus InvalidHandle = NtStatus.InvalidHandle;
 
         /// <summary>
         /// The device is not ready.
         /// </summary>
-        NotReady = -21,
+        public const NtStatus NotReady = NtStatus.DeviceBusy;
 
         /// <summary>
         /// The process cannot access the file because it is being used by another process.
         /// </summary>
-        SharingViolation = -32,
+        public const NtStatus SharingViolation = NtStatus.SharingViolation;
 
         /// <summary>
         /// The file exists.
         /// </summary>
-        FileExists = -80,
+        public const NtStatus FileExists = NtStatus.ObjectNameCollision;
 
         /// <summary>
         /// There is not enough space on the disk.
         /// </summary>
-        DiskFull = -112,
+        public const NtStatus DiskFull = NtStatus.DiskFull;
 
         /// <summary>
         /// This function is not supported on this system.
         /// </summary>
-        NotImplemented = -120,
+        public const NtStatus NotImplemented = NtStatus.NotImplemented;
 
         /// <summary>
         /// The data area passed to a system call is too small.
         /// </summary>
-        InsufficientBuffer = -122,
+        public const NtStatus BufferTooSmall = NtStatus.BufferTooSmall;
+
+        /// <summary>
+        /// The data area passed to a system call is too small.
+        /// </summary>
+        public const NtStatus BufferOverflow = NtStatus.BufferOverflow;
 
         /// <summary>
         /// The filename, directory name, or volume label syntax is incorrect.
         /// </summary>
-        InvalidName = -123,
+        public const NtStatus InvalidName = NtStatus.ObjectNameInvalid;
 
         /// <summary>
         /// The directory is not empty.
         /// </summary>
-        DirNotEmpty = -145,
+        public const NtStatus DirectoryNotEmpty = NtStatus.DirectoryNotEmpty;
 
         /// <summary>
         /// Cannot create a file when that file already exists.
         /// </summary>
-        AlreadyExists = -183,
+        public const NtStatus AlreadyExists = NtStatus.ObjectNameCollision;
 
         /// <summary>
         /// An exception occurred in the service when handling the control request.
         /// </summary>
-        ExceptionInService = -1064,
+        public const NtStatus InternalError = NtStatus.InternalError;
 
         /// <summary>
         /// A required privilege is not held by the client.
         /// </summary>
-        PrivilegeNotHeld = -1314,
+        public const NtStatus PrivilegeNotHeld = NtStatus.PrivilegeNotHeld;
 
-        Undefined = int.MaxValue
+        /// <summary>
+        /// The requested operation was unsuccessful.
+        /// </summary>
+        public const NtStatus Unsuccessful = NtStatus.Unsuccessful;
+
+        /// <summary>
+        /// The parameter is incorrect.
+        /// </summary>
+        public const NtStatus InvalidParameter = NtStatus.InvalidParameter;
     }
 }
