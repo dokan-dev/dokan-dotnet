@@ -442,6 +442,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetDirectories_OnSubDirectory_CallsApiCorrectly()
         {
@@ -528,6 +529,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetFiles_OnSubDirectory_CallsApiCorrectly()
         {
@@ -614,6 +616,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetFileSystemInfos_OnSubDirectory_CallsApiCorrectly()
         {
@@ -756,6 +759,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
