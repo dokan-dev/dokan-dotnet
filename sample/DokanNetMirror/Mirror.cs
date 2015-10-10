@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using FileAccess = DokanNet.FileAccess;
 
@@ -525,19 +524,9 @@ namespace DokanNetMirror
 
         public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
+            streamName = String.Empty;
             streamSize = 0;
-            int streamId = Marshal.ReadInt32(enumContext);
-            if (streamId != 0)
-            {
-                streamName = String.Empty;
-                return Trace("EnumerateNamedStreams", fileName, info, NtStatus.NotImplemented, streamId.ToString(), "out " + streamName, "out " + streamSize.ToString());
-            }
-            else
-            {
-                streamName = "$DATA";
-                Marshal.WriteInt32(enumContext, ++streamId);
-                return Trace("EnumerateNamedStreams", fileName, info, NtStatus.Success, streamId.ToString(), "out " + streamName, "out " + streamSize.ToString());
-            }
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
         }
 
         #endregion Implementation of IDokanOperations
