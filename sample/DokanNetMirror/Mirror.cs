@@ -1,9 +1,11 @@
-﻿using DokanNet;
+﻿using CodeFluent.Runtime.BinaryServices;
+using DokanNet;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using FileAccess = DokanNet.FileAccess;
 
@@ -526,7 +528,42 @@ namespace DokanNetMirror
         {
             streamName = String.Empty;
             streamSize = 0;
-            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+            try
+            {
+                NtfsAlternateStream[] streams = NtfsAlternateStream.EnumerateStreams(GetPath(fileName)).ToArray();
+                int streamId = Marshal.ReadInt32(enumContext);
+                // No stream found.
+                if (streams.Length == 0)
+                {
+                    return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, "out " + streamName, "out " + streamSize.ToString());
+                }
+                // No more streams.
+                else if (streams.Length <= streamId)
+                {
+                    return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, "out " + streamName, "out " + streamSize.ToString());
+                }
+                else
+                {
+                    NtfsAlternateStream stream = streams[streamId];
+                    if (streamId == 0)
+                    {
+                        // For some reason, streamLength is 1/2 its real size.
+                        // Because of that, I had to put the name twice.
+                        streamName = ":$DATA" + ":$DATA";
+                    }
+                    else
+                    {
+                        streamName = stream.Name + stream.Name;
+                    }
+                    streamSize = stream.Size;
+                    Marshal.WriteInt32(enumContext, ++streamId);
+                    return Trace("EnumerateNamedStreams", fileName, info, DokanResult.Success, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+                }
+            }
+            catch
+            {
+                return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, "out " + streamName, "out " + streamSize.ToString());
+            }
         }
 
         #endregion Implementation of IDokanOperations
