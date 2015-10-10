@@ -965,7 +965,7 @@ namespace DokanNet
                 if (result == DokanResult.Success)
                 {
                     rawStreamName.Append(name);
-                    rawStreamNameLength = (uint)name.Length;
+                    rawStreamNameLength = (uint)name.Length * 2;
                 }
 
                 Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);

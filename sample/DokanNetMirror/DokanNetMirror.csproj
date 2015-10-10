@@ -54,6 +54,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CodeFluent.Runtime.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1bb6d7cccf1045ec, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CodeFluentRuntimeClient.1.0.0.829\lib\CodeFluent.Runtime.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -97,12 +101,18 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DokanNet\DokanNet.csproj">
       <Project>{a09b408a-26a0-4ff8-83d5-6e1b1da5f63c}</Project>
       <Name>DokanNet</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="External\Readme.txt" />
+    <Content Include="External\x64\CodeFluent.Runtime.Compression.dll" />
+    <Content Include="External\x86\CodeFluent.Runtime.Compression.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
