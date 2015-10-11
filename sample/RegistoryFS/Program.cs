@@ -284,7 +284,7 @@ namespace RegistoryFS
         {
             streamName = String.Empty;
             streamSize = 0;
-            return DokanResult.Error;
+            return DokanResult.NotImplemented;
         }
 
         #endregion DokanOperations member
