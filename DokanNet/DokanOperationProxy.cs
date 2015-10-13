@@ -129,7 +129,7 @@ namespace DokanNet
 
         public delegate NtStatus EnumerateNamedStreamsDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawEnumContext,
-            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref uint rawStreamNameLength, ref long rawStreamSize,
+            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref long rawStreamSize,
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus UnmountDelegate(
@@ -951,7 +951,7 @@ namespace DokanNet
 
         public NtStatus EnumerateNamedStreamsProxy(string rawFileName,
                                               IntPtr rawEnumContext,
-                                              StringBuilder rawStreamName, ref uint rawStreamNameLength,
+                                              StringBuilder rawStreamName,
                                               ref long rawStreamSize,
                                               DokanFileInfo rawFileInfo)
         {
@@ -965,7 +965,6 @@ namespace DokanNet
                 if (result == DokanResult.Success)
                 {
                     rawStreamName.Append(name);
-                    rawStreamNameLength = (uint)name.Length;
                 }
 
                 Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);
