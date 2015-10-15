@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
+using System.Threading;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace DokanNet
@@ -128,7 +129,7 @@ namespace DokanNet
 
         public delegate NtStatus EnumerateNamedStreamsDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawEnumContext,
-            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref uint rawStreamNameLength, ref long rawStreamSize,
+            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref long rawStreamSize,
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus UnmountDelegate(
@@ -150,7 +151,7 @@ namespace DokanNet
         {
 #if TRACE
             Console.WriteLine(message);
-            Thread.Sleep(500):
+            Thread.Sleep(500);
 #endif
         }
 
@@ -950,7 +951,7 @@ namespace DokanNet
 
         public NtStatus EnumerateNamedStreamsProxy(string rawFileName,
                                               IntPtr rawEnumContext,
-                                              StringBuilder rawStreamName, ref uint rawStreamNameLength,
+                                              StringBuilder rawStreamName,
                                               ref long rawStreamSize,
                                               DokanFileInfo rawFileInfo)
         {
@@ -964,7 +965,6 @@ namespace DokanNet
                 if (result == DokanResult.Success)
                 {
                     rawStreamName.Append(name);
-                    rawStreamNameLength = (uint)name.Length;
                 }
 
                 Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);

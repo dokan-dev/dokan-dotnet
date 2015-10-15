@@ -9,7 +9,7 @@ install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC1/DokanInstall_0.8.0-RC1_redist.exe',
+              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC2/DokanInstall_0.8.0_redist-RC2.exe',
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
@@ -24,10 +24,3 @@ test:
     except:
       - Manual
       - Timing
-notifications:
-- provider: Email
-  to:
-  - reports@islog.com
-  on_build_success: false
-  on_build_failure: false
-  on_build_status_changed: true
