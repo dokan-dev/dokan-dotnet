@@ -1074,7 +1074,7 @@ namespace DokanNet.Tests
         {
             long streamSize = streamNames.Count;
             operations
-                .Setup(d => d.FindStreams(path, out streamNames, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.FindStreams(path, out streamNames, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.NotImplemented)
                 .Callback((string fileName, IList<FileInformation> _streamNames, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.FindStreams)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_streamNames.Count}], {info.Log()})"));
