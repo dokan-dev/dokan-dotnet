@@ -287,6 +287,12 @@ namespace RegistoryFS
             return DokanResult.NotImplemented;
         }
 
+        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+        {
+            streams = new FileInformation[0];
+            return DokanResult.NotImplemented;
+        }
+
         #endregion DokanOperations member
     }
 

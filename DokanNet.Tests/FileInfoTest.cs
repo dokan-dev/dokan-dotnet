@@ -251,7 +251,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
+            fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
@@ -282,7 +282,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: value.Length);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
+            fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
@@ -317,7 +317,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
+            fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, false);
             fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, false);
@@ -365,7 +365,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
-            fixture.SetupEnumerateNamedStreams(path, string.Empty);
+            fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
 #endif
 
@@ -1255,7 +1255,7 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
-            fixture.SetupEnumerateNamedStreams(destinationPath, string.Empty);
+            fixture.SetupFindStreams(destinationPath, new FileInformation[0]);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
@@ -1299,7 +1299,7 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
-            fixture.SetupEnumerateNamedStreams(destinationPath, string.Empty);
+            fixture.SetupFindStreams(destinationPath, new FileInformation[0]);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath());
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupCleanupFile(destinationBackupPath);

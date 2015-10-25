@@ -35,6 +35,6 @@ namespace DokanNet.Native
         public DokanOperationProxy.GetFileSecurityDelegate GetFileSecurity;
         public DokanOperationProxy.SetFileSecurityDelegate SetFileSecurity;
 
-        public DokanOperationProxy.EnumerateNamedStreamsDelegate EnumerateNamedStreams;
+        public DokanOperationProxy.FindStreamsDelegate FindStreams;
     }
 }

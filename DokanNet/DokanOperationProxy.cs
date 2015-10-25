@@ -127,10 +127,9 @@ namespace DokanNet
             IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        public delegate NtStatus EnumerateNamedStreamsDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawEnumContext,
-            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref long rawStreamSize,
-            [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+        public delegate NtStatus FindStreamsDelegate(
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
+            [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus UnmountDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
@@ -455,7 +454,7 @@ namespace DokanNet
                     }
 
                 var fill =
-                   (FILL_FIND_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_DATA));
+                   (FILL_FIND_FILE_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_FILE_DATA));
                     // used a single entry call to speed up the "enumeration" of the list
                     for (int index = 0; index < files.Count; index++)
                     {
@@ -475,7 +474,7 @@ namespace DokanNet
             }
         }
 
-        private static void Addto(FILL_FIND_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void Addto(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
             long ctime = fi.CreationTime.ToFileTime();
@@ -502,6 +501,62 @@ namespace DokanNet
                 nFileSizeLow = (uint)(fi.Length & 0xffffffff),
                 nFileSizeHigh = (uint)(fi.Length >> 32),
                 cFileName = fi.FileName
+            };
+            //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
+
+            fill(ref data, rawFileInfo);
+        }
+
+        public NtStatus FindStreamsProxy(string rawFileName,
+                          IntPtr rawFillFindData,
+                          DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                IList<FileInformation> files;
+
+                Trace("\nFindStreamsProxy: " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
+
+                NtStatus result = operations.FindStreams(rawFileName, out files, rawFileInfo);
+
+                Debug.Assert(files != null);
+                if (result == DokanResult.Success && files.Count != 0)
+                {
+                    foreach (FileInformation fi in files)
+                    {
+                        Trace("\n\tFileName\t" + fi.FileName);
+                        Trace("\tLength\t" + fi.Length);
+                    }
+
+                    var fill =
+                       (FILL_FIND_STREAM_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_STREAM_DATA));
+                    // used a single entry call to speed up the "enumeration" of the list
+                    for (int index = 0; index < files.Count; index++)
+                    {
+                        Addto(fill, rawFileInfo, files[index]);
+                    }
+                }
+
+                Trace("FindStreamsProxy : " + rawFileName + " Return : " + result);
+                return result;
+            }
+#pragma warning disable 0168
+            catch (Exception ex)
+#pragma warning restore 0168
+            {
+                Trace("FindStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
+                return DokanResult.InvalidParameter;
+            }
+        }
+
+        private static void Addto(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
+            var data = new WIN32_FIND_STREAM_DATA
+            {
+                StreamSize = fi.Length,
+                cStreamName = fi.FileName
             };
             //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
 
@@ -949,41 +1004,18 @@ namespace DokanNet
             }
         }
 
-        public NtStatus EnumerateNamedStreamsProxy(string rawFileName,
-                                              IntPtr rawEnumContext,
-                                              StringBuilder rawStreamName,
-                                              ref long rawStreamSize,
-                                              DokanFileInfo rawFileInfo)
-        {
-            try
-            {
-                Trace("\tEnumerateNamedStreamsProxy : " + rawFileName);
-                Trace("\tContext\t" + ToTrace(rawFileInfo));
+#region Nested type: FILL_FIND_FILE_DATA
 
-                string name;
-                NtStatus result = operations.EnumerateNamedStreams(rawFileName, rawEnumContext, out name, out rawStreamSize, rawFileInfo);
-                if (result == DokanResult.Success)
-                {
-                    rawStreamName.Append(name);
-                }
-
-                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);
-                return result;
-            }
-#pragma warning disable 0168
-            catch (Exception ex)
-#pragma warning restore 0168
-            {
-                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
-                return DokanResult.InvalidParameter;
-            }
-        }
-
-#region Nested type: FILL_FIND_DATA
-
-        private delegate long FILL_FIND_DATA(
+        private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-#endregion Nested type: FILL_FIND_DATA
+#endregion Nested type: FILL_FIND_FILE_DATA
+
+#region Nested type: FILL_FIND_FILE_DATA
+
+        private delegate long FILL_FIND_STREAM_DATA(
+            ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+
+#endregion Nested type: FILL_FIND_FILE_DATA
     }
 }

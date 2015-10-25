@@ -63,7 +63,6 @@ namespace DokanNet
 
         NtStatus Unmount(DokanFileInfo info);
 
-        NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize,
-            DokanFileInfo info);
+        NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info);
     }
 }
