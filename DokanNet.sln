@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{6AF218
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNetMirror", "sample\DokanNetMirror\DokanNetMirror.csproj", "{01247A47-387C-4BB4-8068-31CB3F16BD9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistoryFS", "sample\RegistoryFS\RegistoryFS.csproj", "{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistryFS", "sample\RegistryFS\RegistryFS.csproj", "{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D685023A-6DCE-4CC5-8468-8A0E672E2ACC}"
 	ProjectSection(SolutionItems) = preProject

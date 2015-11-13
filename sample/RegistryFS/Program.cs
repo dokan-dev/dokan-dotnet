@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
 
-namespace RegistoryFS
+namespace RegistryFS
 {
     internal class RFS : IDokanOperations
     {

@@ -8,8 +8,8 @@
     <ProjectGuid>{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RegistoryFS</RootNamespace>
-    <AssemblyName>RegistoryFS</AssemblyName>
+    <RootNamespace>RegistryFS</RootNamespace>
+    <AssemblyName>RegistryFS</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
