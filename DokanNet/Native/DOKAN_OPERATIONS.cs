@@ -6,9 +6,7 @@ namespace DokanNet.Native
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct DOKAN_OPERATIONS
     {
-        public DokanOperationProxy.CreateFileDelegate CreateFile;
-        public DokanOperationProxy.OpenDirectoryDelegate OpenDirectory;
-        public DokanOperationProxy.CreateDirectoryDelegate CreateDirectory;
+        public DokanOperationProxy.ZwCreateFileDelegate ZwCreateFile;
         public DokanOperationProxy.CleanupDelegate Cleanup;
         public DokanOperationProxy.CloseFileDelegate CloseFile;
         public DokanOperationProxy.ReadFileDelegate ReadFile;
