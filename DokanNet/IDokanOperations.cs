@@ -10,10 +10,6 @@ namespace DokanNet
         NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
                               FileOptions options, FileAttributes attributes, DokanFileInfo info);
 
-        NtStatus OpenDirectory(string fileName, DokanFileInfo info);
-
-        NtStatus CreateDirectory(string fileName, DokanFileInfo info);
-
         void Cleanup(string fileName, DokanFileInfo info);
 
         void CloseFile(string fileName, DokanFileInfo info);
