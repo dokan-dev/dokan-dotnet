@@ -30,11 +30,6 @@ namespace RegistryFS
         {
         }
 
-        public NtStatus CreateDirectory(string filename, DokanFileInfo info)
-        {
-            return DokanResult.Error;
-        }
-
         public NtStatus CreateFile(
             string filename,
             FileAccess access,
@@ -44,6 +39,8 @@ namespace RegistryFS
             System.IO.FileAttributes attributes,
             DokanFileInfo info)
         {
+            if (info.IsDirectory && mode == System.IO.FileMode.CreateNew)
+                return DokanResult.AccessDenied;
             return DokanResult.Success;
         }
 
@@ -179,11 +176,6 @@ namespace RegistryFS
             DokanFileInfo info)
         {
             return DokanResult.Error;
-        }
-
-        public NtStatus OpenDirectory(string filename, DokanFileInfo info)
-        {
-            return DokanResult.Success;
         }
 
         public NtStatus ReadFile(
