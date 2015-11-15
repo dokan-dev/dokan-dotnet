@@ -247,6 +247,7 @@ namespace DokanNetMirror
             else
             {
                 var stream = info.Context as FileStream;
+                stream.Position = offset;
                 stream.Write(buffer, 0, buffer.Length);
                 bytesWritten = buffer.Length;
             }
