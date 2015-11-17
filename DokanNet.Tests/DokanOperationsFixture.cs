@@ -289,9 +289,6 @@ namespace DokanNet.Tests
             public NtStatus DeleteFile(string fileName, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.DeleteFile(f, i), nameof(DeleteFile));
 
-            public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
-                => TryExecute(fileName, enumContext, out streamName, out streamSize, info, (string f, IntPtr e, out string sn, out long ss, DokanFileInfo i) => Target.EnumerateNamedStreams(f, e, out sn, out ss, i), nameof(EnumerateNamedStreams));
-
             public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
                 => TryExecute(fileName, out files, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindFiles(f, out o, i), nameof(FindFiles));
 
@@ -345,6 +342,9 @@ namespace DokanNet.Tests
 
             public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, DokanFileInfo info)
                 => TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, DokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
+
+            public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+                => TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
         }
 
         public const char MOUNT_POINT = 'Z';
@@ -1070,14 +1070,14 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.SetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_security.AsString()}, {access}, {info.Log()})"));
         }
 
-        internal void SetupEnumerateNamedStreams(string path, string streamName)
+        internal void SetupFindStreams(string path, IList<FileInformation> streamNames)
         {
-            long streamSize = streamName.Length;
+            long streamSize = streamNames.Count;
             operations
-                .Setup(d => d.EnumerateNamedStreams(path, It.IsAny<IntPtr>(), out streamName, out streamSize, It.IsAny<DokanFileInfo>()))
+                .Setup(d => d.FindStreams(path, out streamNames, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.NotImplemented)
-                .Callback((string fileName, IntPtr _enumContext, string _streamName, long _streamSize, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.EnumerateNamedStreams)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_enumContext}, out {_streamName}, out {_streamSize}, {info.Log()})"));
+                .Callback((string fileName, IList<FileInformation> _streamNames, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.FindStreams)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_streamNames.Count}], {info.Log()})"));
         }
 
         internal void VerifyAll()

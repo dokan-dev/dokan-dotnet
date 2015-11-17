@@ -1,3 +1,4 @@
+using System;
 using DokanNet.Native;
 
 namespace DokanNet
@@ -6,15 +7,7 @@ namespace DokanNet
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 800; // ver 0.7.4
-        /*
-        private const uint DOKAN_OPTION_DEBUG = 1;
-        private const uint DOKAN_OPTION_STDERR = 2;
-        private const uint DOKAN_OPTION_ALT_STREAM = 4;
-        private const uint DOKAN_OPTION_KEEP_ALIVE = 8;
-        private const uint DOKAN_OPTION_NETWORK = 16;
-        private const uint DOKAN_OPTION_REMOVABLE = 32;
-        */
+        private const ushort DOKAN_VERSION = 800; // ver 0.8.0
 
         #endregion Dokan Driver Options
 
@@ -32,12 +25,12 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint)
         {
-            Mount(operations, mountPoint, DokanOptions.FixedDrive, 0, DOKAN_VERSION);
+            Mount(operations, mountPoint, DokanOptions.FixedDrive);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions)
         {
-            Mount(operations, mountPoint, mountOptions, 0, DOKAN_VERSION);
+            Mount(operations, mountPoint, mountOptions, 0);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount)
@@ -47,6 +40,11 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version)
         {
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20));
+        }
+
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout)
+        {
             var dokanOperationProxy = new DokanOperationProxy(operations);
 
             var dokanOptions = new DOKAN_OPTIONS
@@ -55,20 +53,12 @@ namespace DokanNet
                 MountPoint = mountPoint,
                 ThreadCount = (ushort)threadCount,
                 Options = (uint)mountOptions,
+                Timeout = (uint)timeout.Milliseconds
             };
-
-            /*    dokanOptions.Options |= options.RemovableDrive ? DOKAN_OPTION_REMOVABLE : 0;
-                dokanOptions.Options |= options.DebugMode ? DOKAN_OPTION_DEBUG : 0;
-                dokanOptions.Options |= options.UseStandardError ? DOKAN_OPTION_STDERR : 0;
-                dokanOptions.Options |= options.UseAlternativeStreams ? DOKAN_OPTION_ALT_STREAM : 0;
-                dokanOptions.Options |= options.UseKeepAlive ? DOKAN_OPTION_KEEP_ALIVE : 0;
-                dokanOptions.Options |= options.NetworkDrive ? DOKAN_OPTION_NETWORK : 0;*/
 
             var dokanOperations = new DOKAN_OPERATIONS
             {
-                CreateFile = dokanOperationProxy.CreateFileProxy,
-                OpenDirectory = dokanOperationProxy.OpenDirectoryProxy,
-                CreateDirectory = dokanOperationProxy.CreateDirectoryProxy,
+                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
                 Cleanup = dokanOperationProxy.CleanupProxy,
                 CloseFile = dokanOperationProxy.CloseFileProxy,
                 ReadFile = dokanOperationProxy.ReadFileProxy,
@@ -90,7 +80,7 @@ namespace DokanNet
                 Unmount = dokanOperationProxy.UnmountProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
-                EnumerateNamedStreams = dokanOperationProxy.EnumerateNamedStreamsProxy,
+                FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
             int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
@@ -102,11 +92,11 @@ namespace DokanNet
                 case DOKAN_DRIVE_LETTER_ERROR:
                     throw new DokanException(status, "Bad drive letter");
                 case DOKAN_DRIVER_INSTALL_ERROR:
-                    throw new DokanException(status, "Can't install driver");
+                    throw new DokanException(status, "Can't install the Dokan driver");
                 case DOKAN_MOUNT_ERROR:
                     throw new DokanException(status, "Can't assign a drive letter or mount point");
                 case DOKAN_START_ERROR:
-                    throw new DokanException(status, "Something's wrong with Dokan driver");
+                    throw new DokanException(status, "Something's wrong with the Dokan driver");
                 case DOKAN_MOUNT_POINT_ERROR:
                     throw new DokanException(status, "Mount point is invalid ");
             }
