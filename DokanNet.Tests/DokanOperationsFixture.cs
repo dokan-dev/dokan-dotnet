@@ -218,31 +218,31 @@ namespace DokanNet.Tests
                 }
             }
 
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-                Justification = "Explicit Exception handler")]
-            private NtStatus TryExecute<TIn, TOut1, TOut2>(string fileName, TIn argIn, out TOut1 argOut1, out TOut2 argOut2, DokanFileInfo info, FuncOut23<string, TIn, TOut1, TOut2, DokanFileInfo, NtStatus> func, string funcName)
-            {
-                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
-                {
-                    argOut1 = default(TOut1);
-                    argOut2 = default(TOut2);
-                    return DokanResult.AccessDenied;
-                }
+            //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+            //    Justification = "Explicit Exception handler")]
+            //private NtStatus TryExecute<TIn, TOut1, TOut2>(string fileName, TIn argIn, out TOut1 argOut1, out TOut2 argOut2, DokanFileInfo info, FuncOut23<string, TIn, TOut1, TOut2, DokanFileInfo, NtStatus> func, string funcName)
+            //{
+            //    if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+            //    {
+            //        argOut1 = default(TOut1);
+            //        argOut2 = default(TOut2);
+            //        return DokanResult.AccessDenied;
+            //    }
 
-                try
-                {
-                    return func(fileName, argIn, out argOut1, out argOut2, info);
-                }
-                catch (Exception ex)
-                {
-                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
-                    if (ex is MockException)
-                        HasUnmatchedInvocations = true;
-                    argOut1 = default(TOut1);
-                    argOut2 = default(TOut2);
-                    return DokanResult.InvalidParameter;
-                }
-            }
+            //    try
+            //    {
+            //        return func(fileName, argIn, out argOut1, out argOut2, info);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+            //        if (ex is MockException)
+            //            HasUnmatchedInvocations = true;
+            //        argOut1 = default(TOut1);
+            //        argOut2 = default(TOut2);
+            //        return DokanResult.InvalidParameter;
+            //    }
+            //}
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
@@ -277,9 +277,6 @@ namespace DokanNet.Tests
             public void CloseFile(string fileName, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.CloseFile(f, i), nameof(CloseFile));
 
-            public NtStatus CreateDirectory(string fileName, DokanFileInfo info)
-                => TryExecute(fileName, info, (f, i) => Target.CreateDirectory(f, i), nameof(CreateDirectory));
-
             public NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.CreateFile(f, access, share, mode, options, attributes, i), nameof(CreateFile));
 
@@ -312,9 +309,6 @@ namespace DokanNet.Tests
 
             public NtStatus MoveFile(string oldName, string newName, bool replace, DokanFileInfo info)
                 => TryExecute(oldName, newName, replace, info, (o, n, r, i) => Target.MoveFile(o, n, r, i), nameof(MoveFile));
-
-            public NtStatus OpenDirectory(string fileName, DokanFileInfo info)
-                => TryExecute(fileName, info, (f, i) => Target.OpenDirectory(f, i), nameof(OpenDirectory));
 
             public NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info)
                 => TryExecute(fileName, buffer, out bytesRead, offset, info, (string f, byte[] b, out int r, long o, DokanFileInfo i) => Target.ReadFile(f, b, out r, o, i), nameof(ReadFile));
@@ -353,17 +347,9 @@ namespace DokanNet.Tests
 
         public const string FILESYSTEM_NAME = "Dokan Test";
 
-        private const FileSystemFeatures fileSystemFeatures = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch | FileSystemFeatures.SupportsRemoteStorage | FileSystemFeatures.UnicodeOnDisk;
+        private const FileSystemFeatures TestFileSystemFeatures = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch | FileSystemFeatures.SupportsRemoteStorage | FileSystemFeatures.UnicodeOnDisk;
 
-        private const FileMode readFileMode = FileMode.Open;
-
-        private const FileOptions readFileOptions = FileOptions.None;
-
-        private const FileOptions writeFileOptions = FileOptions.None;
-
-        private const FileAttributes readFileAttributes = default(FileAttributes);
-
-        private const FileAttributes writeFileAttributes = default(FileAttributes);
+        private const FileAttributes EmptyFileAttributes = default(FileAttributes);
 
         private static Proxy proxy = new Proxy();
 
@@ -500,11 +486,6 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
 
             operations
-                .Setup(d => d.CreateDirectory(It.IsAny<string>(), It.IsAny<DokanFileInfo>()))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CreateDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
-
-            operations
                 .Setup(d => d.CreateFile(It.IsAny<string>(), It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
@@ -580,7 +561,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, FileSystemSecurity _directorySecurity, AccessControlSections sections, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.GetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out {_directorySecurity}, {sections}, {info.Log()})"));
 
             string volumeLabel = VOLUME_LABEL;
-            var features = fileSystemFeatures;
+            var features = TestFileSystemFeatures;
             string fileSystemName = FILESYSTEM_NAME;
             operations
                 .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, It.IsAny<DokanFileInfo>()))
@@ -596,11 +577,6 @@ namespace DokanNet.Tests
                 .Setup(d => d.MoveFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string oldName, string newName, bool replace, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{oldName}\", \"{newName}\", {replace}, {info.Log()})"));
-
-            operations
-                .Setup(d => d.OpenDirectory(It.IsAny<string>(), It.IsAny<DokanFileInfo>()))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
 
             int bytesRead = 0;
             operations
@@ -654,14 +630,10 @@ namespace DokanNet.Tests
         private void SetupMount()
         {
             operations
-                .Setup(d => d.CreateFile(RootName, FileAccess.ReadAttributes, ReadWriteShare, readFileMode, readFileOptions, readFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Setup(d => d.CreateFile(RootName, FileAccess.ReadAttributes, ReadWriteShare, FileMode.Open, OpenReparsePointOptions, EmptyFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
-            operations
-                .Setup(d => d.OpenDirectory(RootName, It.Is<DokanFileInfo>(i => i.IsDirectory)))
-                .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
             var fileInfo = new FileInformation()
             {
                 FileName = RootName,
@@ -686,9 +658,10 @@ namespace DokanNet.Tests
         internal void SetupDiskFreeSpace(long freeBytesAvailable = 0, long totalNumberOfBytes = 0, long totalNumberOfFreeBytes = 0)
         {
             operations
-                .Setup(d => d.OpenDirectory(RootName, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(RootName, OpenDirectoryAccess, OpenDirectoryShare, FileMode.Open, ReadFileOptions, EmptyFileAttributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
             operations
                 .Setup(d => d.GetDiskFreeSpace(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
                 .Returns(DokanResult.Success)
@@ -704,7 +677,7 @@ namespace DokanNet.Tests
 
         internal void SetupGetVolumeInformation(string volumeLabel, string fileSystemName)
         {
-            var features = fileSystemFeatures;
+            var features = TestFileSystemFeatures;
             operations
                 .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
@@ -741,20 +714,22 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.FindFiles)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_files.Count}], {info.Log()})"));
         }
 
-        internal void SetupOpenDirectoryWithoutCleanup(string path)
+        internal void SetupOpenDirectoryWithoutCleanup(string path, FileAccess access = FileAccess.Synchronize, FileShare share = FileShare.None)
         {
             operations
-                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, access, share, FileMode.Open, ReadFileOptions, EmptyFileAttributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
         }
 
-        internal void SetupOpenDirectory(string path)
+        internal void SetupOpenDirectory(string path, FileAccess access = ReadDirectoryAccess, FileShare share = ReadWriteShare, FileOptions options = ReadFileOptions)
         {
             operations
-                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, access, share, FileMode.Open, options, EmptyFileAttributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode mode, FileOptions _options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {mode}, [{_options}], [{attributes}], {info.Log()})"));
             operations
                 .Setup(d => d.Cleanup(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
@@ -769,17 +744,19 @@ namespace DokanNet.Tests
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
 
             operations
-                .Setup(d => d.OpenDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, OpenDirectoryAccess, ReadWriteShare, FileMode.Open, ReadFileOptions, EmptyFileAttributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(result)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.OpenDirectory)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
         }
 
         internal void SetupCreateDirectory(string path)
         {
             operations
-                .Setup(d => d.CreateDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, ReadDirectoryAccess, FileShare.ReadWrite, FileMode.CreateNew, OpenReparsePointOptions, FileAttributes.Normal, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CreateDirectory)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
             operations
                 .Setup(d => d.Cleanup(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
@@ -791,9 +768,10 @@ namespace DokanNet.Tests
         internal void SetupCreateDirectoryWithError(string path, NtStatus result)
         {
             operations
-                .Setup(d => d.CreateDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, ReadDirectoryAccess, FileShare.ReadWrite, FileMode.CreateNew, It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(result)
-                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CreateDirectory)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", {info.Log()})"));
+                .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
         }
 
         internal void SetupDeleteDirectory(string path, bool recurse)
@@ -804,22 +782,31 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
-        internal void SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, object context = null, bool isDirectory = false, FileAttributes attributes = default(FileAttributes), bool deleteOnClose = false)
-        {
-            SetupCreateFileWithoutCleanup(path, access, share, mode, context, isDirectory, attributes, deleteOnClose);
-            SetupCleanupFile(path, context, isDirectory, deleteOnClose);
-        }
-
-        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, object context = null, bool isDirectory = false, FileAttributes attributes = default(FileAttributes), bool deleteOnClose = false)
+        internal void SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
-                .Setup(d => d.CreateFile(path, access, share, mode, writeFileOptions, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
+                .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
                 .Returns(DokanResult.Success)
-                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
+                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions _options, FileAttributes _attributes, DokanFileInfo info)
                     =>
                 {
                     info.Context = context;
-                    Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})");
+                    Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{_options}], [{_attributes}], {info.Log()})");
+                });
+
+            SetupCleanupFile(path, context, isDirectory, deleteOnClose);
+        }
+
+        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        {
+            operations
+                .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions _options, FileAttributes _attributes, DokanFileInfo info)
+                    =>
+                {
+                    info.Context = context;
+                    Trace($"{nameof(IDokanOperations.CreateFile)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{_options}], [{_attributes}], {info.Log()})");
                 });
         }
 
@@ -838,7 +825,7 @@ namespace DokanNet.Tests
         internal void SetupCleanupFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
-                .Setup(d => d.Cleanup(path, It.Is<DokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
+                .Setup(d => d.Cleanup(path, It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.DeleteOnClose == deleteOnClose)))
                 .Callback((string fileName, DokanFileInfo info)
                     =>
                 {
@@ -852,7 +839,7 @@ namespace DokanNet.Tests
         internal void SetupCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
-                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
+                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => /*i.Context == context &&*/ i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
@@ -1005,6 +992,8 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string oldName, string newName, bool _replace, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"));
+
+            SetupCleanupFile(destinationPath, isDirectory: true);
         }
 
         internal void SetupMoveFileWithError(string path, string destinationPath, bool replace, NtStatus result)
