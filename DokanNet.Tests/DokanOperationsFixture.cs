@@ -218,32 +218,6 @@ namespace DokanNet.Tests
                 }
             }
 
-            //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            //    Justification = "Explicit Exception handler")]
-            //private NtStatus TryExecute<TIn, TOut1, TOut2>(string fileName, TIn argIn, out TOut1 argOut1, out TOut2 argOut2, DokanFileInfo info, FuncOut23<string, TIn, TOut1, TOut2, DokanFileInfo, NtStatus> func, string funcName)
-            //{
-            //    if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
-            //    {
-            //        argOut1 = default(TOut1);
-            //        argOut2 = default(TOut2);
-            //        return DokanResult.AccessDenied;
-            //    }
-
-            //    try
-            //    {
-            //        return func(fileName, argIn, out argOut1, out argOut2, info);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
-            //        if (ex is MockException)
-            //            HasUnmatchedInvocations = true;
-            //        argOut1 = default(TOut1);
-            //        argOut2 = default(TOut2);
-            //        return DokanResult.InvalidParameter;
-            //    }
-            //}
-
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut1, TOut2, TOut3>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, NtStatus> func, string funcName)
