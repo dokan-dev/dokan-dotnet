@@ -1252,9 +1252,7 @@ namespace DokanNet.Tests
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
-            fixture.SetupCloseFile(destinationBackupPath);
             fixture.SetupMoveFile(path, destinationPath, true);
-            fixture.SetupCloseFile(destinationPath);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1292,9 +1290,7 @@ namespace DokanNet.Tests
             fixture.SetupFindStreams(destinationPath, new FileInformation[0]);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
-            fixture.SetupCloseFile(destinationBackupPath);
             fixture.SetupMoveFile(path, destinationPath, true);
-            fixture.SetupCloseFile(destinationPath);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());

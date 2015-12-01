@@ -813,7 +813,7 @@ namespace DokanNet.Tests
         internal void SetupCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
-                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => /*i.Context == context &&*/ i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
+                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.Context == null && i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
@@ -965,9 +965,10 @@ namespace DokanNet.Tests
                 .Setup(d => d.MoveFile(path, destinationPath, replace, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string oldName, string newName, bool _replace, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"));
+                    => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Add(ref pendingFiles, 2)}] (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"));
 
             SetupCleanupFile(destinationPath, isDirectory: true);
+            SetupCloseFile(destinationPath);
         }
 
         internal void SetupMoveFileWithError(string path, string destinationPath, bool replace, NtStatus result)
@@ -977,6 +978,9 @@ namespace DokanNet.Tests
                 .Returns(result)
                 .Callback((string oldName, string newName, bool _replace, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Increment(ref pendingFiles)}] **{result}** (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"));
+
+            SetupCleanupFile(destinationPath, isDirectory: true);
+            SetupCloseFile(destinationPath);
         }
 
         internal void SetupSetAllocationSize(string path, long length)
