@@ -1049,6 +1049,10 @@ namespace DokanNet.Tests
 
         internal void VerifyAll()
         {
+            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
+            Thread.Sleep(10);
+            // End HACK
+
             for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
             {
                 if (i > 5)
