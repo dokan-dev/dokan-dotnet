@@ -397,6 +397,10 @@ namespace DokanNet.Tests
             InitInstance();
             Instance.SetupMount();
 
+            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
+            Thread.Sleep(10);
+            // End HACK
+
             InitSecurity();
         }
 
