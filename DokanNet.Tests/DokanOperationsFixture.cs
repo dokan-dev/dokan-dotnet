@@ -398,7 +398,7 @@ namespace DokanNet.Tests
             Instance.SetupMount();
 
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(10);
+            Thread.Sleep(5);
             // End HACK
 
             InitSecurity();
@@ -415,7 +415,7 @@ namespace DokanNet.Tests
         internal static void InitInstance()
         {
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(10);
+            Thread.Sleep(5);
             // End HACK
 
             Instance = new DokanOperationsFixture();
@@ -754,6 +754,9 @@ namespace DokanNet.Tests
                 .Returns(result)
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
+            operations
+                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
         internal void SetupDeleteDirectory(string path, bool recurse)
@@ -1058,7 +1061,7 @@ namespace DokanNet.Tests
         internal void VerifyAll()
         {
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(10);
+            Thread.Sleep(5);
             // End HACK
 
             for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
