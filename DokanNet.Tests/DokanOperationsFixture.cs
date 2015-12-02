@@ -414,6 +414,10 @@ namespace DokanNet.Tests
 
         internal static void InitInstance()
         {
+            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
+            Thread.Sleep(10);
+            // End HACK
+
             Instance = new DokanOperationsFixture();
             proxy.Target = Instance.operations.Object;
             proxy.HasUnmatchedInvocations = false;
