@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("RegistoryFS")]
+[assembly: AssemblyTitle("RegistryFS")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RegistoryFS")]
-[assembly: AssemblyCopyright("Copyright (C)  2007")]
+[assembly: AssemblyProduct("RegistryFS")]
+[assembly: AssemblyCopyright("Copyright (C)  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

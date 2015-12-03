@@ -58,9 +58,7 @@ namespace DokanNet
 
             var dokanOperations = new DOKAN_OPERATIONS
             {
-                CreateFile = dokanOperationProxy.CreateFileProxy,
-                OpenDirectory = dokanOperationProxy.OpenDirectoryProxy,
-                CreateDirectory = dokanOperationProxy.CreateDirectoryProxy,
+                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
                 Cleanup = dokanOperationProxy.CleanupProxy,
                 CloseFile = dokanOperationProxy.CloseFileProxy,
                 ReadFile = dokanOperationProxy.ReadFileProxy,
@@ -82,7 +80,7 @@ namespace DokanNet
                 Unmount = dokanOperationProxy.UnmountProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
-                EnumerateNamedStreams = dokanOperationProxy.EnumerateNamedStreamsProxy
+                FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
             int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);

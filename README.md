@@ -8,6 +8,15 @@ By using Dokan library, you can create your own file systems very easily
 without writing device driver. Dokan.NET Binding is a library that allows
 you to make a file system on .NET environment.
 
+## Install
+
+To install DokanNet, run the following command in the Package Manager Console
+
+    PM> Install-Package DokanNet
+    
+    //Prerelease 
+    PM> Install-Package DokanNet -Pre 
+
 ## Licensing
 Dokan.NET Binding is distributed under a version of the "MIT License",
 which is a BSD-like license. See the 'license.mit.txt' file for details.
