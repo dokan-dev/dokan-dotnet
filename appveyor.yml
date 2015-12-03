@@ -4,12 +4,12 @@ configuration:
 - Debug
 platform:
 - Any CPU
-os: Windows Server 2012 R2
+os: Visual Studio 2015
 install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC2/DokanInstall_0.8.0_redist-RC2.exe',
+              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC3/DokanInstall_0.8.0_redist-RC3.exe',
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S

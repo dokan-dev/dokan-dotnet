@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
 
-namespace RegistoryFS
+namespace RegistryFS
 {
     internal class RFS : IDokanOperations
     {
@@ -30,11 +30,6 @@ namespace RegistoryFS
         {
         }
 
-        public NtStatus CreateDirectory(string filename, DokanFileInfo info)
-        {
-            return DokanResult.Error;
-        }
-
         public NtStatus CreateFile(
             string filename,
             FileAccess access,
@@ -44,6 +39,8 @@ namespace RegistoryFS
             System.IO.FileAttributes attributes,
             DokanFileInfo info)
         {
+            if (info.IsDirectory && mode == System.IO.FileMode.CreateNew)
+                return DokanResult.AccessDenied;
             return DokanResult.Success;
         }
 
@@ -181,11 +178,6 @@ namespace RegistoryFS
             return DokanResult.Error;
         }
 
-        public NtStatus OpenDirectory(string filename, DokanFileInfo info)
-        {
-            return DokanResult.Success;
-        }
-
         public NtStatus ReadFile(
             string filename,
             byte[] buffer,
@@ -284,6 +276,12 @@ namespace RegistoryFS
         {
             streamName = String.Empty;
             streamSize = 0;
+            return DokanResult.NotImplemented;
+        }
+
+        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+        {
+            streams = new FileInformation[0];
             return DokanResult.NotImplemented;
         }
 

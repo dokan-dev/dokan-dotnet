@@ -92,6 +92,7 @@
     <Compile Include="Native\NativeMethods.cs" />
     <Compile Include="Dokan.cs" />
     <Compile Include="IDokanOperations.cs" />
+    <Compile Include="Native\WIN32_FIND_STREAM_DATA.cs" />
     <Compile Include="NtStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DokanOperationProxy.cs" />
@@ -120,7 +121,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="YearStamp.MonthStamp.DayStamp.Increment" />
+      <UserProperties BuildVersion_BuildVersioningStyle="YearStamp.MonthStamp.DayStamp.Increment" BuildVersion_UseGlobalSettings="False" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

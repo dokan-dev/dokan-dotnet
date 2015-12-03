@@ -77,103 +77,97 @@ namespace DokanNetMirror
         {
             var path = GetPath(fileName);
 
-            bool pathExists = true;
-            bool pathIsDirectory = false;
-
-            bool readWriteAttributes = (access & DataAccess) == 0;
-
-            bool readAccess = (access & DataWriteAccess) == 0;
-
-            try
+            if (info.IsDirectory)
             {
-                pathIsDirectory = File.GetAttributes(path).HasFlag(FileAttributes.Directory);
-            }
-            catch (IOException)
-            {
-                pathExists = false;
-            }
-
-            switch (mode)
-            {
-                case FileMode.Open:
-
-                    if (pathExists)
+                try
+                {
+                    switch (mode)
                     {
-                        if (readWriteAttributes || pathIsDirectory)
-                        // check if driver only wants to read attributes, security info, or open directory
+                        case FileMode.Open:
+                            if (!Directory.Exists(path))
+                            {
+                                Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.PathNotFound);
+                            }
+
+                            new DirectoryInfo(path).EnumerateFileSystemInfos().Any(); // you can't list the directory
+                            break;
+
+                        case FileMode.CreateNew:
+                            if (Directory.Exists(GetPath(fileName)))
+                                Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
+
+                            Directory.CreateDirectory(GetPath(fileName));
+                            break;
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
+                }
+            }
+            else
+            {
+                bool pathExists = true;
+                bool pathIsDirectory = false;
+
+                bool readWriteAttributes = (access & DataAccess) == 0;
+                bool readAccess = (access & DataWriteAccess) == 0;
+
+                try
+                {
+                    pathIsDirectory = File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+                }
+                catch (IOException)
+                {
+                    pathExists = false;
+                }
+
+                switch (mode)
+                {
+                    case FileMode.Open:
+
+                        if (pathExists)
                         {
-                            info.IsDirectory = pathIsDirectory;
-                            info.Context = new object();
-                            // must set it to someting if you return DokanError.Success
+                            if (readWriteAttributes || pathIsDirectory)
+                            // check if driver only wants to read attributes, security info, or open directory
+                            {
+                                info.IsDirectory = pathIsDirectory;
+                                info.Context = new object();
+                                // must set it to someting if you return DokanError.Success
 
-                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
+                                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
+                            }
                         }
-                    }
-                    else
-                    {
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
-                    }
-                    break;
+                        else
+                        {
+                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
+                        }
+                        break;
 
-                case FileMode.CreateNew:
-                    if (pathExists)
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
-                    break;
+                    case FileMode.CreateNew:
+                        if (pathExists)
+                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
+                        break;
 
-                case FileMode.Truncate:
-                    if (!pathExists)
-                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
-                    break;
+                    case FileMode.Truncate:
+                        if (!pathExists)
+                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+
+                try
+                {
+                    info.Context = new FileStream(path, mode, readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
+                }
+                catch (UnauthorizedAccessException) // don't have access rights
+                {
+                    return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
+                }
             }
-
-            try
-            {
-                info.Context = new FileStream(path, mode, readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
-            }
-            catch (UnauthorizedAccessException) // don't have access rights
-            {
-                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
-            }
-
             return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
-        }
-
-        public NtStatus OpenDirectory(string fileName, DokanFileInfo info)
-        {
-            string path = GetPath(fileName);
-            if (!Directory.Exists(path))
-            {
-                return Trace("OpenDirectory", fileName, info, DokanResult.PathNotFound);
-            }
-
-            try
-            {
-                new DirectoryInfo(path).EnumerateFileSystemInfos().Any(); // you can't list the directory
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Trace("OpenDirectory", fileName, info, DokanResult.AccessDenied);
-            }
-            return Trace("OpenDirectory", fileName, info, DokanResult.Success);
-        }
-
-        public NtStatus CreateDirectory(string fileName, DokanFileInfo info)
-        {
-            if (Directory.Exists(GetPath(fileName)))
-                return Trace("CreateDirectory", fileName, info, DokanResult.FileExists);
-
-            try
-            {
-                Directory.CreateDirectory(GetPath(fileName));
-                return Trace("CreateDirectory", fileName, info, DokanResult.Success);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Trace("CreateDirectory", fileName, info, DokanResult.AccessDenied);
-            }
         }
 
         public void Cleanup(string fileName, DokanFileInfo info)
@@ -253,6 +247,7 @@ namespace DokanNetMirror
             else
             {
                 var stream = info.Context as FileStream;
+                stream.Position = offset;
                 stream.Write(buffer, 0, buffer.Length);
                 bytesWritten = buffer.Length;
             }
@@ -522,11 +517,17 @@ namespace DokanNetMirror
             return Trace("Unmount", null, info, DokanResult.Success);
         }
 
-        public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
+        public NtStatus FindStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
             streamName = String.Empty;
             streamSize = 0;
             return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+        }
+
+        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+        {
+            streams = new FileInformation[0];
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented);
         }
 
         #endregion Implementation of IDokanOperations
