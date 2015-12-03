@@ -398,7 +398,7 @@ namespace DokanNet.Tests
             Instance.SetupMount();
 
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(5);
+            Thread.Yield();
             // End HACK
 
             InitSecurity();
@@ -415,7 +415,7 @@ namespace DokanNet.Tests
         internal static void InitInstance()
         {
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(5);
+            Thread.Yield();
             // End HACK
 
             Instance = new DokanOperationsFixture();
@@ -1061,8 +1061,11 @@ namespace DokanNet.Tests
         internal void VerifyAll()
         {
             // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Sleep(5);
+            Thread.Yield();
             // End HACK
+
+            if (Interlocked.Read(ref pendingFiles) < 0)
+                throw new InvalidOperationException("Negative pending files count");
 
             for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
             {
