@@ -305,6 +305,9 @@ namespace DokanNet.Tests
             public NtStatus UnlockFile(string fileName, long offset, long length, DokanFileInfo info)
                 => TryExecute(fileName, offset, length, info, (f, o, l, i) => Target.UnlockFile(f, o, l, i), nameof(UnlockFile));
 
+            public NtStatus Mount(DokanFileInfo info)
+                => TryExecute(info, i => Target.Mount(i), nameof(Mount));
+
             public NtStatus Unmount(DokanFileInfo info)
                 => TryExecute(info, i => Target.Unmount(i), nameof(Unmount));
 
@@ -596,6 +599,11 @@ namespace DokanNet.Tests
                 .Setup(d => d.UnlockFile(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, long offset, long length, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.UnlockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {offset}, {length}, {info.Log()})"));
+
+            operations
+                .Setup(d => d.Mount(It.IsAny<DokanFileInfo>()))
+                .Returns(DokanResult.Success)
+                .Callback((DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Mount)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
 
             operations
                 .Setup(d => d.Unmount(It.IsAny<DokanFileInfo>()))

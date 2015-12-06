@@ -123,6 +123,9 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
+        public delegate NtStatus MountDelegate(
+            [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+
         public delegate NtStatus UnmountDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
@@ -816,6 +819,27 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("GetVolumeInformationProxy Throw : " + ex.Message);
+                return DokanResult.InvalidParameter;
+            }
+        }
+
+        public NtStatus MountProxy(DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                Trace("\nMountProxy");
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
+
+                NtStatus result = operations.Mount(rawFileInfo);
+
+                Trace("MountProxy Return : " + result);
+                return result;
+            }
+#pragma warning disable 0168
+            catch (Exception ex)
+#pragma warning restore 0168
+            {
+                Trace("MountProxy Throw : " + ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }

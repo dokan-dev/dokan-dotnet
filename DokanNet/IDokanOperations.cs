@@ -57,6 +57,8 @@ namespace DokanNet
         NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
                                    DokanFileInfo info);
 
+        NtStatus Mount(DokanFileInfo info);
+
         NtStatus Unmount(DokanFileInfo info);
 
         NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info);

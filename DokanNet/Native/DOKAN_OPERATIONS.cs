@@ -28,6 +28,7 @@ namespace DokanNet.Native
         public DokanOperationProxy.UnlockFileDelegate UnlockFile;
         public DokanOperationProxy.GetDiskFreeSpaceDelegate GetDiskFreeSpace;
         public DokanOperationProxy.GetVolumeInformationDelegate GetVolumeInformation;
+        public DokanOperationProxy.MountDelegate Mount;
         public DokanOperationProxy.UnmountDelegate Unmount;
 
         public DokanOperationProxy.GetFileSecurityDelegate GetFileSecurity;
