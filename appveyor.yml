@@ -5,6 +5,9 @@ configuration:
 platform:
 - Any CPU
 os: Visual Studio 2015
+branches:
+  only:
+    - master
 install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
