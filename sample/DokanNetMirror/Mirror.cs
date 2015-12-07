@@ -512,7 +512,12 @@ namespace DokanNetMirror
             }
         }
 
-        public NtStatus Unmount(DokanFileInfo info)
+        public NtStatus Mounted(DokanFileInfo info)
+        {
+            return Trace("Mount", null, info, DokanResult.Success);
+        }
+
+        public NtStatus Unmounted(DokanFileInfo info)
         {
             return Trace("Unmount", null, info, DokanResult.Success);
         }
