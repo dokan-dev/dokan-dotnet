@@ -397,10 +397,6 @@ namespace DokanNet.Tests
             InitInstance();
             Instance.SetupMount();
 
-            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
-            Thread.Yield();
-            // End HACK
-
             InitSecurity();
         }
 
@@ -414,9 +410,8 @@ namespace DokanNet.Tests
 
         internal static void InitInstance()
         {
-            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
+            // For single-core environments, allow other threads to process
             Thread.Yield();
-            // End HACK
 
             Instance = new DokanOperationsFixture();
             proxy.Target = Instance.operations.Object;
@@ -1060,9 +1055,8 @@ namespace DokanNet.Tests
 
         internal void VerifyAll()
         {
-            // HACK: Experimental additional timeout to maybe fix AppVeyor tests
+            // For single-core environments, allow other threads to complete
             Thread.Yield();
-            // End HACK
 
             if (Interlocked.Read(ref pendingFiles) < 0)
                 throw new InvalidOperationException("Negative pending files count");
@@ -1073,7 +1067,7 @@ namespace DokanNet.Tests
                     throw new TimeoutException("Cleanup wait cycles exceeded");
 
                 Trace($"Waiting for closure (#{i})");
-                Thread.Sleep(5);
+                Thread.Sleep(1);
             }
             operations.VerifyAll();
         }
