@@ -71,7 +71,7 @@ namespace DokanNet
         public delegate NtStatus DeleteFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
-        
+
         public delegate NtStatus DeleteDirectoryDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
@@ -976,18 +976,18 @@ namespace DokanNet
             }
         }
 
-#region Nested type: FILL_FIND_FILE_DATA
+        #region Nested type: FILL_FIND_FILE_DATA
 
         private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-#endregion Nested type: FILL_FIND_FILE_DATA
+        #endregion Nested type: FILL_FIND_FILE_DATA
 
-#region Nested type: FILL_FIND_FILE_DATA
+        #region Nested type: FILL_FIND_STREAM_DATA
 
         private delegate long FILL_FIND_STREAM_DATA(
             ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-#endregion Nested type: FILL_FIND_FILE_DATA
+        #endregion Nested type: FILL_FIND_STREAM_DATA
     }
 }
