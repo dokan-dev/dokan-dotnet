@@ -305,8 +305,11 @@ namespace DokanNet.Tests
             public NtStatus UnlockFile(string fileName, long offset, long length, DokanFileInfo info)
                 => TryExecute(fileName, offset, length, info, (f, o, l, i) => Target.UnlockFile(f, o, l, i), nameof(UnlockFile));
 
-            public NtStatus Unmount(DokanFileInfo info)
-                => TryExecute(info, i => Target.Unmount(i), nameof(Unmount));
+            public NtStatus Mounted(DokanFileInfo info)
+                => TryExecute(info, i => Target.Mounted(i), nameof(Mounted));
+
+            public NtStatus Unmounted(DokanFileInfo info)
+                => TryExecute(info, i => Target.Unmounted(i), nameof(Unmounted));
 
             public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, DokanFileInfo info)
                 => TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, DokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
@@ -593,9 +596,14 @@ namespace DokanNet.Tests
                 .Callback((string fileName, long offset, long length, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.UnlockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {offset}, {length}, {info.Log()})"));
 
             operations
-                .Setup(d => d.Unmount(It.IsAny<DokanFileInfo>()))
+                .Setup(d => d.Mounted(It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
-                .Callback((DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Unmount)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
+                .Callback((DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Mounted)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
+
+            operations
+                .Setup(d => d.Unmounted(It.IsAny<DokanFileInfo>()))
+                .Returns(DokanResult.Success)
+                .Callback((DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Unmounted)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
 
             int bytesWritten = 0;
             operations

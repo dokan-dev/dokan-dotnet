@@ -5,11 +5,14 @@ configuration:
 platform:
 - Any CPU
 os: Visual Studio 2015
+branches:
+  only:
+    - master
 install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC3/DokanInstall_0.8.0_redist-RC3.exe',
+              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0-RC4/DokanInstall_0.8.0_redist-RC4.exe',
               'C:\projects\dokan-dotnet\DokanInstall.exe'
             )
  - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
