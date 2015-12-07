@@ -222,12 +222,12 @@ namespace RegistryFS
             return DokanResult.Success;
         }
 
-        public NtStatus Mount(DokanFileInfo info)
+        public NtStatus Mounted(DokanFileInfo info)
         {
             return DokanResult.Success;
         }
 
-        public NtStatus Unmount(DokanFileInfo info)
+        public NtStatus Unmounted(DokanFileInfo info)
         {
             return DokanResult.Success;
         }

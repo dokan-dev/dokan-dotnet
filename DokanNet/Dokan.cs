@@ -77,8 +77,8 @@ namespace DokanNet
                 UnlockFile = dokanOperationProxy.UnlockFileProxy,
                 GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
                 GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
-                Mount = dokanOperationProxy.MountProxy,
-                Unmount = dokanOperationProxy.UnmountProxy,
+                Mounted = dokanOperationProxy.MountedProxy,
+                Unmounted = dokanOperationProxy.UnmountedProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
                 FindStreams = dokanOperationProxy.FindStreamsProxy

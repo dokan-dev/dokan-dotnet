@@ -123,10 +123,10 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        public delegate NtStatus MountDelegate(
+        public delegate NtStatus MountedDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-        public delegate NtStatus UnmountDelegate(
+        public delegate NtStatus UnmountedDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         #endregion Delegates
@@ -823,44 +823,44 @@ namespace DokanNet
             }
         }
 
-        public NtStatus MountProxy(DokanFileInfo rawFileInfo)
+        public NtStatus MountedProxy(DokanFileInfo rawFileInfo)
         {
             try
             {
-                Trace("\nMountProxy");
+                Trace("\nMountedProxy");
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                NtStatus result = operations.Mount(rawFileInfo);
+                NtStatus result = operations.Mounted(rawFileInfo);
 
-                Trace("MountProxy Return : " + result);
+                Trace("MountedProxy Return : " + result);
                 return result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-                Trace("MountProxy Throw : " + ex.Message);
+                Trace("MountedProxy Throw : " + ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
 
-        public NtStatus UnmountProxy(DokanFileInfo rawFileInfo)
+        public NtStatus UnmountedProxy(DokanFileInfo rawFileInfo)
         {
             try
             {
-                Trace("\nUnmountProxy");
+                Trace("\nUnmountedProxy");
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                NtStatus result = operations.Unmount(rawFileInfo);
+                NtStatus result = operations.Unmounted(rawFileInfo);
 
-                Trace("UnmountProxy Return : " + result);
+                Trace("UnmountedProxy Return : " + result);
                 return result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-                Trace("UnmountProxy Throw : " + ex.Message);
+                Trace("UnmountedProxy Throw : " + ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
