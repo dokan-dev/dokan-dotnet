@@ -57,6 +57,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ContextTest.cs" />
     <Compile Include="FileInfoTest.cs" />
     <Compile Include="DirectoryInfoTest.cs" />
     <Compile Include="DriveInfoTest.cs" />

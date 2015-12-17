@@ -288,8 +288,8 @@ namespace DokanNet.Tests
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetEndOfFile(destinationPath, value.Length);
-            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, false);
-            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, false);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 #endif
@@ -320,8 +320,8 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
-            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, false);
-            fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, false);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+            fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 #endif
@@ -931,7 +931,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
-            fixture.SetupReadFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1015,7 +1015,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
-            fixture.SetupReadFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1227,7 +1227,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
-            fixture.SetupWriteFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -1306,7 +1306,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
-            fixture.SetupWriteFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());

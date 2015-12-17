@@ -852,10 +852,10 @@ namespace DokanNet.Tests
                 .Callback((string fileName, long _offset, long _length, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.UnlockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {_offset}, {_length}, {info.Log()})"));
         }
 
-        internal void SetupReadFile(string path, byte[] buffer, int bytesRead, bool synchronousIo = true)
+        internal void SetupReadFile(string path, byte[] buffer, int bytesRead, object context = null, bool synchronousIo = true)
         {
             operations
-                .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, 0, It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                     =>
@@ -880,7 +880,7 @@ namespace DokanNet.Tests
                 });
         }
 
-        internal void SetupReadFileInChunks(string path, byte[] buffer, int chunkSize, bool synchronousIo = true)
+        internal void SetupReadFileInChunks(string path, byte[] buffer, int chunkSize, object context = null, bool synchronousIo = true)
         {
             var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
@@ -888,7 +888,7 @@ namespace DokanNet.Tests
                 offsets[index] = offset;
                 int bytesRead = Math.Min(chunkSize, buffer.Length - offset);
                 operations
-                    .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, offsets[index], It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                    .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(DokanResult.Success)
                     .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                         =>
@@ -899,27 +899,10 @@ namespace DokanNet.Tests
             }
         }
 
-        internal void SetupReadFileInChunksUsingContext(string path, byte[] buffer, int chunkSize)
-        {
-            for (int offset = 0; offset < buffer.Length; offset += chunkSize)
-            {
-                int bytesRead = Math.Min(chunkSize, buffer.Length - offset);
-                operations
-                    .Setup(d => d.ReadFile(path, It.IsAny<byte[]>(), out bytesRead, offset, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo && i.Context == buffer)))
-                    .Returns(DokanResult.Success)
-                    .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
-                        =>
-                    {
-                        Array.ConstrainedCopy((byte[])info.Context, (int)_offset, _buffer, 0, _bytesRead);
-                        Trace($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer.Skip((int)_offset).Take(_bytesRead))}, out {_bytesRead}, {_offset}, {info.Log()})");
-                    });
-            }
-        }
-
-        internal void SetupWriteFile(string path, byte[] buffer, int bytesWritten, bool synchronousIo = true)
+        internal void SetupWriteFile(string path, byte[] buffer, int bytesWritten, object context = null, bool synchronousIo = true)
         {
             operations
-                .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(buffer)), out bytesWritten, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(buffer)), out bytesWritten, 0, It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, byte[] _buffer, int _bytesWritten, long offset, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {offset}, {info.Log()})"));
@@ -935,7 +918,7 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {offset}, {info.Log()})"));
         }
 
-        internal void SetupWriteFileInChunks(string path, byte[] buffer, int chunkSize, bool synchronousIo = true)
+        internal void SetupWriteFileInChunks(string path, byte[] buffer, int chunkSize, object context = null, bool synchronousIo = true)
         {
             var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
@@ -944,21 +927,7 @@ namespace DokanNet.Tests
                 int bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
                 var chunk = buffer.Skip(offset).Take(bytesWritten);
                 operations
-                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo == synchronousIo)))
-                    .Returns(DokanResult.Success)
-                    .Callback((string fileName, byte[] _buffer, int _bytesWritten, long _offset, DokanFileInfo info)
-                        => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {_offset}, {info.Log()})"));
-            }
-        }
-
-        internal void SetupWriteFileInChunksUsingContext(string path, byte[] buffer, int chunkSize)
-        {
-            for (int offset = 0; offset < buffer.Length; offset += chunkSize)
-            {
-                int bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
-                var chunk = buffer.Skip(offset).Take(bytesWritten);
-                operations
-                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offset, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo && i.Context == buffer)))
+                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(DokanResult.Success)
                     .Callback((string fileName, byte[] _buffer, int _bytesWritten, long _offset, DokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {_offset}, {info.Log()})"));
