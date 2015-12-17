@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
 
@@ -24,7 +25,7 @@ namespace DokanNet.Tests
             for (int i = 0; i < smallData.Length; ++i)
                 smallData[i] = (byte)(i % 256);
 
-            largeData = new byte[3 * FILE_BUFFER_SIZE + 65536];
+            largeData = new byte[5 * FILE_BUFFER_SIZE + 65536];
             for (int i = 0; i < largeData.Length; ++i)
                 largeData[i] = (byte)(i % 251);
         }
@@ -347,7 +348,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFileWithError(path, DokanResult.FileNotFound);
 #endif
 
-             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
@@ -369,7 +370,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
 #endif
 
-             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
@@ -882,7 +883,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod,TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -905,7 +906,7 @@ namespace DokanNet.Tests
                 do
                 {
                     int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
-                    Assert.IsTrue(readBytes > 0, "Unexpected empty read");
+                    Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
                 } while (totalReadBytes < largeData.Length);
 
@@ -940,15 +941,106 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[largeData.Length];
                 int totalReadBytes = 0;
+
                 do
                 {
                     int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
-                    Assert.IsTrue(readBytes > 0, "Unexpected empty read");
+                    Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
                 } while (totalReadBytes < largeData.Length);
 
 #if !LOGONLY
                 Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFile_InParallel_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        int readBytes = stream.Read(target, origin, count);
+                        Assert.AreEqual(count, readBytes, $"Unexpected empty read at origin {origin}");
+                        totalReadBytes += readBytes;
+                    }
+                });
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, totalReadBytes, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFileUsingContext_InParallel_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
+            fixture.SetupReadFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        int readBytes = stream.Read(target, origin, count);
+                        Assert.AreEqual(count, readBytes, $"Unexpected empty read at origin {origin}");
+                        totalReadBytes += readBytes;
+                    }
+                });
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, totalReadBytes, "Unexpected read count");
                 CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
 #endif
             }
@@ -1107,6 +1199,7 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 int totalWrittenBytes = 0;
+
                 do
                 {
                     int writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
@@ -1143,6 +1236,7 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 int totalWrittenBytes = 0;
+
                 do
                 {
                     int writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
@@ -1152,6 +1246,90 @@ namespace DokanNet.Tests
 
 #if !LOGONLY
                 Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFile_InParallel_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
+            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                int totalWrittenBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        stream.Write(largeData, origin, count);
+                        totalWrittenBytes += count;
+                    }
+                });
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, totalWrittenBytes, "Unexpected write count");
+#endif
+            }
+
+#if !LOGONLY
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFileUsingContext_InParallel_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
+            fixture.SetupWriteFileInChunksUsingContext(path, largeData, FILE_BUFFER_SIZE);
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                int totalWrittenBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        stream.Write(largeData, origin, count);
+                        totalWrittenBytes += count;
+                    }
+                });
+
+#if !LOGONLY
+                Assert.AreEqual(largeData.Length, totalWrittenBytes, "Unexpected write count");
 #endif
             }
 
