@@ -26,6 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>DokanNet.Tests.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,6 +59,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ContextTest.cs" />
+    <Compile Include="OverlappedTest.cs" />
     <Compile Include="FileInfoTest.cs" />
     <Compile Include="DirectoryInfoTest.cs" />
     <Compile Include="DriveInfoTest.cs" />

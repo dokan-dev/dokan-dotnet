@@ -961,7 +961,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void OpenRead_WithLargeFile_InParallel_CallsApiCorrectly()
+        public void OpenRead_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -1006,7 +1006,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void OpenRead_WithLargeFileUsingContext_InParallel_CallsApiCorrectly()
+        public void OpenRead_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -1056,7 +1056,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenRead_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1255,7 +1255,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void OpenWrite_WithLargeFile_InParallel_CallsApiCorrectly()
+        public void OpenWrite_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -1297,7 +1297,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void OpenWrite_WithLargeFileUsingContext_InParallel_CallsApiCorrectly()
+        public void OpenWrite_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -1377,7 +1377,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
+            string value = $"TestValue for test {nameof(OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
 #else
