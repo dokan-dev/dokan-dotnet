@@ -21,13 +21,9 @@ namespace DokanNet.Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            smallData = new byte[4096];
-            for (int i = 0; i < smallData.Length; ++i)
-                smallData[i] = (byte)(i % 256);
+            smallData = DokanOperationsFixture.InitPeriodicTestData(4096);
 
-            largeData = new byte[5 * FILE_BUFFER_SIZE + 65536];
-            for (int i = 0; i < largeData.Length; ++i)
-                largeData[i] = (byte)(i % 251);
+            largeData = DokanOperationsFixture.InitPeriodicTestData(5 * FILE_BUFFER_SIZE + 65536);
         }
 
         [ClassCleanup]

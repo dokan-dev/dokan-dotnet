@@ -452,6 +452,10 @@ namespace DokanNet.Tests
                 new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             };
 
+        internal static byte[] InitPeriodicTestData(long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i % 251)).ToArray();
+
+        internal static byte[] InitBlockTestData(long bufferSize, long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i / bufferSize + 1)).ToArray();
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
