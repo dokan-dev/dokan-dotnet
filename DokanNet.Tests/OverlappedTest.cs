@@ -81,29 +81,23 @@ namespace DokanNet.Tests
             private static extern SafeFileHandle CreateFile(string lpFileName, DesiredAccess dwDesiredAccess, ShareMode dwShareMode, IntPtr lpSecurityAttributes, CreationDisposition dwCreationDisposition, FlagsAndAttributes dwFlagsAndAttributes, IntPtr hTemplateFile);
 
             [DllImport(KERNEL_32_DLL, SetLastError = true)]
-            private static extern bool ReadFileEx(SafeFileHandle hFile, byte[] lpBuffer, uint nNumberOfBytesToRead, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
+            private static extern bool ReadFileEx(SafeFileHandle hFile, byte[] lpBuffer, int nNumberOfBytesToRead, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
 
             [DllImport(KERNEL_32_DLL, SetLastError = true)]
-            private static extern bool WriteFileEx(SafeFileHandle hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
+            private static extern bool WriteFileEx(SafeFileHandle hFile, byte[] lpBuffer, int nNumberOfBytesToWrite, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
 
-            private delegate void FileIOCompletionRoutine(uint dwErrorCode, uint dwNumberOfBytesTransfered, ref NativeOverlapped lpOverlapped);
+            private delegate void FileIOCompletionRoutine(int dwErrorCode, int dwNumberOfBytesTransfered, ref NativeOverlapped lpOverlapped);
 
             [DebuggerDisplay("{DebuggerDisplay(),nq}")]
-            private struct OverlappedRecord
+            internal class OverlappedRecord
             {
                 public byte[] Buffer { get; }
 
-                public uint BytesTransferred { get; set; }
-
-                public NativeOverlapped? Overlapped { get; set; }
-
-                public ManualResetEvent ResetEvent { get; }
-
-                public FileIOCompletionRoutine Completion { get; set; }
+                public int BytesTransferred { get; set; }
 
                 public int Win32Error { get; set; }
 
-                public OverlappedRecord(uint count) : this(new byte[count])
+                public OverlappedRecord(int count) : this(new byte[count])
                 {
                 }
 
@@ -111,9 +105,6 @@ namespace DokanNet.Tests
                 {
                     Buffer = buffer;
                     BytesTransferred = 0;
-                    Overlapped = null;
-                    ResetEvent = new ManualResetEvent(false);
-                    Completion = null;
                     Win32Error = 0;
                 }
 
@@ -122,72 +113,72 @@ namespace DokanNet.Tests
 
             internal static SafeFileHandle CreateFile(string fileName) => CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_NONE, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
-            internal static uint BufferSize(int segment) => (uint)Math.Min(FILE_BUFFER_SIZE, testData.Length - segment * FILE_BUFFER_SIZE);
+            internal static int BufferSize(int segment) => (int)Math.Min(FILE_BUFFER_SIZE, testData.Length - segment * FILE_BUFFER_SIZE);
 
-            private static void ReadEx(SafeFileHandle handle, long offset, uint count, OverlappedRecord output)
+            private static void ReadEx(SafeFileHandle handle, long offset, int count, NativeOverlapped overlapped, EventWaitHandle waitHandle, OverlappedRecord output)
             {
-                var overlapped = output.Overlapped.Value;
-                output.Completion = (uint dwErrorCode, uint dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) => {
+                FileIOCompletionRoutine completion = (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                {
+                    output.Win32Error = dwErrorCode;
                     output.BytesTransferred = dwNumberOfBytesTransferred;
-                    output.ResetEvent.Set();
+                    waitHandle.Set();
                 };
 
-                if (!ReadFileEx(handle, output.Buffer, count, ref overlapped, output.Completion))
+                if (!ReadFileEx(handle, output.Buffer, count, ref overlapped, completion))
                     output.Win32Error = Marshal.GetLastWin32Error();
             }
 
-            internal static byte[][] Read(string fileName, int segments)
+            internal static OverlappedRecord[] Read(string fileName, int segments)
             {
-                var slots = new OverlappedRecord[segments];
-                for (int i = 0; i < segments; ++i)
-                {
-                    var offset = i * FILE_BUFFER_SIZE;
-                    slots[i] = new OverlappedRecord(BufferSize(i)) { Overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero } };
-                }
+                var slots = Enumerable.Range(0, segments).Select(i => new OverlappedRecord(BufferSize(i))).ToArray();
+                var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), segments).Select(e => e()).ToArray();
 
-                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(slots.Select(s => s.ResetEvent).ToArray())));
-                //awaiterThread.SetApartmentState(ApartmentState.MTA);
+                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_READ, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
                     for (int i = 0; i < segments; ++i)
-                        ReadEx(handle, i * FILE_BUFFER_SIZE, BufferSize(i), slots[i]);
+                    {
+                        var offset = i * FILE_BUFFER_SIZE;
+                        var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
+                        ReadEx(handle, offset, BufferSize(i), overlapped, waitHandles[i], slots[i]);
+                    }
                 }
 
                 awaiterThread.Join();
 
-                return slots.Select(s => s.Buffer).ToArray();
+                return slots;
             }
 
-            private static void WriteEx(SafeFileHandle handle, long offset, uint count, OverlappedRecord input)
+            private static void WriteEx(SafeFileHandle handle, long offset, int count, NativeOverlapped overlapped, EventWaitHandle waitHandle, OverlappedRecord input)
             {
-                var overlapped = input.Overlapped.Value;
-                input.Completion = (uint dwErrorCode, uint dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) => {
+                FileIOCompletionRoutine completion = (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                {
+                    input.Win32Error = dwErrorCode;
                     input.BytesTransferred = dwNumberOfBytesTransferred;
-                    input.ResetEvent.Set();
+                    waitHandle.Set();
                 };
 
-                if (!WriteFileEx(handle, input.Buffer, count, ref overlapped, input.Completion))
+                if (!WriteFileEx(handle, input.Buffer, count, ref overlapped, completion))
                     input.Win32Error = Marshal.GetLastWin32Error();
             }
 
-            internal static void Write(string fileName, int segments, byte[][] inputs)
+            internal static void Write(string fileName, int segments, OverlappedRecord[] slots)
             {
-                var slots = new OverlappedRecord[segments];
-                for (int i = 0; i < segments; ++i)
-                {
-                    var offset = i * FILE_BUFFER_SIZE;
-                    slots[i] = new OverlappedRecord(inputs[i]) { Overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero } };
-                }
+                var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), segments).Select(e => e()).ToArray();
 
-                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(slots.Select(s => s.ResetEvent).ToArray())));
+                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE, IntPtr.Zero, CreationDisposition.OPEN_ALWAYS, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
                     for (int i = 0; i < segments; ++i)
-                        WriteEx(handle, i * FILE_BUFFER_SIZE, BufferSize(i), slots[i]);
+                    {
+                        var offset = i * FILE_BUFFER_SIZE;
+                        var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
+                        WriteEx(handle, i * FILE_BUFFER_SIZE, BufferSize(i), overlapped, waitHandles[i], slots[i]);
+                    }
                 }
 
                 awaiterThread.Join();
@@ -239,11 +230,15 @@ namespace DokanNet.Tests
 
             var segments = testData.Length / (int)FILE_BUFFER_SIZE + 1;
 
-            var results = Native.Read(DokanOperationsFixture.FileName.AsDriveBasedPath(), segments);
+            var outputs = Native.Read(DokanOperationsFixture.FileName.AsDriveBasedPath(), segments);
 
 #if !LOGONLY
             for (int i = 0; i < segments; ++i)
-                Assert.IsTrue(Enumerable.All(results[i], b => b == (byte)i + 1), $"Unexpected data in segment {i}");
+            {
+                Assert.AreEqual(0, outputs[i].Win32Error, "Unexpected Win32 error");
+                //Assert.AreEqual(outputs[i].BytesTransferred, Native.BufferSize(i), "Unexpected number of bytes read");
+                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in segment {i}");
+            }
 
             fixture.VerifyAll();
 #endif
@@ -263,13 +258,17 @@ namespace DokanNet.Tests
 #endif
 
             var segments = testData.Length / (int)FILE_BUFFER_SIZE + 1;
-            var inputs = (byte[][])Array.CreateInstance(typeof(byte[]), segments);
-            for (int i = 0; i < segments; ++i)
-                inputs[i] = Enumerable.Repeat((byte)(i + 1), (int)Native.BufferSize(i)).ToArray();
+            var inputs = Enumerable.Range(0, segments).Select(i => new Native.OverlappedRecord(Enumerable.Repeat((byte)(i + 1), Native.BufferSize(i)).ToArray())).ToArray();
 
             Native.Write(DokanOperationsFixture.FileName.AsDriveBasedPath(), segments, inputs);
 
 #if !LOGONLY
+            for (int i = 0; i < segments; ++i)
+            {
+                Assert.AreEqual(0, inputs[i].Win32Error, "Unexpected Win32 error");
+                //Assert.AreEqual(inputs[i].BytesTransferred, Native.BufferSize(i), "Unexpected number of bytes written");
+            }
+
             fixture.VerifyAll();
 #endif
         }
