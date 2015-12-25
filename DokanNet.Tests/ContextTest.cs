@@ -1,0 +1,315 @@
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static DokanNet.Tests.FileSettings;
+
+namespace DokanNet.Tests
+{
+    [TestClass]
+    public sealed class ContextTest
+    {
+        private const int FILE_BUFFER_SIZE = 262144;
+
+        private static byte[] smallData;
+
+        private static byte[] largeData;
+
+        private class TracingContext
+        {
+            private ContextTest test;
+
+            private string name;
+
+            public TracingContext(ContextTest test)
+            {
+                this.test = test;
+            }
+
+            public void InitTrace(string name)
+            {
+                this.name = name;
+                test.context = null;
+            }
+
+            public override string ToString() => name != null ? $"{nameof(TestContext)} '{name}' #{++test.contextAccessCount}" : base.ToString();
+        }
+
+        private TracingContext context;
+
+        private int contextAccessCount;
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            smallData = new byte[4096];
+            for (int i = 0; i < smallData.Length; ++i)
+                smallData[i] = (byte)(i % 256);
+
+            largeData = new byte[5 * FILE_BUFFER_SIZE + 65536];
+            for (int i = 0; i < largeData.Length; ++i)
+                largeData[i] = (byte)(i % 251);
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            largeData = null;
+            smallData = null;
+        }
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            DokanOperationsFixture.InitInstance();
+
+            context = new TracingContext(this);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            bool hasUnmatchedInvocations = false;
+            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void Create_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            context.InitTrace(nameof(Create_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.Create())
+            {
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+            }
+
+#if !LOGONLY
+            //Assert.AreEqual(3, context.ReadCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            context.InitTrace(nameof(OpenRead_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                var target = new byte[value.Length];
+                int readBytes = stream.Read(target, 0, target.Length);
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(3, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFile_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            context.InitTrace(nameof(OpenRead_WithLargeFile_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+                do
+                {
+                    totalReadBytes += stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                } while (totalReadBytes < largeData.Length);
+
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenRead_WithLargeFile_InParallel_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            context.InitTrace(nameof(OpenRead_WithLargeFile_InParallel_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenRead())
+            {
+                var target = new byte[largeData.Length];
+                int totalReadBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        totalReadBytes += stream.Read(target, origin, count);
+                    }
+                });
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            context.InitTrace(nameof(OpenWrite_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                stream.Write(Encoding.UTF8.GetBytes(value), 0, value.Length);
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(3, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFile_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            context.InitTrace(nameof(OpenWrite_WithLargeFile_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                int totalWrittenBytes = 0;
+
+                do
+                {
+                    int writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
+                    totalWrittenBytes += writtenBytes;
+                } while (totalWrittenBytes < largeData.Length);
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = DokanOperationsFixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            context.InitTrace(nameof(OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly));
+#endif
+
+            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+
+            using (var stream = sut.OpenWrite())
+            {
+                int totalWrittenBytes = 0;
+
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                {
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
+                    lock (stream)
+                    {
+                        stream.Seek(origin, SeekOrigin.Begin);
+                        stream.Write(largeData, origin, count);
+                        totalWrittenBytes += count;
+                    }
+                });
+            }
+
+#if !LOGONLY
+            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+
+            fixture.VerifyAll();
+#endif
+        }
+    }
+}
