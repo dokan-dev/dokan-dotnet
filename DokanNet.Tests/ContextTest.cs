@@ -27,6 +27,7 @@ namespace DokanNet.Tests
                 this.test = test;
             }
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "name")]
             public void InitTrace(string name)
             {
                 this.name = name;
@@ -168,6 +169,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_InParallel_PassesContextCorrectly()
         {
@@ -272,6 +274,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly()
         {

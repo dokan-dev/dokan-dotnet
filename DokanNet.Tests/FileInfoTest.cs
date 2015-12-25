@@ -590,6 +590,7 @@ namespace DokanNet.Tests
             sut.MoveTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void OpenFile_InSpecifiedMode(FileInfo info, FileMode mode, System.IO.FileAccess[] accessModes)
         {
             foreach (var access in accessModes)
@@ -956,6 +957,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
@@ -1001,6 +1003,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
@@ -1250,6 +1253,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
@@ -1292,6 +1296,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
