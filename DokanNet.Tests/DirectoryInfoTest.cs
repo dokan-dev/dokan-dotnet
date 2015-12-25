@@ -318,7 +318,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options: OpenReparsePointOptions);
-            fixture.SetupDeleteDirectory(path, false);
+            fixture.SetupDeleteDirectory(path);
 #endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
@@ -351,7 +351,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path + subFilePath, FileAttributes.Normal);
             fixture.SetupDeleteFile(path + subFilePath);
             fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options:OpenReparsePointOptions);
-            fixture.SetupDeleteDirectory(path, true);
+            fixture.SetupDeleteDirectory(path);
 #endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
@@ -377,7 +377,7 @@ namespace DokanNet.Tests
             fixture.SetupOpenDirectory(path);
             fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
             fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options: OpenReparsePointOptions);
-            fixture.SetupDeleteDirectory(path, true);
+            fixture.SetupDeleteDirectory(path);
 #endif
 
             var sut = new DirectoryInfo(DokanOperationsFixture.DirectoryName.AsDriveBasedPath());
@@ -732,6 +732,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {

@@ -405,6 +405,13 @@ namespace DokanNet.Tests
 
         private static DateTime ToDateTime(string value) => DateTime.Parse(value, CultureInfo.InvariantCulture);
 
+        private static int NumberOfChunks(long bufferSize, long fileSize)
+        {
+            var remainder = default(long);
+            var quotient = Math.DivRem(fileSize, bufferSize, out remainder);
+            return (int)quotient + (remainder > 0 ? 1 : 0);
+        }
+
         internal static string DriveBasedPath(string fileName)
             => DriveName + RootedPath(fileName);
 
@@ -459,6 +466,7 @@ namespace DokanNet.Tests
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal void SetupAny()
         {
             operations
@@ -766,7 +774,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
-        internal void SetupDeleteDirectory(string path, bool recurse)
+        internal void SetupDeleteDirectory(string path)
         {
             operations
                 .Setup(d => d.DeleteDirectory(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
@@ -789,7 +797,7 @@ namespace DokanNet.Tests
             SetupCleanupFile(path, context, isDirectory, deleteOnClose);
         }
 
-        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
         {
             operations
                 .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
@@ -825,10 +833,10 @@ namespace DokanNet.Tests
                     info.Context = null;
                 });
 
-            SetupCloseFile(path, context, isDirectory, deleteOnClose);
+            SetupCloseFile(path, isDirectory, deleteOnClose);
         }
 
-        internal void SetupCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        internal void SetupCloseFile(string path, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.Context == null && i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
@@ -886,7 +894,7 @@ namespace DokanNet.Tests
 
         internal void SetupReadFileInChunks(string path, byte[] buffer, int chunkSize, object context = null, bool synchronousIo = true)
         {
-            var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
+            var offsets = new int[NumberOfChunks(chunkSize, buffer.Length)];
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
                 offsets[index] = offset;
@@ -924,7 +932,7 @@ namespace DokanNet.Tests
 
         internal void SetupWriteFileInChunks(string path, byte[] buffer, int chunkSize, object context = null, bool synchronousIo = true)
         {
-            var offsets = new int[(int)Math.Ceiling((decimal)(buffer.Length / chunkSize)) + 1];
+            var offsets = new int[NumberOfChunks(chunkSize, buffer.Length)];
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
                 offsets[index] = offset;
@@ -1014,6 +1022,7 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.GetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out {_security.AsString()}, {_access}, {info.Log()})"));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "security", Justification = "Reserved for future use")]
         internal void SetupSetFileSecurity(string path, FileSystemSecurity security)
         {
             operations
