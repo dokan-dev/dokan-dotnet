@@ -121,6 +121,12 @@ namespace DokanNet.Tests
                     .Select(i => new OverlappedChunk(BufferSize(bufferSize, fileSize, i)))
                     .ToArray();
                 var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), chunks.Length).Select(e => e()).ToArray();
+                var completions = Enumerable.Range(0, (int)(fileSize / bufferSize + 1)).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                {
+                    chunks[i].Win32Error = dwErrorCode;
+                    chunks[i].BytesTransferred = dwNumberOfBytesTransferred;
+                    waitHandles[i].Set();
+                }).ToArray();
 
                 var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
@@ -129,17 +135,12 @@ namespace DokanNet.Tests
                 {
                     for (int i = 0; i < chunks.Length; ++i)
                     {
-                        var offset = i * FILE_BUFFER_SIZE;
+                        var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
 
                         var chunk = chunks[i];
                         var waitHandle = waitHandles[i];
-                        FileIOCompletionRoutine completion = (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
-                        {
-                            chunk.Win32Error = dwErrorCode;
-                            chunk.BytesTransferred = dwNumberOfBytesTransferred;
-                            waitHandle.Set();
-                        };
+                        var completion = completions[i];
 
                         if (!ReadFileEx(handle, chunk.Buffer, BufferSize(bufferSize, fileSize, i), ref overlapped, completion))
                             chunk.Win32Error = Marshal.GetLastWin32Error();
@@ -154,6 +155,12 @@ namespace DokanNet.Tests
             internal static void WriteEx(string fileName, long bufferSize, long fileSize, OverlappedChunk[] chunks)
             {
                 var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), chunks.Length).Select(e => e()).ToArray();
+                var completions = Enumerable.Range(0, (int)(fileSize / bufferSize + 1)).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                {
+                    chunks[i].Win32Error = dwErrorCode;
+                    chunks[i].BytesTransferred = dwNumberOfBytesTransferred;
+                    waitHandles[i].Set();
+                }).ToArray();
 
                 var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
@@ -162,17 +169,12 @@ namespace DokanNet.Tests
                 {
                     for (int i = 0; i < chunks.Length; ++i)
                     {
-                        var offset = i * FILE_BUFFER_SIZE;
+                        var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
 
                         var chunk = chunks[i];
                         var waitHandle = waitHandles[i];
-                        FileIOCompletionRoutine completion = (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
-                        {
-                            chunk.Win32Error = dwErrorCode;
-                            chunk.BytesTransferred = dwNumberOfBytesTransferred;
-                            waitHandle.Set();
-                        };
+                        var completion = completions[i];
 
                         if (!WriteFileEx(handle, chunk.Buffer, BufferSize(bufferSize, fileSize, i), ref overlapped, completion))
                             chunk.Win32Error = Marshal.GetLastWin32Error();
@@ -232,7 +234,7 @@ namespace DokanNet.Tests
             for (int i = 0; i < outputs.Length; ++i)
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i}");
-                //Assert.AreEqual(outputs[i].BytesTransferred, Native.BufferSize(i), $"Unexpected number of bytes read in output {i}");
+                //Assert.AreEqual(outputs[i].BytesTransferred, Native.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), $"Unexpected number of bytes read in output {i}");
                 Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i}");
             }
 
@@ -263,7 +265,7 @@ namespace DokanNet.Tests
             for (int i = 0; i < inputs.Length; ++i)
             {
                 Assert.AreEqual(0, inputs[i].Win32Error, "Unexpected Win32 error");
-                //Assert.AreEqual(inputs[i].BytesTransferred, Native.BufferSize(i), "Unexpected number of bytes written");
+                //Assert.AreEqual(inputs[i].BytesTransferred, Native.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), "Unexpected number of bytes written");
             }
 
             fixture.VerifyAll();
@@ -295,7 +297,7 @@ namespace DokanNet.Tests
             for (int i = 0; i < outputs.Length; ++i)
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
-                //Assert.AreEqual(outputs[i].BytesTransferred, Native.BufferSize(i), $"Unexpected number of bytes read in output {i}");
+                //Assert.AreEqual(outputs[i].BytesTransferred, Native.BufferSize(bufferSize, fileSize, i), $"Unexpected number of bytes read in output {i}");
                 Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
             }
 
@@ -323,15 +325,15 @@ namespace DokanNet.Tests
 #endif
 
             var numberOfChunks = testData.Length / bufferSize + 1;
-            var inputs = Enumerable.Range(0, numberOfChunks).Select(i => new Native.OverlappedChunk(Enumerable.Repeat((byte)(i + 1), Native.BufferSize(FILE_BUFFER_SIZE, testData.Length, i)).ToArray())).ToArray();
+            var inputs = Enumerable.Range(0, numberOfChunks).Select(i => new Native.OverlappedChunk(Enumerable.Repeat((byte)(i + 1), Native.BufferSize(bufferSize, testData.Length, i)).ToArray())).ToArray();
 
-            Native.WriteEx(DokanOperationsFixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length, inputs);
+            Native.WriteEx(DokanOperationsFixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length, inputs);
 
 #if !LOGONLY
             for (int i = 0; i < inputs.Length; ++i)
             {
                 Assert.AreEqual(0, inputs[i].Win32Error, $"Unexpected Win32 error for BufferSize={bufferSize}, FileSize={fileSize}");
-                //Assert.AreEqual(inputs[i].BytesTransferred, Native.BufferSize(i), "Unexpected number of bytes written");
+                //Assert.AreEqual(inputs[i].BytesTransferred, Native.BufferSize(bufferSize, fileSize, i), "Unexpected number of bytes written");
             }
 
             fixture.VerifyAll();
