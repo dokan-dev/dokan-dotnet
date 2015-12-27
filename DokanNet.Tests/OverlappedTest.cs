@@ -84,6 +84,12 @@ namespace DokanNet.Tests
             private static extern bool ReadFileEx(SafeFileHandle hFile, byte[] lpBuffer, int nNumberOfBytesToRead, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
 
             [DllImport(KERNEL_32_DLL, SetLastError = true)]
+            private static extern bool SetEndOfFile(SafeFileHandle hFile);
+
+            [DllImport(KERNEL_32_DLL, SetLastError = true)]
+            private static extern int SetFilePointer(SafeFileHandle hFile, int lDistanceToMove, out int lpDistanceToMoveHigh, MoveMethod dwMoveMethod);
+
+            [DllImport(KERNEL_32_DLL, SetLastError = true)]
             private static extern bool WriteFileEx(SafeFileHandle hFile, byte[] lpBuffer, int nNumberOfBytesToWrite, ref NativeOverlapped lpOverlapped, FileIOCompletionRoutine lpCompletionRoutine);
 
             private delegate void FileIOCompletionRoutine(int dwErrorCode, int dwNumberOfBytesTransfered, ref NativeOverlapped lpOverlapped);
@@ -171,6 +177,13 @@ namespace DokanNet.Tests
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE, IntPtr.Zero, CreationDisposition.OPEN_ALWAYS, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
+                    var offsetHigh = (int)(fileSize >> 32);
+                    if (SetFilePointer(handle, (int)(fileSize & 0xffffffff), out offsetHigh, MoveMethod.FILE_BEGIN) != fileSize || offsetHigh != (int)(fileSize >> 32) || !SetEndOfFile(handle))
+                    {
+                        chunks[0].Win32Error = Marshal.GetLastWin32Error();
+                        throw new InvalidOperationException();
+                    }
+
                     for (int i = 0; i < chunks.Length; ++i)
                     {
                         var offset = i * bufferSize;
@@ -256,6 +269,8 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: testData);
+            fixture.SetupSetAllocationSize(path, testData.Length);
+            fixture.SetupSetEndOfFile(path, testData.Length);
             fixture.SetupWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
@@ -329,6 +344,8 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: testData);
+            fixture.SetupSetAllocationSize(path, testData.Length);
+            fixture.SetupSetEndOfFile(path, testData.Length);
             fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
 #endif
 
