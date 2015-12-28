@@ -31,8 +31,6 @@ namespace DokanNet.Tests
         {
             largeData = null;
             smallData = null;
-
-            var x = DokanOperationsFixture.Hub.Instance.LogEntries;
         }
 
         [TestInitialize]
@@ -52,7 +50,6 @@ namespace DokanNet.Tests
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetAttributes_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetAttributes_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -85,13 +82,11 @@ namespace DokanNet.Tests
 
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetDirectory_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetDirectory_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName;
@@ -106,13 +101,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetExists_WhereFileExists_ReturnsCorrectResult()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetExists_WhereFileExists_ReturnsCorrectResult));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -130,13 +123,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         public void GetExists_WhereFileDoesNotExist_ReturnsCorrectResult()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetExists_WhereFileDoesNotExist_ReturnsCorrectResult));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -153,13 +144,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetExtension_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetExtension_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -196,13 +185,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetIsReadOnly_WhereFileIsReadWrite_ReturnsCorrectResult()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetIsReadOnly_WhereFileIsReadWrite_ReturnsCorrectResult));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -220,13 +207,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void AppendText_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(AppendText_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -249,13 +234,11 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void CopyTo_WhereSourceIsEmpty_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CopyTo_WhereSourceIsEmpty_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -267,12 +250,12 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+            // WARNING: This is probably an error in AppVeyor's test execution flow!
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
-
-fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
@@ -282,14 +265,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "NonEmpty")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -318,13 +299,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void CopyTo_WhereSourceIsLargeFile_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CopyTo_WhereSourceIsLargeFile_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -352,14 +331,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void CopyTo_WhereSourceDoesNotExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CopyTo_WhereSourceDoesNotExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -372,14 +349,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void CopyTo_WhereTargetExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CopyTo_WhereTargetExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -396,13 +371,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.CopyTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Create_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Create_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -424,13 +397,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void CreateText_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(CreateText_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -452,13 +423,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Delete_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Delete_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -477,13 +446,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         public void Delete_WhereFileDoesNotExists_IgnoresResult()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Delete_WhereFileDoesNotExists_IgnoresResult));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -500,13 +467,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetAccessControl_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(GetAccessControl_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -529,14 +494,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
             Assert.AreEqual(DokanOperationsFixture.DefaultFileSecurity.AsString(), security.AsString(), "Security descriptors should match");
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(MoveTo_WhereParentIsRoot_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -558,14 +521,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(MoveTo_WhereParentIsDirectory_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string origin = Path.Combine(DokanOperationsFixture.DirectoryName, DokanOperationsFixture.FileName),
@@ -588,14 +549,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void MoveTo_WhereSourceDoesNotExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(MoveTo_WhereSourceDoesNotExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -608,14 +567,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.MoveTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void MoveTo_WhereTargetExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(MoveTo_WhereTargetExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -633,13 +590,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
 
             sut.MoveTo(DokanOperationsFixture.DestinationFileName.AsDriveBasedPath());
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void OpenFile_InSpecifiedMode(FileInfo info, FileMode mode, System.IO.FileAccess[] accessModes)
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenFile_InSpecifiedMode));
             foreach (var access in accessModes)
             {
                 Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
@@ -672,13 +627,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
                     }
                 }
             }
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsAppend_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsAppend_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -698,13 +651,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsCreate_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsCreate_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -725,13 +676,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsCreateNew_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsCreateNew_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -752,14 +701,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void Open_WhereFileModeIsCreateNew_AndFileExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsCreateNew_AndFileExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -773,13 +720,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 
             var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsOpen_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsOpen_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -800,14 +745,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(FileNotFoundException), "Expected FileNotFoundException not thrown")]
         public void Open_WhereFileModeIsOpen_AndFileDoesNotExists_Throws()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsOpen_AndFileDoesNotExists_Throws));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -821,13 +764,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 
             var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsOpenOrCreate_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsOpenOrCreate_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -849,13 +790,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Open_WhereFileModeIsTruncate_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Open_WhereFileModeIsTruncate_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -875,13 +814,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -910,13 +847,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Timing)]
         public void OpenRead_WithDelay_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithDelay_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -945,13 +880,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithLargeFile_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -985,13 +918,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFileUsingContext_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithLargeFileUsingContext_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1026,14 +957,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithLargeFile_InRandomOrder_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1074,14 +1003,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1122,13 +1049,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenRead_WithLockingAndUnlocking_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1160,13 +1085,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenText_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenText_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1194,13 +1117,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1227,13 +1148,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Timing)]
         public void OpenWrite_WithDelay_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithDelay_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1260,13 +1179,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithLargeFile_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1299,13 +1216,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFileUsingContext_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithLargeFileUsingContext_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1338,14 +1253,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithLargeFile_InRandomOrder_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1383,14 +1296,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1428,13 +1339,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithFlush_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithFlush_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1463,13 +1372,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath();
@@ -1499,14 +1406,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Replace_WhereParentIsRoot_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Replace_WhereParentIsRoot_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName.AsRootedPath(),
@@ -1537,14 +1442,12 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Replace_WhereParentIsDirectory_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(Replace_WhereParentIsDirectory_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string origin = Path.Combine(DokanOperationsFixture.DirectoryName, DokanOperationsFixture.FileName),
@@ -1577,13 +1480,11 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
         public void SetAccessControl_CallsApiCorrectly()
         {
-            DokanOperationsFixture.Hub.Instance.OpenTest(nameof(SetAccessControl_CallsApiCorrectly));
             var fixture = DokanOperationsFixture.Instance;
 
             string path = DokanOperationsFixture.FileName;
@@ -1608,7 +1509,6 @@ fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.Open
 #if !LOGONLY
             fixture.VerifyAll();
 #endif
-            DokanOperationsFixture.Hub.Instance.CloseTest();
         }
     }
 }
