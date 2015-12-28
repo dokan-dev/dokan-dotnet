@@ -59,11 +59,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ContextTest.cs" />
-    <Compile Include="OverlappedTest.cs" />
-    <Compile Include="FileInfoTest.cs" />
+    <Compile Include="ContextTests.cs" />
+    <Compile Include="OverlappedTests.cs" />
+    <Compile Include="FileInfoTests.cs" />
     <Compile Include="DirectoryInfoTest.cs" />
-    <Compile Include="DriveInfoTest.cs" />
+    <Compile Include="DriveInfoTests.cs" />
     <Compile Include="DokanOperationsFixture.cs" />
     <Compile Include="FileSettings.cs" />
     <Compile Include="FileSystemSecurityExtensions.cs" />
@@ -88,7 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="OverlappedTest.Configuration.xml">
-      <DependentUpon>OverlappedTest.cs</DependentUpon>
+      <DependentUpon>OverlappedTests.cs</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>

@@ -8,7 +8,7 @@ using static DokanNet.Tests.FileSettings;
 namespace DokanNet.Tests
 {
     [TestClass]
-    public sealed class ContextTest
+    public sealed class ContextTests
     {
         private const int FILE_BUFFER_SIZE = 262144;
 
@@ -18,11 +18,11 @@ namespace DokanNet.Tests
 
         private class TracingContext
         {
-            private ContextTest test;
+            private ContextTests test;
 
             private string name;
 
-            public TracingContext(ContextTest test)
+            public TracingContext(ContextTests test)
             {
                 this.test = test;
             }
