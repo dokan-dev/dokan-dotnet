@@ -11,7 +11,7 @@ using System.Diagnostics;
 namespace DokanNet.Tests
 {
     [TestClass]
-    public sealed class OverlappedTest
+    public sealed class OverlappedTests
     {
         private const long FILE_BUFFER_SIZE = 1 << 19;
 
@@ -143,7 +143,7 @@ namespace DokanNet.Tests
                 var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
 
-                using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_READ, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
+                using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_READ | ShareMode.FILE_SHARE_DELETE, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_NO_BUFFERING | FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
                     for (int i = 0; i < chunks.Length; ++i)
                     {
@@ -175,7 +175,7 @@ namespace DokanNet.Tests
                 var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
                 awaiterThread.Start();
 
-                using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE, IntPtr.Zero, CreationDisposition.OPEN_ALWAYS, FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
+                using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_NO_BUFFERING | FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
                     var offsetHigh = (int)(fileSize >> 32);
                     if (SetFilePointer(handle, (int)(fileSize & 0xffffffff), out offsetHigh, MoveMethod.FILE_BEGIN) != fileSize || offsetHigh != (int)(fileSize >> 32) || !SetEndOfFile(handle))
@@ -239,7 +239,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: testData);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
             fixture.SetupReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
@@ -268,7 +268,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: testData);
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
             fixture.SetupSetAllocationSize(path, testData.Length);
             fixture.SetupSetEndOfFile(path, testData.Length);
             fixture.SetupWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
@@ -308,7 +308,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: testData);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
             fixture.SetupReadFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
 #endif
 
@@ -343,7 +343,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: testData);
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
             fixture.SetupSetAllocationSize(path, testData.Length);
             fixture.SetupSetEndOfFile(path, testData.Length);
             fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
