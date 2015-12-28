@@ -14,12 +14,13 @@ namespace DokanNet
         #region Dokan Driver Errors
 
         private const int DOKAN_SUCCESS = 0;
-        private const int DOKAN_ERROR = -1;
-        private const int DOKAN_DRIVE_LETTER_ERROR = -2;
-        private const int DOKAN_DRIVER_INSTALL_ERROR = -3;
-        private const int DOKAN_START_ERROR = -4;
-        private const int DOKAN_MOUNT_ERROR = -5;
-        private const int DOKAN_MOUNT_POINT_ERROR = -6;
+        private const int DOKAN_ERROR = -1;                 /* General Error */
+        private const int DOKAN_DRIVE_LETTER_ERROR = -2;    /* Bad Drive letter */
+        private const int DOKAN_DRIVER_INSTALL_ERROR = -3;  /* Can't install driver */
+        private const int DOKAN_START_ERROR = -4;           /* Driver something wrong */
+        private const int DOKAN_MOUNT_ERROR = -5;           /* Can't assign a drive letter or mount point */
+        private const int DOKAN_MOUNT_POINT_ERROR = -6;     /* Mount point is invalid */
+        private const int DOKAN_VERSION_ERROR = -7;         /* Requested an incompatible version */
 
         #endregion Dokan Driver Errors
 
@@ -99,7 +100,9 @@ namespace DokanNet
                 case DOKAN_START_ERROR:
                     throw new DokanException(status, "Something's wrong with the Dokan driver");
                 case DOKAN_MOUNT_POINT_ERROR:
-                    throw new DokanException(status, "Mount point is invalid ");
+                    throw new DokanException(status, "Mount point is invalid");
+                case DOKAN_VERSION_ERROR:
+                    throw new DokanException(status, "Version error");
             }
         }
 
