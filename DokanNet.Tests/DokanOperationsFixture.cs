@@ -1093,16 +1093,7 @@ namespace DokanNet.Tests
                 Thread.Sleep(1);
             }
 
-            Trace($"Trailing 1 ...");
-            Thread.Sleep(5);
-
             operations.VerifyAll();
-
-            Trace($"Trailing 2 ...");
-            Thread.Sleep(5);
-
-            Trace($"Trailing 3 ...");
-            Thread.Sleep(5);
         }
     }
 }
