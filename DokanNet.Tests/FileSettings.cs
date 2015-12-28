@@ -53,5 +53,7 @@ namespace DokanNet.Tests
         public const FileOptions WriteFileOptions = FileOptions.None;
 
         public const FileOptions OpenReparsePointOptions = (FileOptions)0x00200000;
+
+        public const FileOptions OpenNoBufferingOptions = (FileOptions)0x20000000;
     }
 }
