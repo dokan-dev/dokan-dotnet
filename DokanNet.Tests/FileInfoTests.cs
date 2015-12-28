@@ -272,8 +272,7 @@ namespace DokanNet.Tests
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 
-fixture.SetupCreateFileWithoutCleanup(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
-fixture.SetupCreateFileWithoutCleanup(destinationPath, ReadWriteAccess | DeleteAccess | ChangePermissionsAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
 #endif
 
             var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
