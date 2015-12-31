@@ -87,10 +87,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="OverlappedTest.Configuration.xml">
+    <Content Include="OverlappedTests.Configuration.xml">
       <DependentUpon>OverlappedTests.cs</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Choose>
