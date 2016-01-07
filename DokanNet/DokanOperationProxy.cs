@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
+using System.Threading;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace DokanNet
@@ -15,18 +16,10 @@ namespace DokanNet
     {
         #region Delegates
 
-        public delegate NtStatus CreateFileDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, uint rawAccessMode, uint rawShare,
-            uint rawCreationDisposition, uint rawFlagsAndAttributes,
+        public delegate NtStatus ZwCreateFileDelegate(
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr SecurityContext, uint rawDesiredAccess, uint rawFileAttributes,
+            uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
             [MarshalAs(UnmanagedType.LPStruct), In, Out] DokanFileInfo dokanFileInfo);
-
-        public delegate NtStatus OpenDirectoryDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string fileName,
-            [MarshalAs(UnmanagedType.LPStruct), In, Out] DokanFileInfo fileInfo);
-
-        public delegate NtStatus CreateDirectoryDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
-            [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate void CleanupDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
@@ -78,7 +71,7 @@ namespace DokanNet
         public delegate NtStatus DeleteFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
-        
+
         public delegate NtStatus DeleteDirectoryDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
@@ -126,12 +119,14 @@ namespace DokanNet
             IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        public delegate NtStatus EnumerateNamedStreamsDelegate(
-            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawEnumContext,
-            [MarshalAs(UnmanagedType.LPWStr)] StringBuilder rawStreamName, ref uint rawStreamNameLength, ref long rawStreamSize,
+        public delegate NtStatus FindStreamsDelegate(
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
+            [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
+
+        public delegate NtStatus MountedDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-        public delegate NtStatus UnmountDelegate(
+        public delegate NtStatus UnmountedDelegate(
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         #endregion Delegates
@@ -150,7 +145,7 @@ namespace DokanNet
         {
 #if TRACE
             Console.WriteLine(message);
-            Thread.Sleep(500):
+            Thread.Sleep(500);
 #endif
         }
 
@@ -162,26 +157,30 @@ namespace DokanNet
                 context, info.DeleteOnClose, info.IsDirectory, info.NoCache, info.PagingIo, info.ProcessId, info.SynchronousIo, info.WriteToEndOfFile);
         }
 
-        public NtStatus CreateFileProxy(string rawFileName,
-                                   uint rawAccessMode, uint rawShare, uint rawCreationDisposition, uint rawFlagsAndAttributes,
-                                   DokanFileInfo rawFileInfo)
+        public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, uint rawDesiredAccess, uint rawFileAttributes,
+            uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
+            DokanFileInfo rawFileInfo)
         {
             try
             {
+                int FileAttributesAndFlags = 0;
+                int CreationDisposition = 0;
+                NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions, rawCreateDisposition, ref FileAttributesAndFlags, ref CreationDisposition);
+
                 Trace("\nCreateFileProxy : " + rawFileName);
-                Trace("\tCreationDisposition\t" + (FileMode)rawCreationDisposition);
-                Trace("\tFileAccess\t" + (FileAccess)rawAccessMode);
-                Trace("\tFileShare\t" + (FileShare)rawShare);
-                Trace("\tFileOptions\t" + (FileOptions)(rawFlagsAndAttributes & 0xffffc000));
-                Trace("\tFileAttributes\t" + (FileAttributes)(rawFlagsAndAttributes & 0x3fff));
+                Trace("\tCreationDisposition\t" + (FileMode)CreationDisposition);
+                Trace("\tFileAccess\t" + (FileAccess)rawDesiredAccess);
+                Trace("\tFileShare\t" + (FileShare)rawShareAccess);
+                Trace("\tFileOptions\t" + (FileOptions)(FileAttributesAndFlags & 0xffffc000));
+                Trace("\tFileAttributes\t" + (FileAttributes)(FileAttributesAndFlags & 0x3fff));
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
                 NtStatus result = operations.CreateFile(rawFileName,
-                                                    (FileAccess)rawAccessMode,
-                                                    (FileShare)rawShare,
-                                                    (FileMode)rawCreationDisposition,
-                                                    (FileOptions)(rawFlagsAndAttributes & 0xffffc000),
-                                                    (FileAttributes)(rawFlagsAndAttributes & 0x3fff),
+                                                    (FileAccess)rawDesiredAccess,
+                                                    (FileShare)rawShareAccess,
+                                                    (FileMode)CreationDisposition,
+                                                    (FileOptions)(FileAttributesAndFlags & 0xffffc000),
+                                                    (FileAttributes)(FileAttributesAndFlags & 0x3fff),
                                                     rawFileInfo);
 
                 Trace("CreateFileProxy : " + rawFileName + " Return : " + result);
@@ -192,55 +191,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("CreateFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.Unsuccessful;
-            }
-        }
-
-        ////
-
-        public NtStatus OpenDirectoryProxy(string rawFileName,
-                                      DokanFileInfo rawFileInfo)
-        {
-            try
-            {
-                Trace("\nOpenDirectoryProxy : " + rawFileName);
-                Trace("\tContext\t" + ToTrace(rawFileInfo));
-
-                NtStatus result = operations.OpenDirectory(rawFileName, rawFileInfo);
-
-                Trace("OpenDirectoryProxy : " + rawFileName + " Return : " + result);
-                return result;
-            }
-#pragma warning disable 0168
-            catch (Exception ex)
-#pragma warning restore 0168
-            {
-                Trace("OpenDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
-            }
-        }
-
-        ////
-
-        public NtStatus CreateDirectoryProxy(string rawFileName,
-                                        DokanFileInfo rawFileInfo)
-        {
-            try
-            {
-                Trace("\nCreateDirectoryProxy : " + rawFileName);
-                Trace("\tContext\t" + ToTrace(rawFileInfo));
-
-                NtStatus result = operations.CreateDirectory(rawFileName, rawFileInfo);
-
-                Trace("CreateDirectoryProxy : " + rawFileName + " Return : " + result);
-                return result;
-            }
-#pragma warning disable 0168
-            catch (Exception ex)
-#pragma warning restore 0168
-            {
-                Trace("CreateDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.Unsuccessful;
             }
         }
 
@@ -311,7 +262,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("ReadFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -338,7 +289,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("WriteFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -362,7 +313,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("FlushFileBuffersProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -380,7 +331,7 @@ namespace DokanNet
 
                 NtStatus result = operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
 
-                if (result == NtStatus.Success)
+                if (result == DokanResult.Success)
                 {
                     Debug.Assert(fi.FileName != null);
                     Trace("\tFileName\t" + fi.FileName);
@@ -421,7 +372,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("GetFileInformationProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -441,7 +392,7 @@ namespace DokanNet
                 NtStatus result = operations.FindFiles(rawFileName, out files, rawFileInfo);
 
                 Debug.Assert(files != null);
-                if (result == NtStatus.Success && files.Count != 0)
+                if (result == DokanResult.Success && files.Count != 0)
                 {
                     foreach (FileInformation fi in files)
                     {
@@ -454,7 +405,7 @@ namespace DokanNet
                     }
 
                 var fill =
-                   (FILL_FIND_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_DATA));
+                   (FILL_FIND_FILE_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_FILE_DATA));
                     // used a single entry call to speed up the "enumeration" of the list
                     for (int index = 0; index < files.Count; index++)
                     {
@@ -470,11 +421,11 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("FindFilesProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
-        private static void Addto(FILL_FIND_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void Addto(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
             long ctime = fi.CreationTime.ToFileTime();
@@ -507,6 +458,62 @@ namespace DokanNet
             fill(ref data, rawFileInfo);
         }
 
+        public NtStatus FindStreamsProxy(string rawFileName,
+                          IntPtr rawFillFindData,
+                          DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                IList<FileInformation> files;
+
+                Trace("\nFindStreamsProxy: " + rawFileName);
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
+
+                NtStatus result = operations.FindStreams(rawFileName, out files, rawFileInfo);
+
+                Debug.Assert(files != null);
+                if (result == DokanResult.Success && files.Count != 0)
+                {
+                    foreach (FileInformation fi in files)
+                    {
+                        Trace("\n\tFileName\t" + fi.FileName);
+                        Trace("\tLength\t" + fi.Length);
+                    }
+
+                    var fill =
+                       (FILL_FIND_STREAM_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_STREAM_DATA));
+                    // used a single entry call to speed up the "enumeration" of the list
+                    for (int index = 0; index < files.Count; index++)
+                    {
+                        Addto(fill, rawFileInfo, files[index]);
+                    }
+                }
+
+                Trace("FindStreamsProxy : " + rawFileName + " Return : " + result);
+                return result;
+            }
+#pragma warning disable 0168
+            catch (Exception ex)
+#pragma warning restore 0168
+            {
+                Trace("FindStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
+                return DokanResult.InvalidParameter;
+            }
+        }
+
+        private static void Addto(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
+            var data = new WIN32_FIND_STREAM_DATA
+            {
+                StreamSize = fi.Length,
+                cStreamName = fi.FileName
+            };
+            //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
+
+            fill(ref data, rawFileInfo);
+        }
+
         ////
 
         public NtStatus SetEndOfFileProxy(string rawFileName,
@@ -529,7 +536,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("SetEndOfFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -552,7 +559,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("SetAllocationSizeProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -578,7 +585,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("SetFileAttributesProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -616,7 +623,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("SetFileTimeProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -640,7 +647,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("DeleteFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -664,7 +671,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("DeleteDirectoryProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -691,7 +698,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("MoveFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -718,7 +725,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("LockFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -745,7 +752,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("UnlockFileProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -772,7 +779,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("GetDiskFreeSpaceProxy Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -791,7 +798,7 @@ namespace DokanNet
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
                 NtStatus result = operations.GetVolumeInformation(out label, out rawFileSystemFlags, out name, rawFileInfo);
 
-                if (result == NtStatus.Success)
+                if (result == DokanResult.Success)
                 {
                     Debug.Assert(!String.IsNullOrEmpty(name));
                     Debug.Assert(!String.IsNullOrEmpty(label));
@@ -812,28 +819,49 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("GetVolumeInformationProxy Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
-        public NtStatus UnmountProxy(DokanFileInfo rawFileInfo)
+        public NtStatus MountedProxy(DokanFileInfo rawFileInfo)
         {
             try
             {
-                Trace("\nUnmountProxy");
+                Trace("\nMountedProxy");
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
-                NtStatus result = operations.Unmount(rawFileInfo);
+                NtStatus result = operations.Mounted(rawFileInfo);
 
-                Trace("UnmountProxy Return : " + result);
+                Trace("MountedProxy Return : " + result);
                 return result;
             }
 #pragma warning disable 0168
             catch (Exception ex)
 #pragma warning restore 0168
             {
-                Trace("UnmountProxy Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                Trace("MountedProxy Throw : " + ex.Message);
+                return DokanResult.InvalidParameter;
+            }
+        }
+
+        public NtStatus UnmountedProxy(DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                Trace("\nUnmountedProxy");
+                Trace("\tContext\t" + ToTrace(rawFileInfo));
+
+                NtStatus result = operations.Unmounted(rawFileInfo);
+
+                Trace("UnmountedProxy Return : " + result);
+                return result;
+            }
+#pragma warning disable 0168
+            catch (Exception ex)
+#pragma warning restore 0168
+            {
+                Trace("UnmountedProxy Throw : " + ex.Message);
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -873,14 +901,14 @@ namespace DokanNet
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
                 NtStatus result = operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
-                if (result == NtStatus.Success /*&& sec != null*/)
+                if (result == DokanResult.Success /*&& sec != null*/)
                 {
                     Debug.Assert(sec != null);
                     Trace("\tFileSystemSecurity Result : " + sec);
                     var buffer = sec.GetSecurityDescriptorBinaryForm();
                     rawSecurityDescriptorLengthNeeded = (uint)buffer.Length;
                     if (buffer.Length > rawSecurityDescriptorLength)
-                        return NtStatus.BufferOverflow;
+                        return DokanResult.BufferOverflow;
 
                     Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
                 }
@@ -893,7 +921,7 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("GetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
@@ -944,46 +972,22 @@ namespace DokanNet
 #pragma warning restore 0168
             {
                 Trace("SetFileSecurityProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
+                return DokanResult.InvalidParameter;
             }
         }
 
-        public NtStatus EnumerateNamedStreamsProxy(string rawFileName,
-                                              IntPtr rawEnumContext,
-                                              StringBuilder rawStreamName, ref uint rawStreamNameLength,
-                                              ref long rawStreamSize,
-                                              DokanFileInfo rawFileInfo)
-        {
-            try
-            {
-                Trace("\tEnumerateNamedStreamsProxy : " + rawFileName);
-                Trace("\tContext\t" + ToTrace(rawFileInfo));
+        #region Nested type: FILL_FIND_FILE_DATA
 
-                string name;
-                NtStatus result = operations.EnumerateNamedStreams(rawFileName, rawEnumContext, out name, out rawStreamSize, rawFileInfo);
-                if (result == NtStatus.Success)
-                {
-                    rawStreamName.Append(name);
-                    rawStreamNameLength = (uint)name.Length;
-                }
-
-                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Return : " + result);
-                return result;
-            }
-#pragma warning disable 0168
-            catch (Exception ex)
-#pragma warning restore 0168
-            {
-                Trace("EnumerateNamedStreamsProxy : " + rawFileName + " Throw : " + ex.Message);
-                return NtStatus.InvalidParameter;
-            }
-        }
-
-#region Nested type: FILL_FIND_DATA
-
-        private delegate long FILL_FIND_DATA(
+        private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
-#endregion Nested type: FILL_FIND_DATA
+        #endregion Nested type: FILL_FIND_FILE_DATA
+
+        #region Nested type: FILL_FIND_STREAM_DATA
+
+        private delegate long FILL_FIND_STREAM_DATA(
+            ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+
+        #endregion Nested type: FILL_FIND_STREAM_DATA
     }
 }

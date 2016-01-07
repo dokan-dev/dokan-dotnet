@@ -4,7 +4,10 @@ configuration:
 - Debug
 platform:
 - Any CPU
-os: Windows Server 2012 R2
+os: Visual Studio 2015
+branches:
+  only:
+    - master
 install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -24,10 +27,3 @@ test:
     except:
       - Manual
       - Timing
-notifications:
-- provider: Email
-  to:
-  - reports@islog.com
-  on_build_success: false
-  on_build_failure: false
-  on_build_status_changed: true

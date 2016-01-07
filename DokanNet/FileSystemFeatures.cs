@@ -3,7 +3,9 @@
 namespace DokanNet
 {
     [Flags]
+#pragma warning disable 3009
     public enum FileSystemFeatures : uint
+#pragma warning restore 3009
     {
         None = 0,
         CaseSensitiveSearch = 1,

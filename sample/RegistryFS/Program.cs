@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
 
-namespace RegistoryFS
+namespace RegistryFS
 {
     internal class RFS : IDokanOperations
     {
@@ -30,11 +30,6 @@ namespace RegistoryFS
         {
         }
 
-        public NtStatus CreateDirectory(string filename, DokanFileInfo info)
-        {
-            return NtStatus.Error;
-        }
-
         public NtStatus CreateFile(
             string filename,
             FileAccess access,
@@ -44,17 +39,19 @@ namespace RegistoryFS
             System.IO.FileAttributes attributes,
             DokanFileInfo info)
         {
-            return NtStatus.Success;
+            if (info.IsDirectory && mode == System.IO.FileMode.CreateNew)
+                return DokanResult.AccessDenied;
+            return DokanResult.Success;
         }
 
         public NtStatus DeleteDirectory(string filename, DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus DeleteFile(string filename, DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         private RegistryKey GetRegistoryEntry(string name)
@@ -81,7 +78,7 @@ namespace RegistoryFS
             string filename,
             DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus FindFiles(
@@ -102,13 +99,13 @@ namespace RegistoryFS
                     finfo.CreationTime = DateTime.Now;
                     files.Add(finfo);
                 }
-                return NtStatus.Success;
+                return DokanResult.Success;
             }
             else
             {
                 RegistryKey key = GetRegistoryEntry(filename);
                 if (key == null)
-                    return NtStatus.Error;
+                    return DokanResult.Error;
                 foreach (string name in key.GetSubKeyNames())
                 {
                     FileInformation finfo = new FileInformation();
@@ -129,7 +126,7 @@ namespace RegistoryFS
                     finfo.CreationTime = DateTime.Now;
                     files.Add(finfo);
                 }
-                return NtStatus.Success;
+                return DokanResult.Success;
             }
         }
 
@@ -139,6 +136,8 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             fileinfo = new FileInformation();
+            fileinfo.FileName = filename;
+
             if (filename == "\\")
             {
                 fileinfo.Attributes = System.IO.FileAttributes.Directory;
@@ -146,19 +145,19 @@ namespace RegistoryFS
                 fileinfo.LastWriteTime = DateTime.Now;
                 fileinfo.CreationTime = DateTime.Now;
 
-                return NtStatus.Success;
+                return DokanResult.Success;
             }
 
             RegistryKey key = GetRegistoryEntry(filename);
             if (key == null)
-                return NtStatus.Error;
+                return DokanResult.Error;
 
             fileinfo.Attributes = System.IO.FileAttributes.Directory;
             fileinfo.LastAccessTime = DateTime.Now;
             fileinfo.LastWriteTime = DateTime.Now;
             fileinfo.CreationTime = DateTime.Now;
 
-            return NtStatus.Success;
+            return DokanResult.Success;
         }
 
         public NtStatus LockFile(
@@ -167,7 +166,7 @@ namespace RegistoryFS
             long length,
             DokanFileInfo info)
         {
-            return NtStatus.Success;
+            return DokanResult.Success;
         }
 
         public NtStatus MoveFile(
@@ -176,12 +175,7 @@ namespace RegistoryFS
             bool replace,
             DokanFileInfo info)
         {
-            return NtStatus.Error;
-        }
-
-        public NtStatus OpenDirectory(string filename, DokanFileInfo info)
-        {
-            return NtStatus.Success;
+            return DokanResult.Error;
         }
 
         public NtStatus ReadFile(
@@ -192,17 +186,17 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             readBytes = 0;
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus SetEndOfFile(string filename, long length, DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus SetAllocationSize(string filename, long length, DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus SetFileAttributes(
@@ -210,7 +204,7 @@ namespace RegistoryFS
             System.IO.FileAttributes attr,
             DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus SetFileTime(
@@ -220,17 +214,22 @@ namespace RegistoryFS
             DateTime? mtime,
             DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus UnlockFile(string filename, long offset, long length, DokanFileInfo info)
         {
-            return NtStatus.Success;
+            return DokanResult.Success;
         }
 
-        public NtStatus Unmount(DokanFileInfo info)
+        public NtStatus Mounted(DokanFileInfo info)
         {
-            return NtStatus.Success;
+            return DokanResult.Success;
+        }
+
+        public NtStatus Unmounted(DokanFileInfo info)
+        {
+            return DokanResult.Success;
         }
 
         public NtStatus GetDiskFreeSpace(
@@ -242,7 +241,7 @@ namespace RegistoryFS
             freeBytesAvailable = 512 * 1024 * 1024;
             totalBytes = 1024 * 1024 * 1024;
             totalFreeBytes = 512 * 1024 * 1024;
-            return NtStatus.Success;
+            return DokanResult.Success;
         }
 
         public NtStatus WriteFile(
@@ -253,7 +252,7 @@ namespace RegistoryFS
             DokanFileInfo info)
         {
             writtenBytes = 0;
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
@@ -262,27 +261,33 @@ namespace RegistoryFS
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
             fileSystemName = String.Empty;
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
             DokanFileInfo info)
         {
             security = null;
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
             DokanFileInfo info)
         {
-            return NtStatus.Error;
+            return DokanResult.Error;
         }
 
         public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
             streamName = String.Empty;
             streamSize = 0;
-            return NtStatus.Error;
+            return DokanResult.NotImplemented;
+        }
+
+        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+        {
+            streams = new FileInformation[0];
+            return DokanResult.NotImplemented;
         }
 
         #endregion DokanOperations member

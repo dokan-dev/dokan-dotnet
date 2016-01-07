@@ -1,3 +1,4 @@
+using System;
 using DokanNet.Native;
 
 namespace DokanNet
@@ -6,38 +7,31 @@ namespace DokanNet
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 800; // ver 0.7.4
-        /*
-        private const uint DOKAN_OPTION_DEBUG = 1;
-        private const uint DOKAN_OPTION_STDERR = 2;
-        private const uint DOKAN_OPTION_ALT_STREAM = 4;
-        private const uint DOKAN_OPTION_KEEP_ALIVE = 8;
-        private const uint DOKAN_OPTION_NETWORK = 16;
-        private const uint DOKAN_OPTION_REMOVABLE = 32;
-        */
+        private const ushort DOKAN_VERSION = 800; // ver 0.8.0
 
         #endregion Dokan Driver Options
 
         #region Dokan Driver Errors
 
         private const int DOKAN_SUCCESS = 0;
-        private const int DOKAN_ERROR = -1;
-        private const int DOKAN_DRIVE_LETTER_ERROR = -2;
-        private const int DOKAN_DRIVER_INSTALL_ERROR = -3;
-        private const int DOKAN_START_ERROR = -4;
-        private const int DOKAN_MOUNT_ERROR = -5;
-        private const int DOKAN_MOUNT_POINT_ERROR = -6;
+        private const int DOKAN_ERROR = -1;                 /* General Error */
+        private const int DOKAN_DRIVE_LETTER_ERROR = -2;    /* Bad Drive letter */
+        private const int DOKAN_DRIVER_INSTALL_ERROR = -3;  /* Can't install driver */
+        private const int DOKAN_START_ERROR = -4;           /* Driver something wrong */
+        private const int DOKAN_MOUNT_ERROR = -5;           /* Can't assign a drive letter or mount point */
+        private const int DOKAN_MOUNT_POINT_ERROR = -6;     /* Mount point is invalid */
+        private const int DOKAN_VERSION_ERROR = -7;         /* Requested an incompatible version */
 
         #endregion Dokan Driver Errors
 
         public static void Mount(this IDokanOperations operations, string mountPoint)
         {
-            Mount(operations, mountPoint, DokanOptions.FixedDrive, 0, DOKAN_VERSION);
+            Mount(operations, mountPoint, DokanOptions.FixedDrive);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions)
         {
-            Mount(operations, mountPoint, mountOptions, 0, DOKAN_VERSION);
+            Mount(operations, mountPoint, mountOptions, 0);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount)
@@ -47,6 +41,11 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version)
         {
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20));
+        }
+
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout)
+        {
             var dokanOperationProxy = new DokanOperationProxy(operations);
 
             var dokanOptions = new DOKAN_OPTIONS
@@ -55,20 +54,12 @@ namespace DokanNet
                 MountPoint = mountPoint,
                 ThreadCount = (ushort)threadCount,
                 Options = (uint)mountOptions,
+                Timeout = (uint)timeout.Milliseconds
             };
-
-            /*    dokanOptions.Options |= options.RemovableDrive ? DOKAN_OPTION_REMOVABLE : 0;
-                dokanOptions.Options |= options.DebugMode ? DOKAN_OPTION_DEBUG : 0;
-                dokanOptions.Options |= options.UseStandardError ? DOKAN_OPTION_STDERR : 0;
-                dokanOptions.Options |= options.UseAlternativeStreams ? DOKAN_OPTION_ALT_STREAM : 0;
-                dokanOptions.Options |= options.UseKeepAlive ? DOKAN_OPTION_KEEP_ALIVE : 0;
-                dokanOptions.Options |= options.NetworkDrive ? DOKAN_OPTION_NETWORK : 0;*/
 
             var dokanOperations = new DOKAN_OPERATIONS
             {
-                CreateFile = dokanOperationProxy.CreateFileProxy,
-                OpenDirectory = dokanOperationProxy.OpenDirectoryProxy,
-                CreateDirectory = dokanOperationProxy.CreateDirectoryProxy,
+                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
                 Cleanup = dokanOperationProxy.CleanupProxy,
                 CloseFile = dokanOperationProxy.CloseFileProxy,
                 ReadFile = dokanOperationProxy.ReadFileProxy,
@@ -87,10 +78,11 @@ namespace DokanNet
                 UnlockFile = dokanOperationProxy.UnlockFileProxy,
                 GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
                 GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
-                Unmount = dokanOperationProxy.UnmountProxy,
+                Mounted = dokanOperationProxy.MountedProxy,
+                Unmounted = dokanOperationProxy.UnmountedProxy,
                 GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
-                EnumerateNamedStreams = dokanOperationProxy.EnumerateNamedStreamsProxy,
+                FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
             int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
@@ -102,13 +94,15 @@ namespace DokanNet
                 case DOKAN_DRIVE_LETTER_ERROR:
                     throw new DokanException(status, "Bad drive letter");
                 case DOKAN_DRIVER_INSTALL_ERROR:
-                    throw new DokanException(status, "Can't install driver");
+                    throw new DokanException(status, "Can't install the Dokan driver");
                 case DOKAN_MOUNT_ERROR:
                     throw new DokanException(status, "Can't assign a drive letter or mount point");
                 case DOKAN_START_ERROR:
-                    throw new DokanException(status, "Something's wrong with Dokan driver");
+                    throw new DokanException(status, "Something's wrong with the Dokan driver");
                 case DOKAN_MOUNT_POINT_ERROR:
-                    throw new DokanException(status, "Mount point is invalid ");
+                    throw new DokanException(status, "Mount point is invalid");
+                case DOKAN_VERSION_ERROR:
+                    throw new DokanException(status, "Version error");
             }
         }
 

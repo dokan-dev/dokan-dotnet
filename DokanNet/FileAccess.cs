@@ -21,5 +21,6 @@ namespace DokanNet
         ChangePermissions = 262144,
         SetOwnership = 524288,
         Synchronize = 1048576,
+        Reserved = 16777216
     }
 }

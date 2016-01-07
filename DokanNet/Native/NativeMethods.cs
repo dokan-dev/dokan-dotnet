@@ -27,6 +27,13 @@ namespace DokanNet.Native
         [DllImport("dokan.dll", ExactSpelling = true)]
         public static extern IntPtr DokanOpenRequestorToken(DokanFileInfo rawFileInfo);
 
+        [DllImport("dokan.dll", ExactSpelling = true)]
+        public static extern void DokanMapKernelToUserCreateFileFlags(uint FileAttributes,
+                                                                        uint CreateOptions,
+                                                                        uint CreateDisposition,
+                                                                        ref int outFileAttributesAndFlags,
+                                                                        ref int outCreationDisposition);
+
         /*
         [DllImport("dokan.dll", CharSet = CharSet.Unicode)]
         public static extern bool DokanIsNameInExpression([MarshalAs(UnmanagedType.LPWStr)] string expression,
