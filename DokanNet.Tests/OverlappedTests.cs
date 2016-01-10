@@ -133,7 +133,7 @@ namespace DokanNet.Tests
                     .Select(i => new OverlappedChunk(BufferSize(bufferSize, fileSize, i)))
                     .ToArray();
                 var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), chunks.Length).Select(e => e()).ToArray();
-                var completions = Enumerable.Range(0, (int)(fileSize / bufferSize + 1)).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                var completions = Enumerable.Range(0, chunks.Length).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
                 {
                     chunks[i].Win32Error = dwErrorCode;
                     chunks[i].BytesTransferred = dwNumberOfBytesTransferred;
@@ -165,7 +165,7 @@ namespace DokanNet.Tests
             internal static void WriteEx(string fileName, long bufferSize, long fileSize, OverlappedChunk[] chunks)
             {
                 var waitHandles = Enumerable.Repeat<Func<EventWaitHandle>>(() => new ManualResetEvent(false), chunks.Length).Select(e => e()).ToArray();
-                var completions = Enumerable.Range(0, NumberOfChunks(bufferSize, fileSize)).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
+                var completions = Enumerable.Range(0, chunks.Length).Select<int, FileIOCompletionRoutine>(i => (int dwErrorCode, int dwNumberOfBytesTransferred, ref NativeOverlapped lpOverlapped) =>
                 {
                     chunks[i].Win32Error = dwErrorCode;
                     chunks[i].BytesTransferred = dwNumberOfBytesTransferred;
@@ -294,8 +294,8 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Manual)]
-        [DeploymentItem("OverlappedTest.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTest.Configuration.xml", "ConfigRead", DataAccessMethod.Sequential)]
+        [DeploymentItem("OverlappedTests.Configuration.xml")]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTests.Configuration.xml", "ConfigRead", DataAccessMethod.Sequential)]
         public void OpenRead_WithVariableSizes_Overlapped_CallsApiCorrectly()
         {
             var bufferSize = int.Parse((string)TestContext.DataRow["BufferSize"]);
@@ -329,8 +329,8 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Manual)]
-        [DeploymentItem("OverlappedTest.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTest.Configuration.xml", "ConfigWrite", DataAccessMethod.Sequential)]
+        [DeploymentItem("OverlappedTests.Configuration.xml")]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTests.Configuration.xml", "ConfigWrite", DataAccessMethod.Sequential)]
         public void OpenWrite_WithVariableSizes_Overlapped_CallsApiCorrectly()
         {
             var bufferSize = int.Parse((string)TestContext.DataRow["BufferSize"]);

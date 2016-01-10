@@ -246,7 +246,7 @@ namespace DokanNet.Tests
             }
 
             public void Cleanup(string fileName, DokanFileInfo info)
-                => TryExecute(fileName, info, (f, i) => Target.Cleanup(f, i) , nameof(Cleanup));
+                => TryExecute(fileName, info, (f, i) => Target.Cleanup(f, i), nameof(Cleanup));
 
             public void CloseFile(string fileName, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.CloseFile(f, i), nameof(CloseFile));
