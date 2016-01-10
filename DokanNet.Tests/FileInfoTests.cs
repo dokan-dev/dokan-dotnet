@@ -1420,7 +1420,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
             fixture.SetupCreateFile(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
+            fixture.SetupCreateFile(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
@@ -1460,7 +1460,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
             fixture.SetupCreateFile(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
+            fixture.SetupCreateFile(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(path, FileAttributes.Normal);
