@@ -250,7 +250,6 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
-            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
@@ -1420,7 +1419,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFile(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
             fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
@@ -1428,7 +1427,8 @@ namespace DokanNet.Tests
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupFindStreams(destinationPath, new FileInformation[0]);
-            // WARNING: This is probably an error in the Dokan driver!
+            fixture.SetupFindStreams(path, new FileInformation[0]);
+            // WARNING: This is probably an error in the Dokan driver - the path parameter should be '\' instead of string.Empty!77
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupMoveFile(path, destinationPath, true);
@@ -1459,7 +1459,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFile(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
             fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
@@ -1467,6 +1467,7 @@ namespace DokanNet.Tests
             fixture.SetupSetFileTime(path);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupFindStreams(destinationPath, new FileInformation[0]);
+            fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(destinationPath, destinationBackupPath, true);
             fixture.SetupMoveFile(path, destinationPath, true);

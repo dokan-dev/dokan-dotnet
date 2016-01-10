@@ -230,7 +230,7 @@ namespace DokanNet.Tests
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void OpenRead_WithLargeFileUsingContext_Overlapped_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -259,7 +259,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void OpenWrite_WithLargeFileUsingContext_Overlapped_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;

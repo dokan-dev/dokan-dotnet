@@ -281,13 +281,13 @@ namespace RegistryFS
         {
             streamName = String.Empty;
             streamSize = 0;
-            return DokanResult.NotImplemented;
+            return DokanResult.Success;
         }
 
         public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
         {
             streams = new FileInformation[0];
-            return DokanResult.NotImplemented;
+            return DokanResult.Success;
         }
 
         #endregion DokanOperations member

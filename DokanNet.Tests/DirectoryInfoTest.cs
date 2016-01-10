@@ -745,7 +745,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
-            // WARNING: This is probably an error in the Dokan driver!
+            // WARNING: This is probably an error in the Dokan driver - the path parameter should be '\' instead of string.Empty!77
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(path, destinationPath, false);
 #endif
