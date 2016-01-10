@@ -287,6 +287,12 @@ namespace DokanNetMirror
             return Trace("GetFileInformation", fileName, info, DokanResult.Success);
         }
 
+        private static IList<FileInformation> GetEmptyDirectoryDefaultFiles()
+            => new[] {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+            };
+
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
             files = new DirectoryInfo(GetPath(fileName))
@@ -300,6 +306,9 @@ namespace DokanNetMirror
                     Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
                     FileName = finfo.Name
                 }).ToArray();
+
+            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
+                files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
 
             return Trace("FindFiles", fileName, info, DokanResult.Success);
         }
