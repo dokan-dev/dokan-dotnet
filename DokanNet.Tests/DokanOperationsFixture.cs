@@ -153,7 +153,8 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut>(string fileName, out TOut argOut, DokanFileInfo info, FuncOut2<string, TOut, DokanFileInfo, NtStatus> func, string funcName)
             {
-                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
                     argOut = default(TOut);
                     return DokanResult.AccessDenied;
                 }
@@ -176,7 +177,8 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut, TIn>(string fileName, out TOut argOut, TIn argIn, DokanFileInfo info, FuncOut2<string, TOut, TIn, DokanFileInfo, NtStatus> func, string funcName)
             {
-                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
                     argOut = default(TOut);
                     return DokanResult.AccessDenied;
                 }
@@ -199,7 +201,8 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TIn1, TOut, TIn2>(string fileName, TIn1 argIn1, out TOut argOut, TIn2 argIn2, DokanFileInfo info, FuncOut3<string, TIn1, TOut, TIn2, DokanFileInfo, NtStatus> func, string funcName)
             {
-                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
                     argOut = default(TOut);
                     return DokanResult.AccessDenied;
                 }
@@ -222,7 +225,8 @@ namespace DokanNet.Tests
                 Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut1, TOut2, TOut3>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, NtStatus> func, string funcName)
             {
-                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
                     argOut1 = default(TOut1);
                     argOut2 = default(TOut2);
                     argOut3 = default(TOut3);
@@ -246,7 +250,7 @@ namespace DokanNet.Tests
             }
 
             public void Cleanup(string fileName, DokanFileInfo info)
-                => TryExecute(fileName, info, (f, i) => Target.Cleanup(f, i) , nameof(Cleanup));
+                => TryExecute(fileName, info, (f, i) => Target.Cleanup(f, i), nameof(Cleanup));
 
             public void CloseFile(string fileName, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.CloseFile(f, i), nameof(CloseFile));
@@ -1059,6 +1063,7 @@ namespace DokanNet.Tests
                 Trace($"Waiting for closure (#{i})");
                 Thread.Sleep(1);
             }
+
             operations.VerifyAll();
         }
     }

@@ -22,7 +22,6 @@ namespace DokanNet.Tests
         public static void ClassInitialize(TestContext context)
         {
             smallData = DokanOperationsFixture.InitPeriodicTestData(4096);
-
             largeData = DokanOperationsFixture.InitPeriodicTestData(5 * FILE_BUFFER_SIZE + 65536);
         }
 
@@ -250,6 +249,8 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+            // WARNING: This is probably an error in AppVeyor's test execution flow!
+            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
