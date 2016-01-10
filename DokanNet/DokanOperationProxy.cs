@@ -471,7 +471,7 @@ namespace DokanNet
 
                 NtStatus result = operations.FindStreams(rawFileName, out files, rawFileInfo);
 
-                Debug.Assert(files != null);
+                Debug.Assert(result != DokanResult.NotImplemented && files != null);
                 if (result == DokanResult.Success && files.Count != 0)
                 {
                     foreach (FileInformation fi in files)
