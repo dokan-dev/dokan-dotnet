@@ -163,24 +163,38 @@ namespace DokanNet
         {
             try
             {
+                FileOptions fileOptions = 0;
+                FileAttributes fileAttributes = 0;
                 int FileAttributesAndFlags = 0;
                 int CreationDisposition = 0;
                 NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions, rawCreateDisposition, ref FileAttributesAndFlags, ref CreationDisposition);
+
+                foreach (FileOptions fileOption in Enum.GetValues(typeof(FileOptions)))
+                {
+                    if (((FileOptions)(FileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
+                        fileOptions |= fileOption;
+                }
+
+                foreach (FileAttributes fileAttribute in Enum.GetValues(typeof(FileAttributes)))
+                {
+                    if (((FileAttributes)(FileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
+                        fileAttributes |= fileAttribute;
+                }
 
                 Trace("\nCreateFileProxy : " + rawFileName);
                 Trace("\tCreationDisposition\t" + (FileMode)CreationDisposition);
                 Trace("\tFileAccess\t" + (FileAccess)rawDesiredAccess);
                 Trace("\tFileShare\t" + (FileShare)rawShareAccess);
-                Trace("\tFileOptions\t" + (FileOptions)(FileAttributesAndFlags & 0xffffc000));
-                Trace("\tFileAttributes\t" + (FileAttributes)(FileAttributesAndFlags & 0x3fff));
+                Trace("\tFileOptions\t" + fileOptions);
+                Trace("\tFileAttributes\t" + fileAttributes);
                 Trace("\tContext\t" + ToTrace(rawFileInfo));
 
                 NtStatus result = operations.CreateFile(rawFileName,
                                                     (FileAccess)rawDesiredAccess,
                                                     (FileShare)rawShareAccess,
                                                     (FileMode)CreationDisposition,
-                                                    (FileOptions)(FileAttributesAndFlags & 0xffffc000),
-                                                    (FileAttributes)(FileAttributesAndFlags & 0x3fff),
+                                                    fileOptions,
+                                                    fileAttributes,
                                                     rawFileInfo);
 
                 Trace("CreateFileProxy : " + rawFileName + " Return : " + result);
