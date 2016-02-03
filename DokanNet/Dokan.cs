@@ -3,6 +3,10 @@ using DokanNet.Native;
 
 namespace DokanNet
 {
+    using System.Reflection;
+
+    using DokanNet.Logging;
+
     public static class Dokan
     {
         #region Dokan Driver Options
@@ -24,29 +28,39 @@ namespace DokanNet
 
         #endregion Dokan Driver Errors
 
-        public static void Mount(this IDokanOperations operations, string mountPoint)
+        public static void Mount(this IDokanOperations operations, string mountPoint, ILogger logger = null)
         {
-            Mount(operations, mountPoint, DokanOptions.FixedDrive);
+            Mount(operations, mountPoint, DokanOptions.FixedDrive, logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, 0);
+            Mount(operations, mountPoint, mountOptions, 0, logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, DOKAN_VERSION);
+            Mount(operations, mountPoint, mountOptions, threadCount, DOKAN_VERSION, logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20));
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
         {
-            var dokanOperationProxy = new DokanOperationProxy(operations);
+#if TRACE
+            if(logger == null){
+                logger = new ConsoleLogger();
+            }
+#endif
+            if (logger == null)
+            {
+                logger = new NullLogger();
+            }
+
+            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
 
             var dokanOptions = new DOKAN_OPTIONS
             {
@@ -90,19 +104,19 @@ namespace DokanNet
             switch (status)
             {
                 case DOKAN_ERROR:
-                    throw new DokanException(status, "Dokan error");
+                    throw new DokanException(status, Properties.Resource.ErrorDokan);
                 case DOKAN_DRIVE_LETTER_ERROR:
-                    throw new DokanException(status, "Bad drive letter");
+                    throw new DokanException(status, Properties.Resource.ErrorBadDriveLetter);
                 case DOKAN_DRIVER_INSTALL_ERROR:
-                    throw new DokanException(status, "Can't install the Dokan driver");
+                    throw new DokanException(status, Properties.Resource.ErrorDriverInstall);
                 case DOKAN_MOUNT_ERROR:
-                    throw new DokanException(status, "Can't assign a drive letter or mount point");
+                    throw new DokanException(status, Properties.Resource.ErrorAssignDriveLetter);
                 case DOKAN_START_ERROR:
-                    throw new DokanException(status, "Something's wrong with the Dokan driver");
+                    throw new DokanException(status, Properties.Resource.ErrorStart);
                 case DOKAN_MOUNT_POINT_ERROR:
-                    throw new DokanException(status, "Mount point is invalid");
+                    throw new DokanException(status, Properties.Resource.ErrorMountPointInvalid);
                 case DOKAN_VERSION_ERROR:
-                    throw new DokanException(status, "Version error");
+                    throw new DokanException(status, Properties.Resource.ErrorVersion);
             }
         }
 
