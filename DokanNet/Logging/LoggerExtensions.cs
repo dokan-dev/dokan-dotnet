@@ -9,12 +9,12 @@ namespace DokanNet.Logging
 
     public static class LoggerExtensions
     {
-        public static string FormatMessageForLogging(this string message, string category = null, bool addLoggerName = false)
+        public static string FormatMessageForLogging(this string message, string category = null, string addLoggerName = "")
         {
             return message.FormatMessageForLogging(null, category, addLoggerName);
         }
 
-        public static string FormatMessageForLogging(this string message, DateTime? dateTime, string category = null, bool addLoggerName = false)
+        public static string FormatMessageForLogging(this string message, DateTime? dateTime, string category = null, string loggerName = "")
         {
             var stringBuilder = new StringBuilder();
             if (dateTime.HasValue)
@@ -22,9 +22,9 @@ namespace DokanNet.Logging
                 stringBuilder.AppendFormat("{0}" + " - ", DateTime.Now.ToString(CultureInfo.InvariantCulture));
             }
 
-            if (addLoggerName)
+            if (!string.IsNullOrEmpty(loggerName))
             {
-                stringBuilder.Append("[DokanNet] ");
+                stringBuilder.Append(loggerName);
             }
 
             if (!string.IsNullOrEmpty(category))

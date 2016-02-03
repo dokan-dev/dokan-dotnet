@@ -10,6 +10,12 @@
     /// </summary>
     public class DebugViewLogger : ILogger
     {
+        private string loggerName;
+        public DebugViewLogger(string loggerName = "")
+        {
+            this.loggerName = loggerName;
+        }
+
         public void Debug(string message, params object[] args)
         {
             this.WriteMessageToDebugView("debug", message, args);
@@ -40,7 +46,9 @@
 
         private void WriteMessageToDebugView(string category, string message, params object[] args)
         {
-            OutputDebugString(string.Format(message, args).FormatMessageForLogging(category, true));
+            if (args.Length > 0)
+                message = string.Format(message, args);
+            OutputDebugString(string.Format(message, args).FormatMessageForLogging(category, loggerName));
         }
     }
 }

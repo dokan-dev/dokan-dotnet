@@ -52,7 +52,7 @@ namespace DokanNet
         {
 #if TRACE
             if(logger == null){
-                logger = new ConsoleLogger();
+                logger = new ConsoleLogger("[DokanNet] ");
             }
 #endif
             if (logger == null)

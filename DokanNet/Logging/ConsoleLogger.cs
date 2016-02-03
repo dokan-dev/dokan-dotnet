@@ -5,11 +5,13 @@ using System.Text;
 
 namespace DokanNet.Logging
 {
-    using System.Threading;
-
     public class ConsoleLogger : ILogger
     {
-        private static readonly ReaderWriterLockSlim ReadWriteLock = new ReaderWriterLockSlim();
+        private string loggerName;
+        public ConsoleLogger(string loggerName = "")
+        {
+            this.loggerName = loggerName;
+        }
 
         public void Debug(string message, params object[] args)
         {
@@ -38,17 +40,17 @@ namespace DokanNet.Logging
 
         private void WriteToConsole(ConsoleColor newColor, DateTime dateTime, string message, params object[] args)
         {
-            ReadWriteLock.EnterWriteLock();
             var origForegroundColor = Console.ForegroundColor;
             try
             {
                 Console.ForegroundColor = newColor;
-                Console.WriteLine(message.FormatMessageForLogging(dateTime: dateTime, addLoggerName: true));
+                if (args.Length > 0)
+                    message = string.Format(message, args);
+                Console.WriteLine(message.FormatMessageForLogging(dateTime: dateTime, loggerName: loggerName));
 
             }
             finally
             {
-                ReadWriteLock.ExitWriteLock();
                 Console.ForegroundColor = origForegroundColor;
             }
         }
