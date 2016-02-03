@@ -538,13 +538,13 @@ namespace DokanNetMirror
         {
             streamName = String.Empty;
             streamSize = 0;
-            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.Success, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
         }
 
         public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
         {
             streams = new FileInformation[0];
-            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented);
+            return Trace("EnumerateNamedStreams", fileName, info, DokanResult.Success);
         }
 
         #endregion Implementation of IDokanOperations
