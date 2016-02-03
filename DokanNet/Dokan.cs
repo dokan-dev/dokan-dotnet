@@ -3,7 +3,6 @@ using DokanNet.Native;
 
 namespace DokanNet
 {
-    using System.Reflection;
 
     using DokanNet.Logging;
 

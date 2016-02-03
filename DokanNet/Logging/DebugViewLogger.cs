@@ -1,8 +1,6 @@
 ﻿namespace DokanNet.Logging
 {
-    using System;
     using System.Runtime.InteropServices;
-    using System.Text;
 
     /// <summary>
     /// To see the output in visual studio 
