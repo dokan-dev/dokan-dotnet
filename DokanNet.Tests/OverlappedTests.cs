@@ -240,7 +240,11 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
+#if NETWORK_DRIVE
             fixture.SetupReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+#else
+            fixture.SetupReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData);
+#endif
 #endif
 
             var outputs = NativeMethods.ReadEx(DokanOperationsFixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length);
@@ -268,7 +272,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
+            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
             fixture.SetupSetAllocationSize(path, testData.Length);
             fixture.SetupSetEndOfFile(path, testData.Length);
             fixture.SetupWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
@@ -309,7 +313,11 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
+#if NETWORK_DRIVE
             fixture.SetupReadFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
+#else
+            fixture.SetupReadFileInChunks(path, testData, bufferSize, context: testData);
+#endif
 #endif
 
             var outputs = NativeMethods.ReadEx(DokanOperationsFixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length);
@@ -346,7 +354,11 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, OpenNoBufferingOptions, context: testData);
             fixture.SetupSetAllocationSize(path, testData.Length);
             fixture.SetupSetEndOfFile(path, testData.Length);
+#if NETWORK_DRIVE
             fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
+#else
+            fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData);
+#endif
 #endif
 
             var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(bufferSize, fileSize)).Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte)(i + 1), NativeMethods.BufferSize(bufferSize, testData.Length, i)).ToArray())).ToArray();

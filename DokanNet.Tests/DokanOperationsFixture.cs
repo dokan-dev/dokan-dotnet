@@ -318,7 +318,7 @@ namespace DokanNet.Tests
                 => TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
         }
 
-        public const char MOUNT_POINT = 'Z';
+        public const string MOUNT_POINT = "Z:";
 
         public const string VOLUME_LABEL = "Dokan Volume";
 
@@ -338,7 +338,7 @@ namespace DokanNet.Tests
 
         internal static DokanOperationsFixture Instance { get; private set; }
 
-        internal static string DriveName = new string(new[] { MOUNT_POINT, Path.VolumeSeparatorChar });
+        internal static string DriveName = MOUNT_POINT;
 
         internal static string RootName => @"\";
 
@@ -627,7 +627,12 @@ namespace DokanNet.Tests
         private void SetupMount()
         {
             operations
-                .Setup(d => d.CreateFile(RootName, FileAccess.ReadAttributes, ReadWriteShare, FileMode.Open, OpenReparsePointOptions, EmptyFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
+                .Setup(d => d.Mounted(It.IsAny<DokanFileInfo>()))
+                .Returns(DokanResult.Success)
+                .Callback((DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.Mounted)} {info.Log()}"));
+            operations
+                .Setup(d => d.CreateFile(RootName, FileAccess.ReadAttributes, ReadWriteShare, FileMode.Open, FileOptions.None, EmptyFileAttributes, It.Is<DokanFileInfo>(i => !i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
@@ -703,7 +708,6 @@ namespace DokanNet.Tests
 
         internal void SetupFindFiles(string path, IList<FileInformation> fileInfos)
         {
-            var anyDateTime = new DateTime(2000, 1, 1, 12, 0, 0);
             operations
                 .Setup(d => d.FindFiles(path, out fileInfos, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
@@ -750,7 +754,7 @@ namespace DokanNet.Tests
         internal void SetupCreateDirectory(string path)
         {
             operations
-                .Setup(d => d.CreateFile(path, ReadDirectoryAccess, FileShare.ReadWrite, FileMode.CreateNew, OpenReparsePointOptions, FileAttributes.Normal, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, ReadDirectoryAccess, FileShare.ReadWrite, FileMode.CreateNew, FileOptions.None, FileAttributes.Normal, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"));
@@ -782,7 +786,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
         }
 
-        internal void SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        internal void SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
             operations
                 .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
@@ -797,7 +801,7 @@ namespace DokanNet.Tests
             SetupCleanupFile(path, context, isDirectory, deleteOnClose);
         }
 
-        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = OpenReparsePointOptions, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
+        internal void SetupCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
         {
             operations
                 .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
@@ -920,10 +924,16 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {offset}, {info.Log()})"));
         }
 
+        private bool IsSequenceEqual(IEnumerable<byte> b, IEnumerable<byte> buffer)
+        {
+            bool result = b.SequenceEqual(buffer);
+            return result;
+        }
+
         internal void SetupWriteFileWithDelay(string path, byte[] buffer, int bytesWritten, TimeSpan delay)
         {
             operations
-                .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(buffer)), out bytesWritten, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
+                .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => IsSequenceEqual(b, buffer)/*b.SequenceEqual(buffer)*/), out bytesWritten, 0, It.Is<DokanFileInfo>(i => !i.IsDirectory && i.SynchronousIo)))
                 .Callback(() => Thread.Sleep(delay))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, byte[] _buffer, int _bytesWritten, long offset, DokanFileInfo info)
@@ -939,7 +949,7 @@ namespace DokanNet.Tests
                 int bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
                 var chunk = buffer.Skip(offset).Take(bytesWritten);
                 operations
-                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => b.SequenceEqual(chunk)), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
+                    .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => IsSequenceEqual(b, chunk)/*b.SequenceEqual(chunk)*/), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(DokanResult.Success)
                     .Callback((string fileName, byte[] _buffer, int _bytesWritten, long _offset, DokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.WriteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], out {_bytesWritten}, {_offset}, {info.Log()})"));
