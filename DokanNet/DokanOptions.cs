@@ -12,6 +12,7 @@ namespace DokanNet
         NetworkDrive = 16, // use network drive, you need to install Dokan network provider.
         RemovableDrive = 32, // use removable drive
         MountManager = 64, // use mount manager
+        CurrentSession = 128, // mount the drive on current session only
         FixedDrive = 0,
     }
 }
