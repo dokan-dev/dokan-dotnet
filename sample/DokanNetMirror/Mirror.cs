@@ -1,4 +1,5 @@
 ﻿using DokanNet;
+using DokanNet.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,6 +21,8 @@ namespace DokanNetMirror
         private const FileAccess DataWriteAccess = FileAccess.WriteData | FileAccess.AppendData |
                                                    FileAccess.Delete |
                                                    FileAccess.GenericWrite;
+
+        private ConsoleLogger logger = new ConsoleLogger("[Mirror] ");
 
         public Mirror(string path)
         {
@@ -51,7 +54,7 @@ namespace DokanNetMirror
             var extraParameters = parameters != null && parameters.Length > 0 ? ", " + string.Join(", ", parameters) : string.Empty;
 
 #if TRACE
-            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}('{1}', {2}{3}) -> {4}",
+            logger.Debug(string.Format(CultureInfo.InvariantCulture, "{0}('{1}', {2}{3}) -> {4}",
                 method, fileName, ToTrace(info), extraParameters, result));
 #endif
 
@@ -63,7 +66,7 @@ namespace DokanNetMirror
                                   NtStatus result)
         {
 #if TRACE
-            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}('{1}', {2}, [{3}], [{4}], [{5}], [{6}], [{7}]) -> {8}",
+           logger.Debug(string.Format(CultureInfo.InvariantCulture, "{0}('{1}', {2}, [{3}], [{4}], [{5}], [{6}], [{7}]) -> {8}",
                 method, fileName, ToTrace(info), access, share, mode, options, attributes, result));
 #endif
 
@@ -287,6 +290,12 @@ namespace DokanNetMirror
             return Trace("GetFileInformation", fileName, info, DokanResult.Success);
         }
 
+        private static IList<FileInformation> GetEmptyDirectoryDefaultFiles()
+            => new[] {
+                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
+                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+            };
+
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
             files = new DirectoryInfo(GetPath(fileName))
@@ -300,6 +309,9 @@ namespace DokanNetMirror
                     Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
                     FileName = finfo.Name
                 }).ToArray();
+
+            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
+                files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
 
             return Trace("FindFiles", fileName, info, DokanResult.Success);
         }
