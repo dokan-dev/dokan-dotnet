@@ -405,7 +405,7 @@ namespace DokanNet.Tests
 
         private static DateTime ToDateTime(string value) => DateTime.Parse(value, CultureInfo.InvariantCulture);
 
-        private static int NumberOfChunks(long bufferSize, long fileSize)
+        internal static int NumberOfChunks(long bufferSize, long fileSize)
         {
             var remainder = default(long);
             var quotient = Math.DivRem(fileSize, bufferSize, out remainder);
