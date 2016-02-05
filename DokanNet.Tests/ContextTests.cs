@@ -170,7 +170,7 @@ namespace DokanNet.Tests
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success), TestCategory(TestCategories.Manual)]
         public void OpenRead_WithLargeFile_InParallel_PassesContextCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -275,7 +275,7 @@ namespace DokanNet.Tests
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Success), TestCategory(TestCategories.Manual)]
         public void OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
