@@ -9,10 +9,12 @@ namespace DokanNet.Tests
     [TestClass]
     public sealed class DriveInfoTests
     {
+        public TestContext TestContext { get; set; }
+
         [TestInitialize]
         public void Initialize()
         {
-            DokanOperationsFixture.InitInstance();
+            DokanOperationsFixture.InitInstance(TestContext.TestName);
         }
 
         [TestCleanup]

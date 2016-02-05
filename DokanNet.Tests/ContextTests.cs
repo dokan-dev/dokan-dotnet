@@ -41,6 +41,8 @@ namespace DokanNet.Tests
 
         private int contextAccessCount;
 
+        public TestContext TestContext { get; set; }
+
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
@@ -63,7 +65,7 @@ namespace DokanNet.Tests
         [TestInitialize]
         public void Initialize()
         {
-            DokanOperationsFixture.InitInstance();
+            DokanOperationsFixture.InitInstance(TestContext.TestName);
 
             context = new TracingContext(this);
         }
@@ -81,7 +83,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -91,7 +93,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(Create_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.Create())
             {
@@ -110,7 +112,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -120,7 +122,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenRead_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenRead())
             {
@@ -140,7 +142,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -149,7 +151,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenRead_WithLargeFile_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenRead())
             {
@@ -175,7 +177,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -184,7 +186,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenRead_WithLargeFile_InParallel_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenRead())
             {
@@ -215,7 +217,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -225,7 +227,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenWrite_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenWrite())
             {
@@ -244,7 +246,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -253,7 +255,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenWrite_WithLargeFile_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenWrite())
             {
@@ -280,7 +282,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.FileName.AsRootedPath();
+            string path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -289,7 +291,7 @@ namespace DokanNet.Tests
             context.InitTrace(nameof(OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly));
 #endif
 
-            var sut = new FileInfo(DokanOperationsFixture.FileName.AsDriveBasedPath());
+            var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenWrite())
             {
