@@ -21,6 +21,8 @@ namespace DokanNet.Tests
         {
             public IDokanOperations Target { get; set; }
 
+            public bool RestrictCallingProcessId { get; set; }
+
             public bool HasUnmatchedInvocations { get; set; }
 
             private delegate TResult FuncOut2<in T1, T2, in T3, out TResult>(T1 arg1, out T2 arg2, T3 arg3);
@@ -564,6 +566,7 @@ namespace DokanNet.Tests
 
             Instance = new DokanOperationsFixture(currentTestName);
             proxy.Target = Instance.operations.Object;
+            proxy.RestrictCallingProcessId = restrictCallingProcessId;
             proxy.HasUnmatchedInvocations = false;
         }
 
