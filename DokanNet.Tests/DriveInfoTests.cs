@@ -75,7 +75,11 @@ namespace DokanNet.Tests
         {
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
 
+#if NETWORK_DRIVE
             Assert.AreEqual(DriveType.Network, sut.DriveType, nameof(sut.DriveType));
+#else
+            Assert.AreEqual(DriveType.Removable, sut.DriveType, nameof(sut.DriveType));
+#endif
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]

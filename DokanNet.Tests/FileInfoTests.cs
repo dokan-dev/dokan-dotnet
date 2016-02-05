@@ -246,11 +246,13 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenReparsePointOptions | FileOptions.SequentialScan);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+#if !NETWORK_DRIVE
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+#endif
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
@@ -278,15 +280,20 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenReparsePointOptions | FileOptions.SequentialScan);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: value.Length);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupSetEndOfFile(destinationPath, value.Length);
+#if NETWORK_DRIVE
             fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
             fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+#else
+            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length);
+#endif
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 #endif
@@ -310,15 +317,20 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenReparsePointOptions | FileOptions.SequentialScan);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
             fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
+#if NETWORK_DRIVE
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
             fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+#else
+            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+            fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE);
+#endif
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
 #endif
@@ -361,7 +373,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, OpenReparsePointOptions | FileOptions.SequentialScan);
+            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
@@ -506,7 +518,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
@@ -535,7 +547,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(path, destinationPath, false);
@@ -1419,8 +1431,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
@@ -1458,8 +1470,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
-            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
+            fixture.SetupCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);

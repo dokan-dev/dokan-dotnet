@@ -317,7 +317,7 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
-            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options: OpenReparsePointOptions);
+            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess);
             fixture.SetupDeleteDirectory(path);
 #endif
 
@@ -350,7 +350,7 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open, deleteOnClose: true);
             fixture.SetupGetFileInformation(path + subFilePath, FileAttributes.Normal);
             fixture.SetupDeleteFile(path + subFilePath);
-            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options:OpenReparsePointOptions);
+            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess);
             fixture.SetupDeleteDirectory(path);
 #endif
 
@@ -376,7 +376,7 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectory(path);
             fixture.SetupFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
-            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess, options: OpenReparsePointOptions);
+            fixture.SetupOpenDirectory(path, DeleteFromDirectoryAccess);
             fixture.SetupDeleteDirectory(path);
 #endif
 
@@ -743,7 +743,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
@@ -772,7 +772,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, OpenReparsePointOptions);
+            fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectoryWithoutCleanup(DokanOperationsFixture.DestinationDirectoryName.AsRootedPath(), AppendToDirectoryAccess, FileShare.ReadWrite);
             fixture.SetupMoveFile(path, destinationPath, false);
@@ -847,7 +847,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path.AsRootedPath(), ChangePermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(path.AsRootedPath(), FileAttributes.Directory);
             fixture.SetupGetFileSecurity(path.AsRootedPath(), DokanOperationsFixture.DefaultDirectorySecurity);
-            fixture.SetupOpenDirectory(path.AsRootedPath(), share: FileShare.ReadWrite, options: OpenReparsePointOptions);
+            fixture.SetupOpenDirectory(path.AsRootedPath(), share: FileShare.ReadWrite);
+            fixture.SetupFindFiles(path.AsRootedPath(), Array.Empty<FileInformation>());
             fixture.SetupSetFileSecurity(path.AsRootedPath(), security);
             fixture.SetupCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.SetupGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);

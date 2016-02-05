@@ -191,7 +191,7 @@ namespace DokanNet.Tests
                 var target = new byte[largeData.Length];
                 int totalReadBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
                     var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
@@ -295,7 +295,7 @@ namespace DokanNet.Tests
             {
                 int totalWrittenBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
                     var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
