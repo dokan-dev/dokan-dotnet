@@ -298,21 +298,10 @@ namespace DokanNetMirror
 
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
-            files = new DirectoryInfo(GetPath(fileName))
-                .GetFileSystemInfos()
-                .Select(finfo => new FileInformation
-                {
-                    Attributes = finfo.Attributes,
-                    CreationTime = finfo.CreationTime,
-                    LastAccessTime = finfo.LastAccessTime,
-                    LastWriteTime = finfo.LastWriteTime,
-                    Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
-                    FileName = finfo.Name
-                }).ToArray();
-
-            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
-                files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
-
+            //This fonction is not called because FindFilesWithPattern is implemented
+            // Return DokanResult.NotImplemented in FindFilesWithPattern to make FindFiles called
+            files = files = FindFilesHelper(fileName, "*");
+            
             return Trace("FindFiles", fileName, info, DokanResult.Success);
         }
 
@@ -545,6 +534,33 @@ namespace DokanNetMirror
         {
             streams = new FileInformation[0];
             return Trace("EnumerateNamedStreams", fileName, info, DokanResult.NotImplemented);
+        }
+
+        public IList<FileInformation> FindFilesHelper(string fileName, string searchPattern)
+        {
+            IList<FileInformation> files = new DirectoryInfo(GetPath(fileName))
+                .GetFileSystemInfos(searchPattern)
+                .Select(finfo => new FileInformation
+                {
+                    Attributes = finfo.Attributes,
+                    CreationTime = finfo.CreationTime,
+                    LastAccessTime = finfo.LastAccessTime,
+                    LastWriteTime = finfo.LastWriteTime,
+                    Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
+                    FileName = finfo.Name
+                }).ToArray();
+
+            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
+                files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
+
+            return files;
+        }
+
+        public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+        {
+            files = FindFilesHelper(fileName, searchPattern);
+
+            return Trace("FindFilesWithPattern", fileName, info, DokanResult.Success);
         }
 
         #endregion Implementation of IDokanOperations

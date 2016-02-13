@@ -290,6 +290,12 @@ namespace RegistryFS
             return DokanResult.NotImplemented;
         }
 
+        public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+        {
+            files = new FileInformation[0];
+            return DokanResult.NotImplemented;
+        }
+
         #endregion DokanOperations member
     }
 

@@ -318,6 +318,12 @@ namespace DokanNet.Tests
 
             public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
                 => TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
+
+            public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+            {
+                files = new FileInformation[0];
+                return DokanResult.NotImplemented;
+            }
         }
 
         public const string MOUNT_POINT = "Z:";

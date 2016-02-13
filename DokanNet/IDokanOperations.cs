@@ -26,6 +26,8 @@ namespace DokanNet
 
         NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info);
 
+        NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info);
+
         NtStatus SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info);
 
         NtStatus SetFileTime(string fileName, DateTime? creationTime, DateTime? lastAccessTime,

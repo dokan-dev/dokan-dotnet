@@ -54,11 +54,11 @@ namespace DokanNet
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
-        /*public delegate NtStatus FindFilesWithPatternDelegate(
+        public delegate NtStatus FindFilesWithPatternDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPWStr)] string rawSearchPattern,
             IntPtr rawFillFindData, // function pointer
-            [MarshalAs(UnmanagedType.LPStruct), In, Out] DokanFileInfo rawFileInfo);*/
+            [MarshalAs(UnmanagedType.LPStruct), In, Out] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus SetFileAttributesDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, uint rawAttributes,
@@ -414,6 +414,53 @@ namespace DokanNet
             catch (Exception ex)
             {
                 this.logger.Error("FindFilesProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                return DokanResult.InvalidParameter;
+            }
+        }
+
+        public NtStatus FindFilesWithPatternProxy(string rawFileName,
+                          string rawSearchPattern,
+                          IntPtr rawFillFindData,
+                          DokanFileInfo rawFileInfo)
+        {
+            try
+            {
+                IList<FileInformation> files;
+
+                this.logger.Debug("FindFilesWithPatternProxy : {0}", rawFileName);
+                this.logger.Debug("\trawSearchPattern\t{0}", rawSearchPattern);
+                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+
+                NtStatus result = operations.FindFilesWithPattern(rawFileName, rawSearchPattern, out files, rawFileInfo);
+
+                Debug.Assert(files != null);
+                if (result == DokanResult.Success && files.Count != 0)
+                {
+                    foreach (FileInformation fi in files)
+                    {
+                        this.logger.Debug("\tFileName\t{0}", fi.FileName);
+                        this.logger.Debug("\t\tAttributes\t{0}", fi.Attributes);
+                        this.logger.Debug("\t\tCreationTime\t{0}", fi.CreationTime);
+                        this.logger.Debug("\t\tLastAccessTime\t{0}", fi.LastAccessTime);
+                        this.logger.Debug("\t\tLastWriteTime\t{0}", fi.LastWriteTime);
+                        this.logger.Debug("\t\tLength\t{0}", fi.Length);
+                    }
+
+                    var fill =
+                       (FILL_FIND_FILE_DATA)Marshal.GetDelegateForFunctionPointer(rawFillFindData, typeof(FILL_FIND_FILE_DATA));
+                    // used a single entry call to speed up the "enumeration" of the list
+                    for (int index = 0; index < files.Count; index++)
+                    {
+                        Addto(fill, rawFileInfo, files[index]);
+                    }
+                }
+
+                this.logger.Debug("FindFilesWithPatternProxy : {0} Return : {1}", rawFileName, result);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error("FindFilesWithPatternProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
