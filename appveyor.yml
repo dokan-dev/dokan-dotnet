@@ -18,6 +18,7 @@ install:
  - cmd: |
      C:\projects\dokan-dotnet\DokanSetup.exe /quiet
      copy "C:\Program Files\Dokan\Dokan Library-1.0.0\dokan1.dll" "C:\Windows\System32" 
+     copy "C:\Program Files\Dokan\Dokan Library-1.0.0\x86\dokan1.dll" "C:\Windows\SysWOW64"
 
 before_build:
   - nuget restore
