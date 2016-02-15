@@ -1,4 +1,4 @@
-version: 0.8.0-{build}
+version: 1.0.0-{build}
 configuration:
 - Release
 - Debug
@@ -12,10 +12,13 @@ install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v0.8.0/DokanInstall_0.8.0_redist.exe',
-              'C:\projects\dokan-dotnet\DokanInstall.exe'
+              'https://github.com/dokan-dev/dokany/releases/download/v1.0.0-RC1/DokanSetup.exe',
+              'C:\projects\dokan-dotnet\DokanSetup.exe'
             )
- - cmd: C:\projects\dokan-dotnet\DokanInstall.exe /S
+ - cmd: |
+     C:\projects\dokan-dotnet\DokanSetup.exe /quiet
+     copy "C:\Program Files\Dokan\Dokan Library-1.0.0\dokan1.dll" "C:\Windows\System32" 
+     copy "C:\Program Files\Dokan\Dokan Library-1.0.0\x86\dokan1.dll" "C:\Windows\SysWOW64"
 
 before_build:
   - nuget restore
