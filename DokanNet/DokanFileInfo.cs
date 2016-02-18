@@ -91,7 +91,7 @@ namespace DokanNet
         {
             try
             {
-                return new WindowsIdentity(NativeMethods.DokanOpenRequestorToken(this));
+                return new WindowsIdentity(Dokan.Methods.DokanOpenRequestorToken(this));
             }
             catch
             {
@@ -101,7 +101,7 @@ namespace DokanNet
 
         public bool TryResetTimeout(int milliseconds)
         {
-            return NativeMethods.DokanResetTimeout((uint)milliseconds, this);
+            return Dokan.Methods.DokanResetTimeout((uint)milliseconds, this);
         }
 
         private DokanFileInfo()

@@ -163,7 +163,7 @@ namespace DokanNet
                 FileAttributes fileAttributes = 0;
                 int FileAttributesAndFlags = 0;
                 int CreationDisposition = 0;
-                NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions, rawCreateDisposition, ref FileAttributesAndFlags, ref CreationDisposition);
+                Dokan.Methods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions, rawCreateDisposition, ref FileAttributesAndFlags, ref CreationDisposition);
 
                 foreach (FileOptions fileOption in Enum.GetValues(typeof(FileOptions)))
                 {

@@ -27,6 +27,27 @@ namespace DokanNet
 
         #endregion Dokan Driver Errors
 
+        private static NativeMethods _methods;
+
+        internal static NativeMethods Methods
+        {
+            get
+            {
+                if (_methods == null)
+                    _methods = new NativeMethods(); // throw new DokanException(DOKAN_ERROR, "Call Initialize() before using Dokan");
+                return _methods;
+            }
+            private set
+            {
+                _methods = value;
+            }
+        }
+
+        public static void Initialize(string dokanLibrary = null)
+        {
+            Methods = new NativeMethods(dokanLibrary);
+        }
+
         public static void Mount(this IDokanOperations operations, string mountPoint, ILogger logger = null)
         {
             Mount(operations, mountPoint, DokanOptions.FixedDrive, logger);
@@ -98,8 +119,8 @@ namespace DokanNet
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
                 FindStreams = dokanOperationProxy.FindStreamsProxy
             };
-
-            int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
+            
+            int status = Methods.DokanMain(ref dokanOptions, ref dokanOperations);
 
             switch (status)
             {
@@ -122,22 +143,28 @@ namespace DokanNet
 
         public static bool Unmount(char driveLetter)
         {
-            return NativeMethods.DokanUnmount(driveLetter) == DOKAN_SUCCESS;
+            return Methods.DokanUnmount(driveLetter) == DOKAN_SUCCESS;
         }
 
         public static bool RemoveMountPoint(string mountPoint)
         {
-            return NativeMethods.DokanRemoveMountPoint(mountPoint) == DOKAN_SUCCESS;
+            return Methods.DokanRemoveMountPoint(mountPoint) == DOKAN_SUCCESS;
         }
 
         public static int Version
         {
-            get { return (int)NativeMethods.DokanVersion(); }
+            get
+            {
+                return (int)Methods.DokanVersion();
+            }
         }
 
         public static int DriverVersion
         {
-            get { return (int)NativeMethods.DokanDriverVersion(); }
+            get
+            {
+                return (int)Methods.DokanDriverVersion();
+            }
         }
     }
 }
