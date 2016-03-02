@@ -224,7 +224,7 @@ namespace DokanNet.Tests
         [TestInitialize]
         public void Initialize()
         {
-            DokanOperationsFixture.InitInstance(TestContext.TestName, false);
+            DokanOperationsFixture.InitInstance(TestContext.TestName);
         }
 
         [TestCleanup]
