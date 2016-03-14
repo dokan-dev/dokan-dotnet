@@ -13,5 +13,6 @@
     </metadata>
     <files>
         <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
+		<file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
     </files>
 </package>
