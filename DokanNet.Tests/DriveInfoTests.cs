@@ -95,7 +95,7 @@ namespace DokanNet.Tests
 #else
             var anyDateTime = new DateTime(2000, 1, 1, 12, 0, 0);
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupGetFileInformation(path, FileAttributes.Directory, anyDateTime, anyDateTime, anyDateTime);
+            fixture.SetupGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime, lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));

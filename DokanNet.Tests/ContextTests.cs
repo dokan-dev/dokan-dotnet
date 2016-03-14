@@ -101,7 +101,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            //Assert.AreEqual(3, context.ReadCount, "Unexpected number of context accesses");
+            Assert.AreEqual(5, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -131,7 +131,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(3, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(4, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -165,7 +165,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(9, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -206,7 +206,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(9, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -235,7 +235,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(3, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(5, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -270,7 +270,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(10, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
@@ -311,7 +311,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(8, contextAccessCount, "Unexpected number of context accesses");
+            Assert.AreEqual(10, contextAccessCount, "Unexpected number of context accesses");
 
             fixture.VerifyAll();
 #endif
