@@ -42,7 +42,7 @@ namespace DokanNet.Tests
             var lastWriteTime = new DateTime(2015, 3, 31, 12, 0, 0);
             var lastAccessTime = new DateTime(2015, 4, 1, 6, 0, 0);
             fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupGetFileInformation(path, attributes, creationTime, lastWriteTime, lastAccessTime);
+            fixture.SetupGetFileInformation(path, attributes, creationTime: creationTime, lastWriteTime: lastWriteTime, lastAccessTime: lastAccessTime);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -749,6 +749,8 @@ namespace DokanNet.Tests
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.SetupGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
+            fixture.SetupOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.SetupMoveFile(path, destinationPath, false);
 #endif
 
@@ -777,6 +779,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Directory);
             fixture.SetupOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.SetupGetFileInformationWithError(destinationPath, FileAttributes.Directory, DokanResult.PathNotFound);
+            fixture.SetupOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.SetupMoveFile(path, destinationPath, false);
 #endif
 
@@ -823,6 +827,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFileWithError(destinationPath, DokanResult.FileExists);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.SetupOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Directory);
+            fixture.SetupOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.SetupMoveFileWithError(path, destinationPath, false, DokanResult.FileExists);
 #endif
 
