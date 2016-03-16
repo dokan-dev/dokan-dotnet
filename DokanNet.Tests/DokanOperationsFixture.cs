@@ -899,7 +899,8 @@ namespace DokanNet.Tests
                 .Setup(d => d.GetFileInformation(path, out fileInfo, It.Is<DokanFileInfo>(i => FilterByIsDirectory(isDirectory)(i))))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileInformation _fileInfo, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
+                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"))
+                .Verifiable();
         }
 
         internal void PermitGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
@@ -923,7 +924,8 @@ namespace DokanNet.Tests
                 .Setup(d => d.GetFileInformation(path, out fileInfo, It.Is<DokanFileInfo>(i => FilterByIsDirectory(isDirectory)(i))))
                 .Returns(result)
                 .Callback((string fileName, FileInformation _fileInfo, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
+                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"))
+                .Verifiable();
         }
 
         internal void PermitGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
@@ -1393,6 +1395,24 @@ namespace DokanNet.Tests
             PrepareVerify();
 
             operations.Verify();
+        }
+
+        internal void VerifyContextReadInvocations(string fileName, int count)
+        {
+            PrepareVerify();
+
+            int bytesRead;
+            operations.Verify();
+            operations.Verify(d => d.ReadFile(fileName, It.IsAny<byte[]>(), out bytesRead, It.IsAny<long>(), It.IsAny<DokanFileInfo>()), Times.Exactly(count));
+        }
+
+        internal void VerifyContextWriteInvocations(string fileName, int count)
+        {
+            PrepareVerify();
+
+            int bytesRead;
+            operations.Verify();
+            operations.Verify(d => d.WriteFile(fileName, It.IsAny<byte[]>(), out bytesRead, It.IsAny<long>(), It.IsAny<DokanFileInfo>()), Times.Exactly(count));
         }
 
         internal void VerifyContextReadInvocations(string fileName, int count)
