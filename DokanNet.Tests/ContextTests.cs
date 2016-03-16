@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,31 +16,6 @@ namespace DokanNet.Tests
         private static byte[] smallData;
 
         private static byte[] largeData;
-
-        private class TracingContext
-        {
-            private ContextTests test;
-
-            private string name;
-
-            public TracingContext(ContextTests test)
-            {
-                this.test = test;
-            }
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "name")]
-            public void InitTrace(string name)
-            {
-                this.name = name;
-                test.context = null;
-            }
-
-            public override string ToString() => name != null ? $"{nameof(TestContext)} '{name}' #{++test.contextAccessCount}" : base.ToString();
-        }
-
-        private TracingContext context;
-
-        private int contextAccessCount;
 
         public TestContext TestContext { get; set; }
 
@@ -66,8 +42,6 @@ namespace DokanNet.Tests
         public void Initialize()
         {
             DokanOperationsFixture.InitInstance(TestContext.TestName);
-
-            context = new TracingContext(this);
         }
 
         [TestCleanup]
@@ -85,12 +59,14 @@ namespace DokanNet.Tests
 
             string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
-            context.InitTrace(nameof(Create_PassesContextCorrectly));
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -101,9 +77,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(5, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextWriteInvocations(path, 1);
 #endif
         }
 
@@ -114,12 +88,12 @@ namespace DokanNet.Tests
 
             string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
-            context.InitTrace(nameof(OpenRead_PassesContextCorrectly));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -131,9 +105,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(4, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextReadInvocations(path, 1);
 #endif
         }
 
@@ -143,12 +115,12 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = fixture.FileName.AsRootedPath();
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
-            context.InitTrace(nameof(OpenRead_WithLargeFile_PassesContextCorrectly));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -165,9 +137,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(9, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextReadInvocations(path, 6);
 #endif
         }
 
@@ -178,12 +148,12 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = fixture.FileName.AsRootedPath();
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
-            context.InitTrace(nameof(OpenRead_WithLargeFile_InParallel_PassesContextCorrectly));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -206,9 +176,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(9, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextReadInvocations(path, 6);
 #endif
         }
 
@@ -219,12 +187,14 @@ namespace DokanNet.Tests
 
             string path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
-            context.InitTrace(nameof(OpenWrite_PassesContextCorrectly));
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -235,9 +205,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(5, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextWriteInvocations(path, 1);
 #endif
         }
 
@@ -247,12 +215,14 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = fixture.FileName.AsRootedPath();
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
-            context.InitTrace(nameof(OpenWrite_WithLargeFile_PassesContextCorrectly));
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -270,9 +240,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(10, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextWriteInvocations(path, 6);
 #endif
         }
 
@@ -283,12 +251,14 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             string path = fixture.FileName.AsRootedPath();
+            var context = new object();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
-            context.InitTrace(nameof(OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly));
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -311,9 +281,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            Assert.AreEqual(10, contextAccessCount, "Unexpected number of context accesses");
-
-            fixture.VerifyAll();
+            fixture.VerifyContextWriteInvocations(path, 6);
 #endif
         }
     }

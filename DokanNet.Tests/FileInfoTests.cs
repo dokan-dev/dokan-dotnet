@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -14,6 +15,10 @@ namespace DokanNet.Tests
     {
         private const int FILE_BUFFER_SIZE = 262144;
 
+        private const int SMALL_DATA_SIZE = 4096;
+
+        private const int LARGE_DATA_SIZE = 5 * FILE_BUFFER_SIZE + FILE_BUFFER_SIZE / 4;
+
         private static byte[] smallData;
 
         private static byte[] largeData;
@@ -23,9 +28,9 @@ namespace DokanNet.Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            smallData = DokanOperationsFixture.InitPeriodicTestData(4096);
+            smallData = DokanOperationsFixture.InitPeriodicTestData(SMALL_DATA_SIZE);
 
-            largeData = DokanOperationsFixture.InitPeriodicTestData(5 * FILE_BUFFER_SIZE + 65536);
+            largeData = DokanOperationsFixture.InitPeriodicTestData(LARGE_DATA_SIZE);
         }
 
         [ClassCleanup]
@@ -224,6 +229,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, ReadOnlyShare, FileMode.OpenOrCreate, FileOptions.SequentialScan);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -234,7 +241,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -298,10 +305,11 @@ namespace DokanNet.Tests
             fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
             fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length);
 #endif
-            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
-            fixture.SetupReadFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length);    // Read-after-Write?
+
+            fixture.PermitCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
+            fixture.PermitProbeFile(destinationPath, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -309,7 +317,7 @@ namespace DokanNet.Tests
             sut.CopyTo(fixture.DestinationFileName.AsDriveBasedPath());
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -329,7 +337,6 @@ namespace DokanNet.Tests
             fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.SetupFindStreams(path, new FileInformation[0]);
-            fixture.SetupCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.SetupSetEndOfFile(destinationPath, largeData.Length);
 #if NETWORK_DRIVE
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
@@ -340,7 +347,10 @@ namespace DokanNet.Tests
 #endif
             fixture.SetupSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.SetupSetFileTime(destinationPath);
-            fixture.SetupReadFile(destinationPath, largeData, largeData.Length);    // Read-after-Write?
+
+            fixture.PermitProbeFile(path, largeData);
+            fixture.PermitProbeFile(destinationPath, largeData);
+            fixture.PermitCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -348,7 +358,7 @@ namespace DokanNet.Tests
             sut.CopyTo(fixture.DestinationFileName.AsDriveBasedPath());
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -404,6 +414,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -414,7 +426,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -430,6 +442,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, ReadOnlyShare, FileMode.Create, FileOptions.SequentialScan);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -440,7 +454,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -668,6 +682,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupGetFileInformation(path, FileAttributes.Normal);
             fixture.SetupWriteFile(path, smallData, smallData.Length);
+
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -676,7 +692,7 @@ namespace DokanNet.Tests
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -805,8 +821,10 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.SetupCreateFile(path, access, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            fixture.SetupReadFile(path, smallData, smallData.Length);
             fixture.SetupWriteFile(path, smallData, smallData.Length);
+
+            fixture.PermitProbeFile(path, smallData, smallData.Length);
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -815,7 +833,7 @@ namespace DokanNet.Tests
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -831,6 +849,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.SetupSetAllocationSize(path, 0);
             fixture.SetupWriteFile(path, smallData, smallData.Length);
+
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -839,7 +859,7 @@ namespace DokanNet.Tests
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1158,6 +1178,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1173,7 +1195,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1189,6 +1211,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFileWithDelay(path, Encoding.UTF8.GetBytes(value), value.Length, DokanOperationsFixture.IODelay);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1204,7 +1228,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1219,6 +1243,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1241,7 +1267,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1256,6 +1282,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1278,7 +1306,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1294,6 +1322,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1321,7 +1351,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1337,6 +1367,8 @@ namespace DokanNet.Tests
 #else
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
             fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
+
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1364,7 +1396,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1381,6 +1413,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
             fixture.SetupFlushFileBuffers(path);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1397,7 +1431,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -1414,6 +1448,8 @@ namespace DokanNet.Tests
             fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
             fixture.SetupLockUnlockFile(path, 0, value.Length);
+
+            fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1431,7 +1467,7 @@ namespace DokanNet.Tests
             }
 
 #if !LOGONLY
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
