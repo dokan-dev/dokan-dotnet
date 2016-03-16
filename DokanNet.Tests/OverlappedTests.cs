@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Win32.SafeHandles;
 using static DokanNet.Tests.FileSettings;
-using System.Runtime.InteropServices;
-using System.Linq;
-using System.Diagnostics;
 
 namespace DokanNet.Tests
 {
@@ -244,8 +244,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
-            fixture.SetupReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
+            fixture.ExpectReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
             var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length);
@@ -258,7 +258,7 @@ namespace DokanNet.Tests
                 Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i}");
             }
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -271,10 +271,10 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
-            fixture.SetupSetAllocationSize(path, testData.Length);
-            fixture.SetupSetEndOfFile(path, testData.Length);
-            fixture.SetupWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
+            fixture.ExpectSetAllocationSize(path, testData.Length);
+            fixture.ExpectSetEndOfFile(path, testData.Length);
+            fixture.ExpectWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
             var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(FILE_BUFFER_SIZE, testData.Length))
@@ -290,7 +290,7 @@ namespace DokanNet.Tests
                 Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i}");
             }
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -309,8 +309,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
-            fixture.SetupReadFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
+            fixture.ExpectReadFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
 #endif
 
             var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length);
@@ -323,7 +323,7 @@ namespace DokanNet.Tests
                 Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
             }
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -342,13 +342,13 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
-            fixture.SetupSetAllocationSize(path, testData.Length);
-            fixture.SetupSetEndOfFile(path, testData.Length);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
+            fixture.ExpectSetAllocationSize(path, testData.Length);
+            fixture.ExpectSetEndOfFile(path, testData.Length);
 #if NETWORK_DRIVE
             fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
 #else
-            fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData);
+            fixture.ExpectWriteFileInChunks(path, testData, bufferSize, context: testData);
 #endif
 #endif
 
@@ -363,7 +363,7 @@ namespace DokanNet.Tests
                 Assert.AreEqual(NativeMethods.BufferSize(bufferSize, fileSize, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i} for BufferSize={bufferSize}, FileSize={fileSize}");
             }
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
     }
