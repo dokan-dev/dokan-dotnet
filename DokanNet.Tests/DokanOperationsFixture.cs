@@ -899,8 +899,7 @@ namespace DokanNet.Tests
                 .Setup(d => d.GetFileInformation(path, out fileInfo, It.Is<DokanFileInfo>(i => FilterByIsDirectory(isDirectory)(i))))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileInformation _fileInfo, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"))
-                .Verifiable();
+                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
         }
 
         internal void PermitGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
@@ -916,6 +915,16 @@ namespace DokanNet.Tests
 
         private IVerifies SetupGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
         {
+            SetupGetFileInformation(path, attributes, isDirectory, creationTime, lastWriteTime, lastAccessTime, length);
+        }
+
+        internal void ExpectGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
+        {
+            SetupGetFileInformation(path, attributes, isDirectory, creationTime, lastWriteTime, lastAccessTime, length).Verifiable();
+        }
+
+        private IVerifies SetupGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
 
@@ -924,8 +933,7 @@ namespace DokanNet.Tests
                 .Setup(d => d.GetFileInformation(path, out fileInfo, It.Is<DokanFileInfo>(i => FilterByIsDirectory(isDirectory)(i))))
                 .Returns(result)
                 .Callback((string fileName, FileInformation _fileInfo, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"))
-                .Verifiable();
+                    => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
         }
 
         internal void PermitGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
@@ -936,6 +944,16 @@ namespace DokanNet.Tests
         internal void ExpectGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
         {
             SetupGetFileInformationToFail(path, result, isDirectory).Verifiable();
+        }
+
+        internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
+        {
+            SetupGetFileInformationWithError(path, attributes, result, isDirectory);
+        }
+
+        internal void ExpectGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        {
+            SetupGetFileInformationWithError(path, attributes, result, isDirectory).Verifiable();
         }
 
         internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
