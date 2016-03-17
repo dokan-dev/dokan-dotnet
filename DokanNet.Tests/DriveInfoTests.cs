@@ -34,7 +34,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             var availableFreeSpace = 1 << 10;
-            fixture.SetupDiskFreeSpace(freeBytesAvailable: availableFreeSpace);
+            fixture.ExpectGetDiskFreeSpace(freeBytesAvailable: availableFreeSpace);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -44,7 +44,7 @@ namespace DokanNet.Tests
 #else
             Assert.AreEqual(availableFreeSpace, sut.AvailableFreeSpace, nameof(sut.AvailableFreeSpace));
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -56,8 +56,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -68,7 +68,7 @@ namespace DokanNet.Tests
 #else
             Assert.AreEqual(DokanOperationsFixture.FILESYSTEM_NAME, sut.DriveFormat, nameof(sut.DriveFormat));
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -94,8 +94,8 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             var anyDateTime = new DateTime(2000, 1, 1, 12, 0, 0);
-            fixture.SetupCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
-            fixture.SetupGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime, lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
+            fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.ExpectGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime, lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -145,7 +145,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             var totalFreeSpace = 1 << 14;
-            fixture.SetupDiskFreeSpace(totalNumberOfFreeBytes: totalFreeSpace);
+            fixture.ExpectGetDiskFreeSpace(totalNumberOfFreeBytes: totalFreeSpace);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -155,7 +155,7 @@ namespace DokanNet.Tests
 #else
             Assert.AreEqual(totalFreeSpace, sut.TotalFreeSpace, nameof(sut.TotalFreeSpace));
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -168,7 +168,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             var totalSize = 1 << 20;
-            fixture.SetupDiskFreeSpace(totalNumberOfBytes: totalSize);
+            fixture.ExpectGetDiskFreeSpace(totalNumberOfBytes: totalSize);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -178,7 +178,7 @@ namespace DokanNet.Tests
 #else
             Assert.AreEqual(totalSize, sut.TotalSize, nameof(sut.TotalSize));
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
 
@@ -190,8 +190,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.SetupGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -202,7 +202,7 @@ namespace DokanNet.Tests
 #else
             Assert.AreEqual(DokanOperationsFixture.VOLUME_LABEL, sut.VolumeLabel, nameof(sut.VolumeLabel));
 
-            fixture.VerifyAll();
+            fixture.Verify();
 #endif
         }
     }

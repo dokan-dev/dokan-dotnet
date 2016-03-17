@@ -63,8 +63,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
-            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
+            fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
@@ -92,8 +92,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
-            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -119,8 +119,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
-            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -152,8 +152,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
-            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -191,8 +191,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
-            fixture.SetupWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
 #endif
@@ -219,8 +219,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
-            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);
 #endif
@@ -255,8 +255,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.SetupCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
-            fixture.SetupWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);
 #endif
