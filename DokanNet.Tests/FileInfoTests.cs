@@ -543,7 +543,7 @@ namespace DokanNet.Tests
             fixture.PermitGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
-            fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal, false);
+            fixture.PermitGetFileInformation(destinationPath, FileAttributes.Normal, false);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -574,6 +574,7 @@ namespace DokanNet.Tests
             fixture.PermitGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
+            fixture.PermitGetFileInformation(destinationPath, FileAttributes.Normal, false);
 #endif
 
             var sut = new FileInfo(origin.AsDriveBasedPath());
@@ -1493,7 +1494,7 @@ namespace DokanNet.Tests
             // WARNING: This is probably an error in the Dokan driver!
             fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectMoveFile(destinationPath, destinationBackupPath, true);
-            fixture.ExpectGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
+            fixture.PermitGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
             fixture.ExpectMoveFile(path, destinationPath, true);
 #endif
 
@@ -1534,7 +1535,7 @@ namespace DokanNet.Tests
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectMoveFile(destinationPath, destinationBackupPath, true);
-            fixture.ExpectGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
+            fixture.PermitGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
             fixture.ExpectMoveFile(path, destinationPath, true);
 #endif
 
