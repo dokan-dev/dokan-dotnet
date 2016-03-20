@@ -10,7 +10,7 @@ namespace DokanNet
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 800; // ver 0.8.0
+        private const ushort DOKAN_VERSION = 1000; // ver 1.0.0
 
         #endregion Dokan Driver Options
 

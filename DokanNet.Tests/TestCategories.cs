@@ -2,12 +2,14 @@
 {
     internal static class TestCategories
     {
-        public const string Success = "Success";
+        public const string Success = nameof(Success);
 
-        public const string Failure = "Failure";
+        public const string Failure = nameof(Failure);
 
-        public const string Timing = "Timing";
+        public const string Timing = nameof(Timing);
 
-        public const string Manual = "Manual";
+        public const string Manual = nameof(Manual);
+
+        public const string NoPatternSearch = nameof(NoPatternSearch);
     }
 }
