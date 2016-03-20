@@ -951,9 +951,9 @@ namespace DokanNet.Tests
             SetupGetFileInformationWithError(path, attributes, result, isDirectory);
         }
 
-        internal void ExpectGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        internal void ExpectGetFileInformationToFail(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
         {
-            SetupGetFileInformationWithError(path, attributes, result, isDirectory).Verifiable();
+            SetupGetFileInformationToFail(path, attributes, result, isDirectory).Verifiable();
         }
 
         internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
