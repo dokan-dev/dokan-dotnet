@@ -29,6 +29,8 @@ namespace DokanNet.Tests
 
             private delegate TResult FuncOut23<in T1, in T2, T3, T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, out T4 arg4, T5 arg5);
 
+            private delegate TResult FuncOut3<in T1, in T2, T3, in T4, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4);
+
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
@@ -152,6 +154,30 @@ namespace DokanNet.Tests
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
                 Justification = "Explicit Exception handler")]
+            private NtStatus TryExecute<TIn, TOut>(string fileName, TIn argIn, out TOut argOut, DokanFileInfo info, FuncOut3<string, TIn, TOut, DokanFileInfo, NtStatus> func, string funcName)
+            {
+                if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id)
+                {
+                    argOut = default(TOut);
+                    return DokanResult.AccessDenied;
+                }
+
+                try
+                {
+                    return func(fileName, argIn, out argOut, info);
+                }
+                catch (Exception ex)
+                {
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    if (ex is MockException)
+                        HasUnmatchedInvocations = true;
+                    argOut = default(TOut);
+                    return DokanResult.InvalidParameter;
+                }
+            }
+
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+                Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut>(string fileName, out TOut argOut, DokanFileInfo info, FuncOut2<string, TOut, DokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != System.Diagnostics.Process.GetCurrentProcess().Id) {
@@ -264,6 +290,12 @@ namespace DokanNet.Tests
             public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
                 => TryExecute(fileName, out files, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindFiles(f, out o, i), nameof(FindFiles));
 
+            public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+                => TryExecute(fileName, searchPattern, out files, info, (string f, string s, out IList<FileInformation> o, DokanFileInfo i) => Target.FindFilesWithPattern(f, s, out o, i), nameof(FindFilesWithPattern));
+
+            public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+                => TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
+
             public NtStatus FlushFileBuffers(string fileName, DokanFileInfo info)
                 => TryExecute(fileName, info, (f, i) => Target.FlushFileBuffers(f, i), nameof(FlushFileBuffers));
 
@@ -314,15 +346,6 @@ namespace DokanNet.Tests
 
             public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, DokanFileInfo info)
                 => TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, DokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
-
-            public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
-                => TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, DokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
-
-            public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
-            {
-                files = new FileInformation[0];
-                return DokanResult.NotImplemented;
-            }
         }
 
         public const string MOUNT_POINT = "Z:";
@@ -766,7 +789,7 @@ namespace DokanNet.Tests
             SetupGetFileInformation(path, attributes, isDirectory, creationTime, lastWriteTime, lastAccessTime, length).Verifiable();
         }
 
-        private IVerifies SetupGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        private IVerifies SetupGetFileInformationToFail(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
         {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
@@ -779,14 +802,14 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.GetFileInformation)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", out [{_fileInfo.Log()}], {info.Log()})"));
         }
 
-        internal void PermitGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        internal void PermitGetFileInformationToFail(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
         {
-            SetupGetFileInformationWithError(path, attributes, result, isDirectory);
+            SetupGetFileInformationToFail(path, attributes, result, isDirectory);
         }
 
-        internal void ExpectGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
+        internal void ExpectGetFileInformationToFail(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
         {
-            SetupGetFileInformationWithError(path, attributes, result, isDirectory).Verifiable();
+            SetupGetFileInformationToFail(path, attributes, result, isDirectory).Verifiable();
         }
 
         internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
@@ -796,6 +819,26 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, IList<FileInformation> _files, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.FindFiles)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out [{_files.Count}], {info.Log()})"))
+                .Verifiable();
+        }
+
+        internal void ExpectFindFilesWithPattern(string path, string searchPattern, IList<FileInformation> fileInfos)
+        {
+            operations
+                .Setup(d => d.FindFilesWithPattern(path, searchPattern, out fileInfos, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Returns(DokanResult.Success)
+                .Callback((string fileName, string _searchPattern, IList<FileInformation> _files, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.FindFilesWithPattern)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", \"{_searchPattern}\", out [{_files.Count}], {info.Log()})"))
+                .Verifiable();
+        }
+        internal void ExpectFindFilesWithPatternToFail(string path, string searchPattern, NtStatus result)
+        {
+            var fileInfos = new List<FileInformation>() as IList<FileInformation>;
+            operations
+                .Setup(d => d.FindFilesWithPattern(path, searchPattern, out fileInfos, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Returns(result)
+                .Callback((string fileName, string _searchPattern, IList<FileInformation> _files, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.FindFilesWithPattern)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", \"{_searchPattern}\", out [{_files.Count}], {info.Log()})"))
                 .Verifiable();
         }
 
@@ -851,7 +894,7 @@ namespace DokanNet.Tests
             PermitGetFileInformation(path, FileAttributes.Directory);
         }
 
-        internal void ExpectCreateDirectoryWithError(string path, NtStatus result)
+        internal void ExpectCreateDirectoryToFail(string path, NtStatus result)
         {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
@@ -917,7 +960,7 @@ namespace DokanNet.Tests
                 .Verifiable();
         }
 
-        internal void ExpectCreateFileWithError(string path, NtStatus result)
+        internal void ExpectCreateFileToFail(string path, NtStatus result)
         {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
@@ -985,7 +1028,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                     =>
                 {
-                    Array.ConstrainedCopy(buffer, 0, _buffer, 0, probeBufferSize);
+                    Array.ConstrainedCopy(buffer, 0, _buffer, 0, Math.Min(probeBufferSize, buffer.Length));
                     Trace($"ProbeFile[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, out {_bytesRead}, {_offset}, {info.Log()})");
                 });
         }
@@ -998,7 +1041,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                     =>
                 {
-                    buffer.CopyTo(_buffer, 0);
+                    Array.ConstrainedCopy(buffer, 0, _buffer, 0, Math.Min(bytesRead, _buffer.Length));
                     Trace($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, out {_bytesRead}, {_offset}, {info.Log()})");
                 })
                 .Verifiable();
@@ -1014,7 +1057,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, byte[] _buffer, int _bytesRead, long _offset, DokanFileInfo info)
                     =>
                 {
-                    buffer.CopyTo(_buffer, 0);
+                    Array.ConstrainedCopy(buffer, 0, _buffer, 0, Math.Min(bytesRead, _buffer.Length));
                     Trace($"{nameof(IDokanOperations.ReadFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_buffer.Length}], {_buffer.SequenceEqual(buffer)}, out {_bytesRead}, {_offset}, {info.Log()})");
                 })
                 .Verifiable();
@@ -1107,7 +1150,7 @@ namespace DokanNet.Tests
             ExpectCleanupFile(destinationPath);
         }
 
-        internal void ExpectMoveFileWithError(string path, string destinationPath, bool replace, NtStatus result)
+        internal void ExpectMoveFileToFail(string path, string destinationPath, bool replace, NtStatus result)
         {
             operations
                 .Setup(d => d.MoveFile(path, destinationPath, replace, It.IsAny<DokanFileInfo>()))

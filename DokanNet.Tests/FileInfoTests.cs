@@ -141,7 +141,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -368,7 +368,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -390,7 +390,7 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
-            fixture.ExpectCreateFileWithError(destinationPath, DokanResult.FileExists);
+            fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -486,7 +486,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -540,7 +540,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
-            fixture.PermitGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound, true);
+            fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
             fixture.PermitGetFileInformation(destinationPath, FileAttributes.Normal, false);
@@ -571,7 +571,7 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
-            fixture.PermitGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
+            fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
             fixture.PermitGetFileInformation(destinationPath, FileAttributes.Normal, false);
@@ -596,7 +596,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -618,9 +618,9 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
-            fixture.ExpectGetFileInformationWithError(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
+            fixture.ExpectGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
-            fixture.ExpectMoveFileWithError(path, destinationPath, false, DokanResult.FileExists);
+            fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
 #endif
@@ -753,7 +753,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileExists);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileExists);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -797,7 +797,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFileWithError(path, DokanResult.FileNotFound);
+            fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1489,7 +1489,7 @@ namespace DokanNet.Tests
             fixture.ExpectSetFileTime(path);
             fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
-            fixture.PermitGetFileInformationWithError(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
+            fixture.PermitGetFileInformationToFail(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
             // WARNING: This is probably an error in the Dokan driver!
             fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
@@ -1531,7 +1531,7 @@ namespace DokanNet.Tests
             fixture.ExpectSetFileTime(path);
             fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
-            fixture.PermitGetFileInformationWithError(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
+            fixture.PermitGetFileInformationToFail(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectMoveFile(destinationPath, destinationBackupPath, true);
