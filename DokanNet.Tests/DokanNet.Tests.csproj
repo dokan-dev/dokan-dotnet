@@ -87,6 +87,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DirectoryInfoTests.Configuration.xml">
+      <DependentUpon>DirectoryInfoTest.cs</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="OverlappedTests.Configuration.xml">
       <DependentUpon>OverlappedTests.cs</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
