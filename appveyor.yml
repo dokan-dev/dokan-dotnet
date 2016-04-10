@@ -23,6 +23,25 @@ before_build:
 build:
   project: DokanNet.sln
   verbosity: minimal
+after_build:
+  - ps: |
+      $app = Start-Process -passthru .\sample\DokanNetMirror\bin\$env:CONFIGURATION\DokanNetMirror.exe
+      Start-Sleep -s 5
+      
+      git clone https://github.com/Liryna/winfstest.git
+      $buildCmd = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
+      $buildArgs = @(
+      ".\winfstest\winfstest.sln",
+      "/m",
+      "/l:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll",
+      "/p:Configuration=Debug",
+      "/p:Platform=x64")
+      
+      New-Item C:\TMP -type directory
+      & $buildCmd $buildArgs
+      & .\winfstest\TestSuite\run-winfstest.bat t N:\TMP
+      Start-Sleep -s 5
+      Stop-Process $app.Id
 test:
   categories:
     except:
