@@ -605,7 +605,7 @@ namespace DokanNetMirror
                     FileName = finfo.Name
                 }).ToArray();
 
-            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
+            if (fileName != "\\" && searchPattern == "*")  //Add current folder and parent folder when root directory is not requested
                 files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
 
             return files;
