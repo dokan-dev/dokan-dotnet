@@ -32,6 +32,9 @@ namespace DokanNet
         /// <summary>Mount the drive on current session only</summary>
         CurrentSession = 128,
 
+        /// <summary>Enable Lockfile/Unlockfile operations</summary>
+        UserModeLock = 256,
+
         /// <summary>Fixed Driver</summary>
         FixedDrive = 0,
     }
