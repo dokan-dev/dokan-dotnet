@@ -1095,7 +1095,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1432,7 +1432,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;

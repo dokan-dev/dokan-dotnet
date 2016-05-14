@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using FileAccess = DokanNet.FileAccess;
 
@@ -89,15 +90,31 @@ namespace DokanNetMirror
                         case FileMode.Open:
                             if (!Directory.Exists(path))
                             {
-                                Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.PathNotFound);
+                                try
+                                {
+                                    if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                                        return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, NtStatus.NotADirectory);
+                                }
+                                catch (Exception)
+                                {
+                                    return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
+                                }
+                                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.PathNotFound);
                             }
 
                             new DirectoryInfo(path).EnumerateFileSystemInfos().Any(); // you can't list the directory
                             break;
 
                         case FileMode.CreateNew:
-                            if (Directory.Exists(GetPath(fileName)))
-                                Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
+                            if (Directory.Exists(path))
+                               return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
+
+                            try
+                            {
+                                File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+                                return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AlreadyExists);
+                            }
+                            catch (IOException) { }
 
                             Directory.CreateDirectory(GetPath(fileName));
                             break;
@@ -118,12 +135,10 @@ namespace DokanNetMirror
 
                 try
                 {
+                    pathExists = (Directory.Exists(path) || File.Exists(path));
                     pathIsDirectory = File.GetAttributes(path).HasFlag(FileAttributes.Directory);
                 }
-                catch (IOException)
-                {
-                    pathExists = false;
-                }
+                catch (IOException) {}
 
                 switch (mode)
                 {
@@ -134,6 +149,10 @@ namespace DokanNetMirror
                             if (readWriteAttributes || pathIsDirectory)
                             // check if driver only wants to read attributes, security info, or open directory
                             {
+                                if (pathIsDirectory && (access & FileAccess.Delete) == FileAccess.Delete
+                                    && (access & FileAccess.Synchronize) != FileAccess.Synchronize) //It is a DeleteFile request on a directory
+                                    return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
+
                                 info.IsDirectory = pathIsDirectory;
                                 info.Context = new object();
                                 // must set it to someting if you return DokanError.Success
@@ -164,10 +183,30 @@ namespace DokanNetMirror
                 try
                 {
                     info.Context = new FileStream(path, mode, readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
+
+                    if (mode == FileMode.CreateNew
+                        || mode == FileMode.Create) //Files are always created as Archive
+                        attributes |= FileAttributes.Archive;
+                    File.SetAttributes(path, attributes);
                 }
                 catch (UnauthorizedAccessException) // don't have access rights
                 {
                     return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.AccessDenied);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.PathNotFound);
+                }
+                catch (Exception ex)
+                {
+                    uint hr = (uint)Marshal.GetHRForException(ex);
+                    switch (hr)
+                    {
+                        case 0x80070020: //Sharing violation
+                            return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.SharingViolation);
+                        default:
+                            throw ex;
+                    }
                 }
             }
             return Trace("CreateFile", fileName, info, access, share, mode, options, attributes, DokanResult.Success);
@@ -230,8 +269,11 @@ namespace DokanNetMirror
             else // normal read
             {
                 var stream = info.Context as FileStream;
-                stream.Position = offset;
-                bytesRead = stream.Read(buffer, 0, buffer.Length);
+                lock (stream) //Protect from overlapped read
+                {
+                    stream.Position = offset;
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                }
             }
             return Trace("ReadFile", fileName, info, DokanResult.Success, "out " + bytesRead.ToString(), offset.ToString(CultureInfo.InvariantCulture));
         }
@@ -250,8 +292,11 @@ namespace DokanNetMirror
             else
             {
                 var stream = info.Context as FileStream;
-                stream.Position = offset;
-                stream.Write(buffer, 0, buffer.Length);
+                lock (stream) //Protect from overlapped write
+                {
+                    stream.Position = offset;
+                    stream.Write(buffer, 0, buffer.Length);
+                }
                 bytesWritten = buffer.Length;
             }
             return Trace("WriteFile", fileName, info, DokanResult.Success, "out " + bytesWritten.ToString(), offset.ToString(CultureInfo.InvariantCulture));
@@ -289,12 +334,6 @@ namespace DokanNetMirror
             };
             return Trace("GetFileInformation", fileName, info, DokanResult.Success);
         }
-
-        private static IList<FileInformation> GetEmptyDirectoryDefaultFiles()
-            => new[] {
-                new FileInformation() { FileName = ".", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today },
-                new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
-            };
 
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info)
         {
@@ -354,7 +393,15 @@ namespace DokanNetMirror
 
         public NtStatus DeleteFile(string fileName, DokanFileInfo info)
         {
-            return Trace("DeleteFile", fileName, info, File.Exists(GetPath(fileName)) ? DokanResult.Success : DokanResult.FileNotFound);
+            var path = GetPath(fileName);
+
+            if (!File.Exists(path))
+                return Trace("DeleteFile", fileName, info, DokanResult.FileNotFound);
+
+            if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                return Trace("DeleteFile", fileName, info, DokanResult.AccessDenied);
+
+            return Trace("DeleteFile", fileName, info, DokanResult.Success);
             // we just check here if we could delete the file - the true deletion is in Cleanup
         }
 
@@ -368,6 +415,12 @@ namespace DokanNetMirror
         {
             string oldpath = GetPath(oldName);
             string newpath = GetPath(newName);
+
+            if (info.Context != null && info.Context is FileStream)
+            {
+                (info.Context as FileStream).Dispose();
+            }
+            info.Context = null;
 
             bool exist = false;
             if (info.IsDirectory)
@@ -388,15 +441,11 @@ namespace DokanNetMirror
             {
                 info.Context = null;
 
-                if (!info.IsDirectory)
-                    File.Delete(newpath);
-                else
-                    Directory.Delete(newpath, true);
+                if (info.IsDirectory) //Cannot replace directory destination - See MOVEFILE_REPLACE_EXISTING
+                    return Trace("MoveFile", oldName, info, DokanResult.AccessDenied, newName, replace.ToString(CultureInfo.InvariantCulture));
 
-                if (info.IsDirectory)
-                    Directory.Move(oldpath, newpath);
-                else
-                    File.Move(oldpath, newpath);
+                File.Delete(newpath);
+                File.Move(oldpath, newpath);
                 return Trace("MoveFile", oldName, info, DokanResult.Success, newName, replace.ToString(CultureInfo.InvariantCulture));
             }
             return Trace("MoveFile", oldName, info, DokanResult.FileExists, newName, replace.ToString(CultureInfo.InvariantCulture));
@@ -549,9 +598,6 @@ namespace DokanNetMirror
                     Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
                     FileName = finfo.Name
                 }).ToArray();
-
-            if (fileName != "\\")  //Add current folder and parent folder when root directory is not requested
-                files = GetEmptyDirectoryDefaultFiles().Concat(files).ToArray();
 
             return files;
         }
