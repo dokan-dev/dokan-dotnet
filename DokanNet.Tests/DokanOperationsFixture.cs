@@ -915,16 +915,6 @@ namespace DokanNet.Tests
 
         private IVerifies SetupGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
         {
-            SetupGetFileInformation(path, attributes, isDirectory, creationTime, lastWriteTime, lastAccessTime, length);
-        }
-
-        internal void ExpectGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
-        {
-            SetupGetFileInformation(path, attributes, isDirectory, creationTime, lastWriteTime, lastAccessTime, length).Verifiable();
-        }
-
-        private IVerifies SetupGetFileInformationWithError(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
-        {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
 
@@ -944,16 +934,6 @@ namespace DokanNet.Tests
         internal void ExpectGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
         {
             SetupGetFileInformationToFail(path, result, isDirectory).Verifiable();
-        }
-
-        internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
-        {
-            SetupGetFileInformationWithError(path, attributes, result, isDirectory);
-        }
-
-        internal void ExpectGetFileInformationToFail(string path, FileAttributes attributes, NtStatus result, bool? isDirectory = null)
-        {
-            SetupGetFileInformationToFail(path, attributes, result, isDirectory).Verifiable();
         }
 
         internal void ExpectFindFiles(string path, IList<FileInformation> fileInfos)
@@ -1413,24 +1393,6 @@ namespace DokanNet.Tests
             PrepareVerify();
 
             operations.Verify();
-        }
-
-        internal void VerifyContextReadInvocations(string fileName, int count)
-        {
-            PrepareVerify();
-
-            int bytesRead;
-            operations.Verify();
-            operations.Verify(d => d.ReadFile(fileName, It.IsAny<byte[]>(), out bytesRead, It.IsAny<long>(), It.IsAny<DokanFileInfo>()), Times.Exactly(count));
-        }
-
-        internal void VerifyContextWriteInvocations(string fileName, int count)
-        {
-            PrepareVerify();
-
-            int bytesRead;
-            operations.Verify();
-            operations.Verify(d => d.WriteFile(fileName, It.IsAny<byte[]>(), out bytesRead, It.IsAny<long>(), It.IsAny<DokanFileInfo>()), Times.Exactly(count));
         }
 
         internal void VerifyContextReadInvocations(string fileName, int count)
