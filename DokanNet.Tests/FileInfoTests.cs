@@ -544,7 +544,6 @@ namespace DokanNet.Tests
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
             fixture.PermitGetFileInformation(destinationPath, FileAttributes.Normal, false);
-            fixture.SetupGetFileInformation(destinationPath, FileAttributes.Normal, false);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
