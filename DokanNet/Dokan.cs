@@ -44,11 +44,11 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), String.Empty, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), null, 512, 512, logger);
         }
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, String.Empty, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, null, 512, 512, logger);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
@@ -56,7 +56,12 @@ namespace DokanNet
             Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, uncName, 512, 512, logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512, int sectorSize = 512, ILogger logger = null)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, int allocationUnitSize, int sectorSize, ILogger logger = null)
+        {
+            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, null, allocationUnitSize, sectorSize, logger);
+        }
+
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName, int allocationUnitSize, int sectorSize, ILogger logger = null)
         {
 #if TRACE
             if(logger == null){
