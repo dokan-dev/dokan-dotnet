@@ -517,7 +517,7 @@ namespace DokanNetMirror
                                                 out string fileSystemName, DokanFileInfo info)
         {
             volumeLabel = "DOKAN";
-            fileSystemName = "DOKAN";
+            fileSystemName = "NTFS";
 
             features = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch |
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |
