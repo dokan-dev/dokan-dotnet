@@ -54,6 +54,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>

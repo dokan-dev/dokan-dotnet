@@ -1,7 +1,9 @@
 ﻿using DokanNet.Native;
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using static DokanNet.FormatProviders;
 
 #pragma warning disable 649,169
 
@@ -106,6 +108,11 @@ namespace DokanNet
 
         private DokanFileInfo()
         {
+        }
+
+        public override string ToString()
+        {
+            return DokanFormat($"{{{Context}, {DeleteOnClose}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
         }
     }
 }
