@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using FileAccess = DokanNet.FileAccess;
+using static DokanNet.FormatProviders;
 
 namespace DokanNetMirror
 {
@@ -37,26 +38,14 @@ namespace DokanNetMirror
             return path + fileName;
         }
 
-        private string ToTrace(DokanFileInfo info)
+        private NtStatus Trace(string method, string fileName, DokanFileInfo info, NtStatus result, params object[] parameters)
         {
-            var context = info.Context != null ? "<" + info.Context.GetType().Name + ">" : "<null>";
-
-            return $"{{{context}, { info.DeleteOnClose}, {info.IsDirectory}, {info.NoCache}, {info.PagingIo}, #{info.ProcessId}, {info.SynchronousIo}, {info.WriteToEndOfFile}}}"
-                .ToString(CultureInfo.InvariantCulture);
-        }
-
-        private string ToTrace(DateTime? date)
-        {
-            return date.HasValue ? date.Value.ToString(CultureInfo.CurrentCulture) : "<null>";
-        }
-
-        private NtStatus Trace(string method, string fileName, DokanFileInfo info, NtStatus result, params string[] parameters)
-        {
-            var extraParameters = parameters != null && parameters.Length > 0 ? ", " + string.Join(", ", parameters) : string.Empty;
-
 #if TRACE
-            logger.Debug($"{method}('{fileName}', {ToTrace(info)}{extraParameters}) -> {result}"
-                    .ToString(CultureInfo.InvariantCulture));
+            var extraParameters = parameters != null && parameters.Length > 0
+                ? ", " + string.Join(", ", parameters.Select(x => string.Format(DefaultFormatProvider, "{0}", x)))
+                : string.Empty;
+
+            logger.Debug(DokanFormat($"{method}('{fileName}', {info}{extraParameters}) -> {result}"));
 #endif
 
             return result;
@@ -67,8 +56,7 @@ namespace DokanNetMirror
                                   NtStatus result)
         {
 #if TRACE
-            logger.Debug($"{method}('{fileName}', {ToTrace(info)}, [{access}], [{share}], [{mode}], [{options}], [{attributes}]) -> {result}"
-                    .ToString(CultureInfo.InvariantCulture));
+            logger.Debug(DokanFormat($"{method}('{fileName}', {info}, [{access}], [{share}], [{mode}], [{options}], [{attributes}]) -> {result}"));
 #endif
 
             return result;
@@ -214,8 +202,7 @@ namespace DokanNetMirror
         {
 #if TRACE
             if (info.Context != null)
-                Console.WriteLine($"{nameof(Cleanup)}('{fileName}', { ToTrace(info)} - entering"
-                    .ToString(CultureInfo.CurrentCulture));
+                Console.WriteLine(DokanFormat($"{nameof(Cleanup)}('{fileName}', {info} - entering"));
 #endif
 
             if (info.Context != null && info.Context is FileStream)
@@ -242,8 +229,7 @@ namespace DokanNetMirror
         {
 #if TRACE
             if (info.Context != null)
-                Console.WriteLine($"{ nameof(CloseFile)}('{fileName}', {ToTrace(info)} - entering"
-                    .ToString(CultureInfo.CurrentCulture));
+                Console.WriteLine(DokanFormat($"{ nameof(CloseFile)}('{fileName}', {info} - entering"));
 #endif
 
             if (info.Context != null && info.Context is FileStream)
@@ -377,15 +363,15 @@ namespace DokanNetMirror
                 if (lastWriteTime.HasValue)
                     File.SetLastWriteTime(path, lastWriteTime.Value);
 
-                return Trace(nameof(SetFileTime), fileName, info, DokanResult.Success, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace(nameof(SetFileTime), fileName, info, DokanResult.Success, creationTime, lastAccessTime, lastWriteTime);
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace(nameof(SetFileTime), fileName, info, DokanResult.AccessDenied, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace(nameof(SetFileTime), fileName, info, DokanResult.AccessDenied, creationTime, lastAccessTime, lastWriteTime);
             }
             catch (FileNotFoundException)
             {
-                return Trace(nameof(SetFileTime), fileName, info, DokanResult.FileNotFound, ToTrace(creationTime), ToTrace(lastAccessTime), ToTrace(lastWriteTime));
+                return Trace(nameof(SetFileTime), fileName, info, DokanResult.FileNotFound, creationTime, lastAccessTime, lastWriteTime);
             }
         }
 
