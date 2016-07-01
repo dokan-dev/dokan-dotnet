@@ -145,14 +145,6 @@ namespace DokanNet
             serialNumber = (uint)this.operations.GetHashCode();
         }
 
-        private string ToTrace(DokanFileInfo info)
-        {
-            var context = info.Context != null ? info.Context.GetType().Name : "<null>";
-
-            return string.Format(CultureInfo.InvariantCulture, "{{{0}, {1}, {2}, {3}, {4}, #{5}, {6}, {7}}}",
-                context, info.DeleteOnClose, info.IsDirectory, info.NoCache, info.PagingIo, info.ProcessId, info.SynchronousIo, info.WriteToEndOfFile);
-        }
-
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, uint rawDesiredAccess, uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
             DokanFileInfo rawFileInfo)
@@ -183,7 +175,7 @@ namespace DokanNet
                 this.logger.Debug("\tFileShare\t{0}", (FileShare)rawShareAccess);
                 this.logger.Debug("\tFileOptions\t{0}", fileOptions);
                 this.logger.Debug("\tFileAttributes\t{0}", fileAttributes);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
                 NtStatus result = operations.CreateFile(rawFileName,
                                                     (FileAccess)rawDesiredAccess,
                                                     (FileShare)rawShareAccess,
@@ -210,7 +202,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("CleanupProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 operations.Cleanup(rawFileName, rawFileInfo);
 
@@ -230,7 +222,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("CloseFileProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 operations.CloseFile(rawFileName, rawFileInfo);
 
@@ -253,7 +245,7 @@ namespace DokanNet
                 this.logger.Debug("ReadFileProxy : " + rawFileName);
                 this.logger.Debug("\tBufferLength\t" + rawBufferLength);
                 this.logger.Debug("\tOffset\t" + rawOffset);
-                this.logger.Debug("\tContext\t" + this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t" + rawFileInfo);
 
                 NtStatus result = operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset, rawFileInfo);
 
@@ -278,7 +270,7 @@ namespace DokanNet
                 this.logger.Debug("WriteFileProxy : {0}", rawFileName);
                 this.logger.Debug("\tNumberOfBytesToWrite\t{0}", rawNumberOfBytesToWrite);
                 this.logger.Debug("\tOffset\t{0}", rawOffset);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.WriteFile(rawFileName, rawBuffer, out rawNumberOfBytesWritten, rawOffset, rawFileInfo);
 
@@ -300,7 +292,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("FlushFileBuffersProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.FlushFileBuffers(rawFileName, rawFileInfo);
 
@@ -324,7 +316,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("GetFileInformationProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
 
@@ -382,7 +374,7 @@ namespace DokanNet
                 IList<FileInformation> files;
 
                 this.logger.Debug("FindFilesProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.FindFiles(rawFileName, out files, rawFileInfo);
 
@@ -429,7 +421,7 @@ namespace DokanNet
 
                 this.logger.Debug("FindFilesWithPatternProxy : {0}", rawFileName);
                 this.logger.Debug("\trawSearchPattern\t{0}", rawSearchPattern);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.FindFilesWithPattern(rawFileName, rawSearchPattern, out files, rawFileInfo);
 
@@ -507,7 +499,7 @@ namespace DokanNet
                 IList<FileInformation> files;
 
                 this.logger.Debug("FindStreamsProxy: {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.FindStreams(rawFileName, out files, rawFileInfo);
 
@@ -562,7 +554,7 @@ namespace DokanNet
             {
                 this.logger.Debug("SetEndOfFileProxy : {0}", rawFileName);
                 this.logger.Debug("\tByteOffset\t{0}", rawByteOffset);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
 
@@ -583,7 +575,7 @@ namespace DokanNet
             {
                 this.logger.Debug("SetAllocationSizeProxy : {0}", rawFileName);
                 this.logger.Debug("\tLength\t{0}", rawLength);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
 
@@ -607,7 +599,7 @@ namespace DokanNet
             {
                 this.logger.Debug("SetFileAttributesProxy : {0}", rawFileName);
                 this.logger.Debug("\tAttributes\t{0}", (FileAttributes)rawAttributes);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
 
@@ -643,7 +635,7 @@ namespace DokanNet
                 this.logger.Debug("\tCreateTime\t{0}", ctime);
                 this.logger.Debug("\tAccessTime\t{0}", atime);
                 this.logger.Debug("\tWriteTime\t{0}", mtime);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.SetFileTime(rawFileName, ctime, atime, mtime, rawFileInfo);
 
@@ -665,7 +657,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("DeleteFileProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.DeleteFile(rawFileName, rawFileInfo);
 
@@ -687,7 +679,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("DeleteDirectoryProxy : {0}", rawFileName);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.DeleteDirectory(rawFileName, rawFileInfo);
 
@@ -712,7 +704,7 @@ namespace DokanNet
                 this.logger.Debug("MoveFileProxy : {0}", rawFileName);
                 this.logger.Debug("\tNewFileName\t{0}", rawNewFileName);
                 this.logger.Debug("\tReplaceIfExisting\t{0}", rawReplaceIfExisting);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting, rawFileInfo);
 
@@ -737,7 +729,7 @@ namespace DokanNet
                 this.logger.Debug("LockFileProxy : {0}", rawFileName);
                 this.logger.Debug("\tByteOffset\t{0}", rawByteOffset);
                 this.logger.Debug("\tLength\t{0}", rawLength);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
@@ -762,7 +754,7 @@ namespace DokanNet
                 this.logger.Debug("UnlockFileProxy : {0}", rawFileName);
                 this.logger.Debug("\tByteOffset\t{0}", rawByteOffset);
                 this.logger.Debug("\tLength\t{0}", rawLength);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
@@ -784,7 +776,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("GetDiskFr{0}eeSpaceProxy", "ARG0");
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes, out rawTotalNumberOfFreeBytes, rawFileInfo);
 
@@ -813,7 +805,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("GetVolumeInformationProxy");
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
                 NtStatus result = operations.GetVolumeInformation(out label, out rawFileSystemFlags, out name, rawFileInfo);
 
                 if (result == DokanResult.Success)
@@ -844,7 +836,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("MountedProxy");
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.Mounted(rawFileInfo);
 
@@ -863,7 +855,7 @@ namespace DokanNet
             try
             {
                 this.logger.Debug("UnmountedProxy");
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.Unmounted(rawFileInfo);
 
@@ -910,7 +902,7 @@ namespace DokanNet
             {
                 this.logger.Debug("GetFileSecurityProxy : {0}", rawFileName);
                 this.logger.Debug("\tFileSystemSecurity\t{0}", sect);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
                 if (result == DokanResult.Success /*&& sec != null*/)
@@ -970,7 +962,7 @@ namespace DokanNet
                 this.logger.Debug("SetFileSecurityProxy : {0}", rawFileName);
                 this.logger.Debug("\tAccessControlSections\t{0}", sect);
                 this.logger.Debug("\tFileSystemSecurity\t{0}", sec);
-                this.logger.Debug("\tContext\t{0}", this.ToTrace(rawFileInfo));
+                this.logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 NtStatus result = operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
 

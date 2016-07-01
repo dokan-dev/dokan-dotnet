@@ -10,7 +10,7 @@ namespace DokanNet
     {
         #region Dokan Driver Options
 
-        private const ushort DOKAN_VERSION = 800; // ver 0.8.0
+        private const ushort DOKAN_VERSION = 100; // ver 1.0.0
 
         #endregion Dokan Driver Options
 
@@ -44,10 +44,19 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), logger);
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), String.Empty, 512, 512, logger);
+        }
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
+        {
+            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, String.Empty, 512, 512, logger);
         }
 
-        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
+        {
+            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, uncName, 512, 512, logger);
+        }
+
+        public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512, int sectorSize = 512, ILogger logger = null)
         {
 #if TRACE
             if(logger == null){
@@ -65,9 +74,12 @@ namespace DokanNet
             {
                 Version = (ushort)version,
                 MountPoint = mountPoint,
+                UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
                 ThreadCount = (ushort)threadCount,
                 Options = (uint)mountOptions,
-                Timeout = (uint)timeout.Milliseconds
+                Timeout = (uint)timeout.Milliseconds,
+                AllocationUnitSize = (uint)allocationUnitSize,
+                SectorSize = (uint)sectorSize
             };
 
             var dokanOperations = new DOKAN_OPERATIONS
