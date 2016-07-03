@@ -529,14 +529,14 @@ namespace DokanNet.Tests
         }
 
 #if !SPECIFIC_NAMES
-        private string Named(string name) => name;
+        private static string Named(string name) => name;
 #else
-        private string Named(string name) => $"{currentTestName}_{name}";
+        private static string Named(string name) => $"{currentTestName}_{name}";
 #endif
 
         private FileInformation[] Named(FileInformation[] infos) => infos.Aggregate(new List<FileInformation>(), (l, i) => { l.Add(Named(i)); return l; }, l => l.ToArray());
 
-        private FileInformation Named(FileInformation info) => new FileInformation()
+        private static FileInformation Named(FileInformation info) => new FileInformation()
         {
             FileName = Named(info.FileName), Attributes = info.Attributes, CreationTime = info.CreationTime, LastAccessTime = info.LastAccessTime, LastWriteTime = info.LastWriteTime, Length = info.Length
         };
@@ -1094,7 +1094,7 @@ namespace DokanNet.Tests
                 .Verifiable();
         }
 
-        private bool IsSequenceEqual(IEnumerable<byte> b, IEnumerable<byte> buffer)
+        private static bool IsSequenceEqual(IEnumerable<byte> b, IEnumerable<byte> buffer)
         {
             bool result = b.SequenceEqual(buffer);
             return result;
