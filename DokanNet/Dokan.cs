@@ -134,12 +134,12 @@ namespace DokanNet
 
         public static bool Unmount(char driveLetter)
         {
-            return NativeMethods.DokanUnmount(driveLetter) == DOKAN_SUCCESS;
+            return NativeMethods.DokanUnmount(driveLetter);
         }
 
         public static bool RemoveMountPoint(string mountPoint)
         {
-            return NativeMethods.DokanRemoveMountPoint(mountPoint) == DOKAN_SUCCESS;
+            return NativeMethods.DokanRemoveMountPoint(mountPoint);
         }
 
         public static int Version

@@ -11,7 +11,7 @@ namespace DokanNet.Native
         public static extern int DokanMain(ref DOKAN_OPTIONS options, ref DOKAN_OPERATIONS operations);
 
         [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Auto)]
-        public static extern int DokanUnmount(char driveLetter);
+        public static extern bool DokanUnmount(char driveLetter);
 
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern uint DokanVersion();
@@ -20,7 +20,7 @@ namespace DokanNet.Native
         public static extern uint DokanDriverVersion();
 
         [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Auto)]
-        public static extern int DokanRemoveMountPoint([MarshalAs(UnmanagedType.LPWStr)] string mountPoint);
+        public static extern bool DokanRemoveMountPoint([MarshalAs(UnmanagedType.LPWStr)] string mountPoint);
 
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
