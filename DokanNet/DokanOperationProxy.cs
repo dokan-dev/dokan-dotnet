@@ -120,6 +120,15 @@ namespace DokanNet
             IntPtr rawSecurityDescriptor, uint rawSecurityDescriptorLength,
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <remarks>Supported since 0.8.0. 
+        /// You must specify the version at <see cref="DOKAN_OPTIONS.Version"/>.</remarks>
+        /// <param name="rawFileName">Filename</param>
+        /// <param name="rawFillFindData">A <see cref="IntPtr"/> to a <see cref="FILL_FIND_STREAM_DATA"/></param>
+        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/></param>
+        /// <returns></returns>
         public delegate NtStatus FindStreamsDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName, IntPtr rawFillFindData, // function pointer
             [MarshalAs(UnmanagedType.LPStruct), In/*, Out*/] DokanFileInfo rawFileInfo);
@@ -145,7 +154,22 @@ namespace DokanNet
             serialNumber = (uint)this.operations.GetHashCode();
         }
 
-        public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, uint rawDesiredAccess, uint rawFileAttributes,
+        /// <summary>
+        /// Called when a file is to be created
+        /// 
+        /// See https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
+        /// </summary>
+        /// <param name="rawFileName">File or directory name</param>
+        /// <param name="SecurityContext"></param>
+        /// <param name="rawDesiredAccess"></param>
+        /// <param name="rawFileAttributes"></param>
+        /// <param name="rawShareAccess"></param>
+        /// <param name="rawCreateDisposition"></param>
+        /// <param name="rawCreateOptions"></param>
+        /// <param name="rawFileInfo"></param>
+        /// <returns></returns>
+        public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, 
+            uint rawDesiredAccess, uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
             DokanFileInfo rawFileInfo)
         {

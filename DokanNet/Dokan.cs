@@ -27,35 +27,100 @@ namespace DokanNet
 
         #endregion Dokan Driver Errors
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, ILogger logger = null)
         {
             Mount(operations, mountPoint, DokanOptions.FixedDrive, logger);
         }
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, ILogger logger = null)
         {
             Mount(operations, mountPoint, mountOptions, 0, logger);
         }
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="threadCount">Number of threads to be used internally by Dokan library</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, ILogger logger = null)
         {
             Mount(operations, mountPoint, mountOptions, threadCount, DOKAN_VERSION, logger);
         }
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="threadCount">Number of threads to be used internally by Dokan library</param>
+        /// <param name="version">Supported Dokan Version, ex. "530" (Dokan ver 0.5.3).</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, ILogger logger = null)
         {
             Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), String.Empty, 512, 512, logger);
         }
+
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="threadCount">Number of threads to be used internally by Dokan library</param>
+        /// <param name="version">Supported Dokan Version, ex. "530" (Dokan ver 0.5.3).</param>
+        /// <param name="timeout">Max time to mount the virtual filesystem</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
         {
             Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, String.Empty, 512, 512, logger);
         }
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="threadCount">Number of threads to be used internally by Dokan library</param>
+        /// <param name="version">Supported Dokan Version, ex. "530" (Dokan ver 0.5.3).</param>
+        /// <param name="timeout">Max time to mount the virtual filesystem</param>
+        /// <param name="uncName">UNC provider name</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
         {
             Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, uncName, 512, 512, logger);
         }
 
+        /// <summary>
+        /// A blocking function that mount the virtual file system
+        /// </summary>
+        /// <param name="operations">An <see cref="IDokanOperations"/></param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
+        /// <param name="mountOptions">Combination of DOKAN_OPTIONS_*</param>
+        /// <param name="threadCount">Number of threads to be used internally by Dokan library</param>
+        /// <param name="version">Supported Dokan Version, ex. "530" (Dokan ver 0.5.3).</param>
+        /// <param name="timeout">Max time to mount the virtual filesystem</param>
+        /// <param name="uncName">UNC provider name</param>
+        /// <param name="allocationUnitSize">Device allocation size.</param>
+        /// <param name="sectorSize">Device sector size.</param>
+        /// <param name="logger">An <see cref="ILogger"/> for logging</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512, int sectorSize = 512, ILogger logger = null)
         {
 #if TRACE
