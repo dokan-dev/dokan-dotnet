@@ -168,10 +168,7 @@ namespace DokanNet
         /// <param name="rawCreateOptions"></param>
         /// <param name="rawFileInfo"></param>
         /// <returns></returns>
-        public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, 
-            uint rawDesiredAccess, uint rawFileAttributes,
-            uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
-            DokanFileInfo rawFileInfo)
+        public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr SecurityContext, uint rawDesiredAccess, uint rawFileAttributes, uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions, DokanFileInfo rawFileInfo)
         {
             try
             {
