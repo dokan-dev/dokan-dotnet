@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -1576,5 +1575,34 @@ namespace DokanNet.Tests
             fixture.Verify();
 #endif
         }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void GetFileInformation_WhereDatesIsUnknown_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = fixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            var attributes = FileAttributes.Normal;
+            fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.ExpectGetFileInformation(path, attributes, creationTime: DateTime.MinValue, lastWriteTime: DateTime.MinValue, lastAccessTime: DateTime.MinValue);
+#endif
+
+            var sut = new DirectoryInfo(path.AsDriveBasedPath());
+
+#if !LOGONLY
+            //As DirectoryInfo do not have any handling om uninitialized date
+            //do we have to use this date insted of DateTime.MinValue 
+            var defaultDate = new DateTime(1601, 1, 1, 1, 0, 0);
+            Assert.AreEqual(sut.CreationTime, defaultDate, "File should have unknown creation time.");
+            Assert.AreEqual(sut.LastWriteTime, defaultDate, "File should have unknown last write time.");
+            Assert.AreEqual(sut.LastAccessTime, defaultDate, "File should have unknown last access time.");
+            Assert.AreEqual(attributes, sut.Attributes, $"{nameof(sut.Attributes)} is not initialized." );
+            
+            fixture.Verify();
+#endif
+        }        
     }
 }

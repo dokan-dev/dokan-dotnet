@@ -95,8 +95,8 @@ namespace RegistryFS
                     finfo.FileName = name;
                     finfo.Attributes = System.IO.FileAttributes.Directory;
                     finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = DateTime.Now;
-                    finfo.CreationTime = DateTime.Now;
+                    finfo.LastWriteTime = DateTime.MinValue;
+                    finfo.CreationTime = DateTime.MinValue;
                     files.Add(finfo);
                 }
                 return DokanResult.Success;
@@ -112,8 +112,8 @@ namespace RegistryFS
                     finfo.FileName = name;
                     finfo.Attributes = System.IO.FileAttributes.Directory;
                     finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = DateTime.Now;
-                    finfo.CreationTime = DateTime.Now;
+                    finfo.LastWriteTime = DateTime.MinValue;
+                    finfo.CreationTime = DateTime.MinValue;
                     files.Add(finfo);
                 }
                 foreach (string name in key.GetValueNames())
@@ -122,8 +122,8 @@ namespace RegistryFS
                     finfo.FileName = name;
                     finfo.Attributes = System.IO.FileAttributes.Normal;
                     finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = DateTime.Now;
-                    finfo.CreationTime = DateTime.Now;
+                    finfo.LastWriteTime = DateTime.MinValue;
+                    finfo.CreationTime = DateTime.MinValue;
                     files.Add(finfo);
                 }
                 return DokanResult.Success;
@@ -142,8 +142,8 @@ namespace RegistryFS
             {
                 fileinfo.Attributes = System.IO.FileAttributes.Directory;
                 fileinfo.LastAccessTime = DateTime.Now;
-                fileinfo.LastWriteTime = DateTime.Now;
-                fileinfo.CreationTime = DateTime.Now;
+                fileinfo.LastWriteTime = DateTime.MinValue;
+                fileinfo.CreationTime = DateTime.MinValue;
 
                 return DokanResult.Success;
             }
@@ -154,8 +154,8 @@ namespace RegistryFS
 
             fileinfo.Attributes = System.IO.FileAttributes.Directory;
             fileinfo.LastAccessTime = DateTime.Now;
-            fileinfo.LastWriteTime = DateTime.Now;
-            fileinfo.CreationTime = DateTime.Now;
+            fileinfo.LastWriteTime = DateTime.MinValue;
+            fileinfo.CreationTime = DateTime.MinValue;
 
             return DokanResult.Success;
         }
