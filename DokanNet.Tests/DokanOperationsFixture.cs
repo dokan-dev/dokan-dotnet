@@ -519,6 +519,17 @@ namespace DokanNet.Tests
                 new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             };
 
+        internal IList<FileInformation> RemoveDatesFromFileInformations(IEnumerable<FileInformation> fileInformations)
+        {
+            return fileInformations
+                .Select(x => new FileInformation()
+                {
+                    FileName = x.FileName,
+                    Attributes = x.Attributes,
+                    Length = x.Length
+                }).ToArray();
+        }
+
         internal static byte[] InitPeriodicTestData(long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i % 251)).ToArray();
 
         internal static byte[] InitBlockTestData(long bufferSize, long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i / bufferSize + 1)).ToArray();
