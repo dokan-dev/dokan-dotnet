@@ -727,29 +727,32 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFiles().Length);
 #else
             var receivedFiles = sut.GetFiles();
+
             //As DirectoryInfo do not have any handling om uninitialized date
             //do we have to use this date insted of DateTime.MinValue 
-            var defaultDate = new DateTime(1601, 1, 1, 1, 0, 0);
+            var defaultDate = DateTime.FromFileTime(0);
             var expectedDateCollection = Enumerable.Repeat(defaultDate, receivedFiles.Length).ToArray();
-            
+
             CollectionAssert.AreEqual(
+                receivedFiles
+                    .Select(f => f.Name)
+                    .ToArray(),
                 fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal))
                     .Select(i => i.FileName)
                     .ToArray(),
-                receivedFiles.Select(f => f.Name).ToArray(),
                 nameof(sut.GetFiles));
 
             CollectionAssert.AreEqual(
-                receivedFiles.Select(x => x.CreationTime).ToArray(),
                 expectedDateCollection,
+                receivedFiles.Select(x => x.CreationTime).ToArray(),
                 nameof(FileInformation.CreationTime));
             CollectionAssert.AreEqual(
-                receivedFiles.Select(x => x.LastWriteTime).ToArray(),
                 expectedDateCollection,
+                receivedFiles.Select(x => x.LastWriteTime).ToArray(),
                 nameof(FileInformation.LastWriteTime));
             CollectionAssert.AreEqual(
-                receivedFiles.Select(x => x.LastAccessTime).ToArray(),
                 expectedDateCollection,
+                receivedFiles.Select(x => x.LastAccessTime).ToArray(),
                 nameof(FileInformation.LastAccessTime));
 
             fixture.Verify();

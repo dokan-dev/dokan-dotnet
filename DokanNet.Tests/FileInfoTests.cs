@@ -1595,10 +1595,10 @@ namespace DokanNet.Tests
 #if !LOGONLY
             //As DirectoryInfo do not have any handling om uninitialized date
             //do we have to use this date insted of DateTime.MinValue 
-            var defaultDate = new DateTime(1601, 1, 1, 1, 0, 0);
-            Assert.AreEqual(sut.CreationTime, defaultDate, "File should have unknown creation time.");
-            Assert.AreEqual(sut.LastWriteTime, defaultDate, "File should have unknown last write time.");
-            Assert.AreEqual(sut.LastAccessTime, defaultDate, "File should have unknown last access time.");
+            var defaultDate = DateTime.FromFileTime(0);
+            Assert.AreEqual(defaultDate, sut.CreationTime, $"File should have unknown {nameof(sut.CreationTime)}.");
+            Assert.AreEqual(defaultDate, sut.LastWriteTime, $"File should have unknown {nameof(sut.LastWriteTime)}.");
+            Assert.AreEqual(defaultDate, sut.LastAccessTime, $"File should have unknown {nameof(sut.LastAccessTime)}.");
             Assert.AreEqual(attributes, sut.Attributes, $"{nameof(sut.Attributes)} is not initialized." );
             
             fixture.Verify();
