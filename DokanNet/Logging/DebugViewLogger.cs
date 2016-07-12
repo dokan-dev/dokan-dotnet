@@ -44,9 +44,9 @@
 
         private void WriteMessageToDebugView(string category, string message, params object[] args)
         {
-            if (args.Length > 0)
+            if (args?.Length > 0)
                 message = string.Format(message, args);
-            OutputDebugString(string.Format(message, args).FormatMessageForLogging(category, loggerName));
+            OutputDebugString(message.FormatMessageForLogging(category, loggerName));
         }
     }
 }
