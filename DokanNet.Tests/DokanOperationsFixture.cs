@@ -526,6 +526,9 @@ namespace DokanNet.Tests
                 {
                     FileName = x.FileName,
                     Attributes = x.Attributes,
+                    CreationTime = null,
+                    LastAccessTime = null,
+                    LastWriteTime = null,
                     Length = x.Length
                 }).ToArray();
         }
@@ -773,14 +776,13 @@ namespace DokanNet.Tests
 
         private IVerifies SetupGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
         {
-            var defaultDateTime = DateTime.Now;
             var fileInfo = new FileInformation()
             {
                 FileName = path,
                 Attributes = attributes,
-                CreationTime = creationTime ?? defaultDateTime,
-                LastWriteTime = lastWriteTime ?? defaultDateTime,
-                LastAccessTime = lastAccessTime ?? defaultDateTime,
+                CreationTime = creationTime,
+                LastWriteTime = lastWriteTime,
+                LastAccessTime = lastAccessTime,
                 Length = length ?? 0
             };
             return operations
