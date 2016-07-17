@@ -689,6 +689,76 @@ namespace DokanNet.Tests
 #endif
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming",
+            "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
+        [TestMethod, TestCategory(TestCategories.Success)]
+        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
+            "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
+        public void GetFiles_UnknownDates_CallsApiCorrectly()
+        {
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
+
+            var fixture = DokanOperationsFixture.Instance;
+
+            string path = fixture.DirectoryName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.ExpectOpenDirectory(path);
+            //Remove all dates
+            var files = fixture.RemoveDatesFromFileInformations(fixture.DirectoryItems);
+
+            if (supportsPatternSearch)
+            {
+                fixture.ExpectFindFilesWithPattern(path, "*", files);
+            }
+            else
+            {
+                fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
+                fixture.ExpectFindFiles(path, files);
+            }
+#endif
+
+            var sut = new DirectoryInfo(fixture.DirectoryName.AsDriveBasedPath());
+
+#if LOGONLY
+            Assert.IsNotNull(sut.GetFiles(), nameof(sut.GetFiles));
+            Console.WriteLine(sut.GetFiles().Length);
+#else
+            var receivedFiles = sut.GetFiles();
+
+            //As DirectoryInfo do not have any handling om uninitialized date
+            //do we have to use this date insted of DateTime.MinValue 
+            var defaultDate = DateTime.FromFileTime(0);
+            var expectedDateCollection = Enumerable.Repeat(defaultDate, receivedFiles.Length).ToArray();
+
+            CollectionAssert.AreEqual(
+                receivedFiles
+                    .Select(f => f.Name)
+                    .ToArray(),
+                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal))
+                    .Select(i => i.FileName)
+                    .ToArray(),
+                nameof(sut.GetFiles));
+
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.CreationTime).ToArray(),
+                nameof(FileInformation.CreationTime));
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.LastWriteTime).ToArray(),
+                nameof(FileInformation.LastWriteTime));
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.LastAccessTime).ToArray(),
+                nameof(FileInformation.LastAccessTime));
+
+            fixture.Verify();
+#endif
+        }
+
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]

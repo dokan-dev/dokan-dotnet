@@ -519,6 +519,20 @@ namespace DokanNet.Tests
                 new FileInformation() { FileName = "..", Attributes = FileAttributes.Directory, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
             };
 
+        internal IList<FileInformation> RemoveDatesFromFileInformations(IEnumerable<FileInformation> fileInformations)
+        {
+            return fileInformations
+                .Select(x => new FileInformation()
+                {
+                    FileName = x.FileName,
+                    Attributes = x.Attributes,
+                    CreationTime = null,
+                    LastAccessTime = null,
+                    LastWriteTime = null,
+                    Length = x.Length
+                }).ToArray();
+        }
+
         internal static byte[] InitPeriodicTestData(long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i % 251)).ToArray();
 
         internal static byte[] InitBlockTestData(long bufferSize, long fileSize) => Enumerable.Range(0, (int)fileSize).Select(i => (byte)(i / bufferSize + 1)).ToArray();
@@ -762,14 +776,13 @@ namespace DokanNet.Tests
 
         private IVerifies SetupGetFileInformation(string path, FileAttributes attributes, bool? isDirectory = null, DateTime? creationTime = null, DateTime? lastWriteTime = null, DateTime? lastAccessTime = null, long? length = null)
         {
-            var defaultDateTime = DateTime.Now;
             var fileInfo = new FileInformation()
             {
                 FileName = path,
                 Attributes = attributes,
-                CreationTime = creationTime ?? defaultDateTime,
-                LastWriteTime = lastWriteTime ?? defaultDateTime,
-                LastAccessTime = lastAccessTime ?? defaultDateTime,
+                CreationTime = creationTime,
+                LastWriteTime = lastWriteTime,
+                LastAccessTime = lastAccessTime,
                 Length = length ?? 0
             };
             return operations

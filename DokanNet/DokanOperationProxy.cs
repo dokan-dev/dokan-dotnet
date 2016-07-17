@@ -2,7 +2,7 @@ using DokanNet.Native;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -332,9 +332,9 @@ namespace DokanNet
 
                     rawHandleFileInformation.dwFileAttributes = (uint)fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
 
-                    long ctime = fi.CreationTime.ToFileTime();
-                    long atime = fi.LastAccessTime.ToFileTime();
-                    long mtime = fi.LastWriteTime.ToFileTime();
+                    long ctime = ToFileTime(fi.CreationTime);
+                    long atime = ToFileTime(fi.LastAccessTime);
+                    long mtime = ToFileTime(fi.LastWriteTime);
                     rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int)(ctime >> 32);
                     rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int)(ctime & 0xffffffff);
 
@@ -460,9 +460,9 @@ namespace DokanNet
         private static void Addto(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!String.IsNullOrEmpty(fi.FileName));
-            long ctime = fi.CreationTime.ToFileTime();
-            long atime = fi.LastAccessTime.ToFileTime();
-            long mtime = fi.LastWriteTime.ToFileTime();
+            long ctime = ToFileTime(fi.CreationTime);
+            long atime = ToFileTime(fi.LastAccessTime);
+            long mtime = ToFileTime(fi.LastWriteTime);
             var data = new WIN32_FIND_DATA
             {
                 dwFileAttributes = fi.Attributes,
@@ -974,6 +974,20 @@ namespace DokanNet
                 this.logger.Error("SetFileSecurityProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
+        }
+        /// <summary>
+        /// Converts the value of <paramref name="dateTime"/> to a Windows file time.
+        /// If <paramref name="dateTime"/> is null, it returns 0
+        /// </summary>
+        /// <returns>The value of <paramref name="dateTime"/> expressed as a Windows file time
+        ///  -or- it returns 0 if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC.</returns>
+        [Pure]
+        private static long ToFileTime(DateTime? dateTime)
+        {
+            //See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx
+            return dateTime.HasValue && (dateTime.Value > DateTime.Parse("1601-01-01"))
+                ? dateTime.Value.ToFileTime() 
+                : 0;
         }
 
         #region Nested type: FILL_FIND_FILE_DATA
