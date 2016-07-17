@@ -977,15 +977,15 @@ namespace DokanNet
         }
         /// <summary>
         /// Converts the value of <paramref name="dateTime"/> to a Windows file time.
-        /// If <paramref name="dateTime"/> is null, it returns 0
+        /// If <paramref name="dateTime"/> is null or before 12:00 midnight January 1, 1601 C.E. UTC, it returns 0
         /// </summary>
         /// <returns>The value of <paramref name="dateTime"/> expressed as a Windows file time
-        ///  -or- it returns 0 if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC.</returns>
+        ///  -or- it returns 0 if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or null.</returns>
         [Pure]
         private static long ToFileTime(DateTime? dateTime)
         {
             //See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx
-            return dateTime.HasValue && (dateTime.Value > DateTime.Parse("1601-01-01"))
+            return dateTime.HasValue && (dateTime.Value >= DateTime.FromFileTime(0))
                 ? dateTime.Value.ToFileTime() 
                 : 0;
         }
