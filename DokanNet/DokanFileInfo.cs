@@ -28,6 +28,9 @@ namespace DokanNet
 
         [MarshalAs(UnmanagedType.U1)] private bool _writeToEndOfFile;
 
+        /// <summary>
+        /// Context that can be used to carry information between operation
+        /// </summary>
         public object Context
         {
             get { return _context != 0 ? ((GCHandle) ((IntPtr) _context)).Target : null; }
@@ -47,12 +50,18 @@ namespace DokanNet
 
         public int ProcessId => (int) _processId;
 
+        /// <summary>
+        /// Context that can be used to carry information between operation
+        /// </summary>
         public bool IsDirectory
         {
             get { return _isDirectory; }
             set { _isDirectory = value; }
         }
 
+        /// <summary>
+        /// Flag if the file has to be delete during Cleanup event
+        /// </summary>
         public bool DeleteOnClose
         {
             get { return _deleteOnClose; }
@@ -67,6 +76,10 @@ namespace DokanNet
 
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
+        /// <summary>
+        /// Request the WindowsIdentity of current operation
+        /// </summary>
+        /// <returns>Return WindowsIdentity of the current request</returns>
         public WindowsIdentity GetRequestor()
         {
             try
@@ -79,11 +92,19 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Ask kernel more time on the current operation
+        /// </summary>
+        /// <param name="milliseconds">Time in milliseconds needed to finish the request</param>
+        /// <returns>Return if kernel accept to give more time</returns>
         public bool TryResetTimeout(int milliseconds)
         {
             return NativeMethods.DokanResetTimeout((uint) milliseconds, this);
         }
 
+        /// <summary>
+        /// Dokan informations on the current operation
+        /// </summary>
         private DokanFileInfo()
         {
         }
