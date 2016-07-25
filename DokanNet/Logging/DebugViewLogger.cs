@@ -16,27 +16,27 @@
 
         public void Debug(string message, params object[] args)
         {
-            this.WriteMessageToDebugView("debug", message, args);
+            WriteMessageToDebugView("debug", message, args);
         }
 
         public void Info(string message, params object[] args)
         {
-            this.WriteMessageToDebugView("info", message, args);
+            WriteMessageToDebugView("info", message, args);
         }
 
         public void Warn(string message, params object[] args)
         {
-            this.WriteMessageToDebugView("warn", message, args);
+            WriteMessageToDebugView("warn", message, args);
         }
 
         public void Error(string message, params object[] args)
         {
-            this.WriteMessageToDebugView("error", message, args);
+            WriteMessageToDebugView("error", message, args);
         }
 
         public void Fatal(string message, params object[] args)
         {
-            this.WriteMessageToDebugView("fatal", message, args);
+            WriteMessageToDebugView("fatal", message, args);
         }
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]

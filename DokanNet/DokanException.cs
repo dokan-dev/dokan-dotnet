@@ -7,7 +7,7 @@ namespace DokanNet
     {
         internal DokanException(int status, string message) : base(message)
         {
-            base.HResult = status;
+            HResult = status;
         }
     }
 }

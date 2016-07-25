@@ -23,7 +23,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            bool hasUnmatchedInvocations = false;
+            var hasUnmatchedInvocations = false;
             DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
@@ -33,7 +33,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -70,7 +70,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -91,7 +91,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -111,7 +111,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -130,7 +130,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -149,7 +149,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -168,7 +168,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -189,7 +189,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -211,7 +211,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -313,7 +313,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -385,7 +385,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -416,7 +416,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -442,7 +442,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -495,7 +495,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -534,8 +534,8 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*r2";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*r2";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
@@ -575,7 +575,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -616,7 +616,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -656,8 +656,8 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*bD*";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*bD*";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
@@ -701,7 +701,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -768,7 +768,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -809,7 +809,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -849,8 +849,8 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*bD*";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*bD*";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
@@ -939,7 +939,7 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFileSystemInfos().Length);
 #else
             CollectionAssert.AreEqual(
-                pathsAndItems.Select(p => p.Items.Where(f => !f.FileName.All(c => c == '.')))
+                pathsAndItems.Select(p => p.Items.Where(f => f.FileName.Any(c => c != '.')))
                     .Aggregate((i1, i2) => i1.Union(i2).ToArray())
                     .Select(i => i.FileName).ToArray(),
                 sut.GetFileSystemInfos("*", SearchOption.AllDirectories).Select(f => f.Name).ToArray(),
@@ -1014,7 +1014,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1065,7 +1065,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
             var security = new DirectorySecurity();
             security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null), FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
 #if LOGONLY

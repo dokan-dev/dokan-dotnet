@@ -145,7 +145,7 @@ namespace DokanNet.Tests
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_READ | ShareMode.FILE_SHARE_DELETE, IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_NO_BUFFERING | FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
-                    for (int i = 0; i < chunks.Length; ++i)
+                    for (var i = 0; i < chunks.Length; ++i)
                     {
                         var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
@@ -188,7 +188,7 @@ namespace DokanNet.Tests
                         throw new InvalidOperationException();
                     }
 
-                    for (int i = 0; i < chunks.Length; ++i)
+                    for (var i = 0; i < chunks.Length; ++i)
                     {
                         var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped() { OffsetHigh = (int)(offset >> 32), OffsetLow = (int)(offset & 0xffffffff), EventHandle = IntPtr.Zero };
@@ -230,7 +230,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            bool hasUnmatchedInvocations = false;
+            var hasUnmatchedInvocations = false;
             DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
@@ -240,7 +240,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -251,7 +251,7 @@ namespace DokanNet.Tests
             var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length);
 
 #if !LOGONLY
-            for (int i = 0; i < outputs.Length; ++i)
+            for (var i = 0; i < outputs.Length; ++i)
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i}");
                 Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i}");
@@ -267,7 +267,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -284,7 +284,7 @@ namespace DokanNet.Tests
             NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length, inputs);
 
 #if !LOGONLY
-            for (int i = 0; i < inputs.Length; ++i)
+            for (var i = 0; i < inputs.Length; ++i)
             {
                 Assert.AreEqual(0, inputs[i].Win32Error, $"Unexpected Win32 error in input {i}");
                 Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i}");
@@ -304,7 +304,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             var testData = DokanOperationsFixture.InitBlockTestData(bufferSize, fileSize);
 #if LOGONLY
             fixture.SetupAny();
@@ -316,7 +316,7 @@ namespace DokanNet.Tests
             var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length);
 
 #if !LOGONLY
-            for (int i = 0; i < outputs.Length; ++i)
+            for (var i = 0; i < outputs.Length; ++i)
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
                 Assert.AreEqual(NativeMethods.BufferSize(bufferSize, fileSize, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
@@ -337,7 +337,7 @@ namespace DokanNet.Tests
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             var testData = DokanOperationsFixture.InitBlockTestData(bufferSize, fileSize);
 #if LOGONLY
             fixture.SetupAny();
@@ -357,7 +357,7 @@ namespace DokanNet.Tests
             NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length, inputs);
 
 #if !LOGONLY
-            for (int i = 0; i < inputs.Length; ++i)
+            for (var i = 0; i < inputs.Length; ++i)
             {
                 Assert.AreEqual(0, inputs[i].Win32Error, $"Unexpected Win32 error in input {i} for BufferSize={bufferSize}, FileSize={fileSize}");
                 Assert.AreEqual(NativeMethods.BufferSize(bufferSize, fileSize, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i} for BufferSize={bufferSize}, FileSize={fileSize}");

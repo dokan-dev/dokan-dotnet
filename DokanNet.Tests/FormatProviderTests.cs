@@ -1,9 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DokanNet.Tests
 {
@@ -14,7 +10,7 @@ namespace DokanNet.Tests
         public void NullValuesShouldBeVisibles()
         {
             DateTime? obj = null;
-            Assert.AreEqual(FormatProviders.NullStringRapresentation, String.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
+            Assert.AreEqual(FormatProviders.NullStringRapresentation, string.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
         }
     }
 }

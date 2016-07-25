@@ -646,9 +646,9 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileSystemSecurity _directorySecurity, AccessControlSections sections, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.GetFileSecurity)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", out {_directorySecurity}, {sections}, {info.Log()})"));
 
-            string volumeLabel = VOLUME_LABEL;
+            var volumeLabel = VOLUME_LABEL;
             var features = TestFileSystemFeatures;
-            string fileSystemName = FILESYSTEM_NAME;
+            var fileSystemName = FILESYSTEM_NAME;
             operations
                 .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
@@ -664,7 +664,7 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((string oldName, string newName, bool replace, DokanFileInfo info) => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{oldName}\", \"{newName}\", {replace}, {info.Log()})"));
 
-            int bytesRead = 0;
+            var bytesRead = 0;
             operations
                 .Setup(d => d.ReadFile(It.IsAny<string>(), It.IsAny<byte[]>(), out bytesRead, It.IsAny<long>(), It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
@@ -711,7 +711,7 @@ namespace DokanNet.Tests
                 .Returns(DokanResult.Success)
                 .Callback((DokanFileInfo info) => Trace($"{nameof(IDokanOperations.Unmounted)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
 
-            int bytesWritten = 0;
+            var bytesWritten = 0;
             operations
                 .Setup(d => d.WriteFile(It.IsAny<string>(), It.IsAny<byte[]>(), out bytesWritten, It.IsAny<long>(), It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
@@ -1082,8 +1082,8 @@ namespace DokanNet.Tests
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
                 offsets[index] = offset;
-                int bytesRemaining = buffer.Length - offset;
-                int bytesRead = Math.Min(chunkSize, bytesRemaining);
+                var bytesRemaining = buffer.Length - offset;
+                var bytesRead = Math.Min(chunkSize, bytesRemaining);
                 operations
                     .Setup(d => d.ReadFile(path, It.Is<byte[]>(b => b.Length == chunkSize || b.Length == bytesRemaining), out bytesRead, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
                     .Returns(DokanResult.Success)
@@ -1109,7 +1109,7 @@ namespace DokanNet.Tests
 
         private static bool IsSequenceEqual(IEnumerable<byte> b, IEnumerable<byte> buffer)
         {
-            bool result = b.SequenceEqual(buffer);
+            var result = b.SequenceEqual(buffer);
             return result;
         }
 
@@ -1130,7 +1130,7 @@ namespace DokanNet.Tests
             for (int offset = 0, index = 0; offset < buffer.Length; offset += chunkSize, ++index)
             {
                 offsets[index] = offset;
-                int bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
+                var bytesWritten = Math.Min(chunkSize, buffer.Length - offset);
                 var chunk = buffer.Skip(offset).Take(bytesWritten);
                 operations
                     .Setup(d => d.WriteFile(path, It.Is<byte[]>(b => IsSequenceEqual(b, chunk)/*b.SequenceEqual(chunk)*/), out bytesWritten, offsets[index], It.Is<DokanFileInfo>(i => i.Context == context && !i.IsDirectory && i.SynchronousIo == synchronousIo)))
@@ -1255,7 +1255,7 @@ namespace DokanNet.Tests
             if (Interlocked.Read(ref pendingFiles) < 0)
                 throw new InvalidOperationException("Negative pending files count");
 
-            for (int i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
+            for (var i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
             {
                 if (i > 5)
                     throw new TimeoutException("Cleanup wait cycles exceeded");

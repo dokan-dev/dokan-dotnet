@@ -1,6 +1,5 @@
 ﻿using DokanNet.Native;
 using System;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using static DokanNet.FormatProviders;
@@ -52,10 +51,7 @@ namespace DokanNet
             }
         }
 
-        public int ProcessId
-        {
-            get { return (int)_processId; }
-        }
+        public int ProcessId => (int)_processId;
 
         public bool IsDirectory
         {
@@ -69,25 +65,13 @@ namespace DokanNet
             set { _deleteOnClose = value; }
         }
 
-        public bool PagingIo
-        {
-            get { return _pagingIo; }
-        }
+        public bool PagingIo => _pagingIo;
 
-        public bool SynchronousIo
-        {
-            get { return _synchronousIo; }
-        }
+        public bool SynchronousIo => _synchronousIo;
 
-        public bool NoCache
-        {
-            get { return _nocache; }
-        }
+        public bool NoCache => _nocache;
 
-        public bool WriteToEndOfFile
-        {
-            get { return _writeToEndOfFile; }
-        }
+        public bool WriteToEndOfFile => _writeToEndOfFile;
 
         public WindowsIdentity GetRequestor()
         {

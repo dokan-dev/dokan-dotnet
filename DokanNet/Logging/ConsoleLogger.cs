@@ -12,27 +12,27 @@ namespace DokanNet.Logging
 
         public void Debug(string message, params object[] args)
         {
-            this.WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
+            WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
         }
 
         public void Info(string message, params object[] args)
         {
-            this.WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
+            WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
         }
 
         public void Warn(string message, params object[] args)
         {
-            this.WriteToConsole(ConsoleColor.DarkYellow, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.DarkYellow, DateTime.Now, message, args);
         }
 
         public void Error(string message, params object[] args)
         {
-            this.WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
         }
 
         public void Fatal(string message, params object[] args)
         {
-            this.WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
         }
 
         private void WriteToConsole(ConsoleColor newColor, DateTime dateTime, string message, params object[] args)

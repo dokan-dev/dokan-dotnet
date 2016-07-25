@@ -4,7 +4,7 @@ using DokanNet.Native;
 namespace DokanNet
 {
 
-    using DokanNet.Logging;
+    using Logging;
 
     public static class Dokan
     {
@@ -44,11 +44,11 @@ namespace DokanNet
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), String.Empty, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), string.Empty, 512, 512, logger);
         }
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, String.Empty, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, string.Empty, 512, 512, logger);
         }
 
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions, int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
@@ -111,7 +111,7 @@ namespace DokanNet
                 FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
-            int status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
+            var status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
 
             switch (status)
             {
@@ -142,14 +142,8 @@ namespace DokanNet
             return NativeMethods.DokanRemoveMountPoint(mountPoint);
         }
 
-        public static int Version
-        {
-            get { return (int)NativeMethods.DokanVersion(); }
-        }
+        public static int Version => (int)NativeMethods.DokanVersion();
 
-        public static int DriverVersion
-        {
-            get { return (int)NativeMethods.DokanDriverVersion(); }
-        }
+        public static int DriverVersion => (int)NativeMethods.DokanDriverVersion();
     }
 }

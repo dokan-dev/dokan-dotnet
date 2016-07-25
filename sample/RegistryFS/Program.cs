@@ -10,16 +10,18 @@ namespace RegistryFS
     {
         #region DokanOperations member
 
-        private Dictionary<string, RegistryKey> TopDirectory;
+        private readonly Dictionary<string, RegistryKey> TopDirectory;
 
         public RFS()
         {
-            TopDirectory = new Dictionary<string, RegistryKey>();
-            TopDirectory["ClassesRoot"] = Registry.ClassesRoot;
-            TopDirectory["CurrentUser"] = Registry.CurrentUser;
-            TopDirectory["CurrentConfig"] = Registry.CurrentConfig;
-            TopDirectory["LocalMachine"] = Registry.LocalMachine;
-            TopDirectory["Users"] = Registry.Users;
+            TopDirectory = new Dictionary<string, RegistryKey>
+            {
+                ["ClassesRoot"] = Registry.ClassesRoot,
+                ["CurrentUser"] = Registry.CurrentUser,
+                ["CurrentConfig"] = Registry.CurrentConfig,
+                ["LocalMachine"] = Registry.LocalMachine,
+                ["Users"] = Registry.Users
+            };
         }
 
         public void Cleanup(string filename, DokanFileInfo info)
@@ -56,13 +58,13 @@ namespace RegistryFS
 
         private RegistryKey GetRegistoryEntry(string name)
         {
-            Console.WriteLine("GetRegistoryEntry : {0}", name);
-            int top = name.IndexOf('\\', 1) - 1;
+            Console.WriteLine($"GetRegistoryEntry : {name}");
+            var top = name.IndexOf('\\', 1) - 1;
             if (top < 0)
                 top = name.Length - 1;
 
-            string topname = name.Substring(1, top);
-            int sub = name.IndexOf('\\', 1);
+            var topname = name.Substring(1, top);
+            var sub = name.IndexOf('\\', 1);
 
             if (TopDirectory.ContainsKey(topname))
             {
@@ -89,41 +91,47 @@ namespace RegistryFS
             files = new List<FileInformation>();
             if (filename == "\\")
             {
-                foreach (string name in TopDirectory.Keys)
+                foreach (var name in TopDirectory.Keys)
                 {
-                    FileInformation finfo = new FileInformation();
-                    finfo.FileName = name;
-                    finfo.Attributes = System.IO.FileAttributes.Directory;
-                    finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = null;
-                    finfo.CreationTime = null;
+                    var finfo = new FileInformation
+                    {
+                        FileName = name,
+                        Attributes = System.IO.FileAttributes.Directory,
+                        LastAccessTime = DateTime.Now,
+                        LastWriteTime = null,
+                        CreationTime = null
+                    };
                     files.Add(finfo);
                 }
                 return DokanResult.Success;
             }
             else
             {
-                RegistryKey key = GetRegistoryEntry(filename);
+                var key = GetRegistoryEntry(filename);
                 if (key == null)
                     return DokanResult.Error;
-                foreach (string name in key.GetSubKeyNames())
+                foreach (var name in key.GetSubKeyNames())
                 {
-                    FileInformation finfo = new FileInformation();
-                    finfo.FileName = name;
-                    finfo.Attributes = System.IO.FileAttributes.Directory;
-                    finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = null;
-                    finfo.CreationTime = null;
+                    var finfo = new FileInformation
+                    {
+                        FileName = name,
+                        Attributes = System.IO.FileAttributes.Directory,
+                        LastAccessTime = DateTime.Now,
+                        LastWriteTime = null,
+                        CreationTime = null
+                    };
                     files.Add(finfo);
                 }
-                foreach (string name in key.GetValueNames())
+                foreach (var name in key.GetValueNames())
                 {
-                    FileInformation finfo = new FileInformation();
-                    finfo.FileName = name;
-                    finfo.Attributes = System.IO.FileAttributes.Normal;
-                    finfo.LastAccessTime = DateTime.Now;
-                    finfo.LastWriteTime = null;
-                    finfo.CreationTime = null;
+                    var finfo = new FileInformation
+                    {
+                        FileName = name,
+                        Attributes = System.IO.FileAttributes.Normal,
+                        LastAccessTime = DateTime.Now,
+                        LastWriteTime = null,
+                        CreationTime = null
+                    };
                     files.Add(finfo);
                 }
                 return DokanResult.Success;
@@ -135,8 +143,7 @@ namespace RegistryFS
             out FileInformation fileinfo,
             DokanFileInfo info)
         {
-            fileinfo = new FileInformation();
-            fileinfo.FileName = filename;
+            fileinfo = new FileInformation {FileName = filename};
 
             if (filename == "\\")
             {
@@ -148,7 +155,7 @@ namespace RegistryFS
                 return DokanResult.Success;
             }
 
-            RegistryKey key = GetRegistoryEntry(filename);
+            var key = GetRegistoryEntry(filename);
             if (key == null)
                 return DokanResult.Error;
 
@@ -260,7 +267,7 @@ namespace RegistryFS
         {
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
-            fileSystemName = String.Empty;
+            fileSystemName = string.Empty;
             return DokanResult.Error;
         }
 
@@ -279,7 +286,7 @@ namespace RegistryFS
 
         public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
-            streamName = String.Empty;
+            streamName = string.Empty;
             streamSize = 0;
             return DokanResult.NotImplemented;
         }
@@ -301,17 +308,17 @@ namespace RegistryFS
 
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             try
             {
-                RFS rfs = new RFS();
+                var rfs = new RFS();
                 rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
-                Console.WriteLine("Success");
+                Console.WriteLine(@"Success");
             }
             catch (DokanException ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine(@"Error: " + ex.Message);
             }
         }
     }

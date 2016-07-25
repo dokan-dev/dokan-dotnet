@@ -66,7 +66,7 @@ namespace DokanNetMirror
 
         public NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
         {
-            var path = GetPath(fileName);
+            var filePath = GetPath(fileName);
 
             if (info.IsDirectory)
             {
@@ -75,11 +75,11 @@ namespace DokanNetMirror
                     switch (mode)
                     {
                         case FileMode.Open:
-                            if (!Directory.Exists(path))
+                            if (!Directory.Exists(filePath))
                             {
                                 try
                                 {
-                                    if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+                                    if (!File.GetAttributes(filePath).HasFlag(FileAttributes.Directory))
                                         return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, NtStatus.NotADirectory);
                                 }
                                 catch (Exception)
@@ -89,16 +89,16 @@ namespace DokanNetMirror
                                 return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, DokanResult.PathNotFound);
                             }
 
-                            new DirectoryInfo(path).EnumerateFileSystemInfos().Any(); // you can't list the directory
+                            new DirectoryInfo(filePath).EnumerateFileSystemInfos().Any(); // you can't list the directory
                             break;
 
                         case FileMode.CreateNew:
-                            if (Directory.Exists(path))
+                            if (Directory.Exists(filePath))
                                 return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, DokanResult.FileExists);
 
                             try
                             {
-                                File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+                                File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
                                 return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, DokanResult.AlreadyExists);
                             }
                             catch (IOException) { }
@@ -114,16 +114,16 @@ namespace DokanNetMirror
             }
             else
             {
-                bool pathExists = true;
-                bool pathIsDirectory = false;
+                var pathExists = true;
+                var pathIsDirectory = false;
 
-                bool readWriteAttributes = (access & DataAccess) == 0;
-                bool readAccess = (access & DataWriteAccess) == 0;
+                var readWriteAttributes = (access & DataAccess) == 0;
+                var readAccess = (access & DataWriteAccess) == 0;
 
                 try
                 {
-                    pathExists = (Directory.Exists(path) || File.Exists(path));
-                    pathIsDirectory = File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+                    pathExists = (Directory.Exists(filePath) || File.Exists(filePath));
+                    pathIsDirectory = File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
                 }
                 catch (IOException) { }
 
@@ -162,18 +162,15 @@ namespace DokanNetMirror
                         if (!pathExists)
                             return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, DokanResult.FileNotFound);
                         break;
-
-                    default:
-                        break;
                 }
 
                 try
                 {
-                    info.Context = new FileStream(path, mode, readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
+                    info.Context = new FileStream(filePath, mode, readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
 
                     if (mode == FileMode.CreateNew || mode == FileMode.Create) //Files are always created as Archive
                         attributes |= FileAttributes.Archive;
-                    File.SetAttributes(path, attributes);
+                    File.SetAttributes(filePath, attributes);
                 }
                 catch (UnauthorizedAccessException) // don't have access rights
                 {
@@ -185,13 +182,13 @@ namespace DokanNetMirror
                 }
                 catch (Exception ex)
                 {
-                    uint hr = (uint)Marshal.GetHRForException(ex);
+                    var hr = (uint)Marshal.GetHRForException(ex);
                     switch (hr)
                     {
                         case 0x80070020: //Sharing violation
                             return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes, DokanResult.SharingViolation);
                         default:
-                            throw ex;
+                            throw;
                     }
                 }
             }
@@ -205,10 +202,7 @@ namespace DokanNetMirror
                 Console.WriteLine(DokanFormat($"{nameof(Cleanup)}('{fileName}', {info} - entering"));
 #endif
 
-            if (info.Context != null && info.Context is FileStream)
-            {
-                (info.Context as FileStream).Dispose();
-            }
+            (info.Context as FileStream)?.Dispose();
             info.Context = null;
 
             if (info.DeleteOnClose)
@@ -232,10 +226,7 @@ namespace DokanNetMirror
                 Console.WriteLine(DokanFormat($"{ nameof(CloseFile)}('{fileName}', {info} - entering"));
 #endif
 
-            if (info.Context != null && info.Context is FileStream)
-            {
-                (info.Context as FileStream).Dispose();
-            }
+            (info.Context as FileStream)?.Dispose();
             info.Context = null;
             Trace(nameof(CloseFile), fileName, info, DokanResult.Success); // could recreate cleanup code here but this is not called sometimes
         }
@@ -302,10 +293,10 @@ namespace DokanNetMirror
         public NtStatus GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info)
         {
             // may be called with info.Context == null, but usually it isn't
-            string path = GetPath(fileName);
-            FileSystemInfo finfo = new FileInfo(path);
+            var filePath = GetPath(fileName);
+            FileSystemInfo finfo = new FileInfo(filePath);
             if (!finfo.Exists)
-                finfo = new DirectoryInfo(path);
+                finfo = new DirectoryInfo(filePath);
 
             fileInfo = new FileInformation
             {
@@ -314,7 +305,7 @@ namespace DokanNetMirror
                 CreationTime = finfo.CreationTime,
                 LastAccessTime = finfo.LastAccessTime,
                 LastWriteTime = finfo.LastWriteTime,
-                Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
+                Length = (finfo as FileInfo)?.Length ?? 0,
             };
             return Trace(nameof(GetFileInformation), fileName, info, DokanResult.Success);
         }
@@ -323,7 +314,7 @@ namespace DokanNetMirror
         {
             // This function is not called because FindFilesWithPattern is implemented
             // Return DokanResult.NotImplemented in FindFilesWithPattern to make FindFiles called
-            files = files = FindFilesHelper(fileName, "*");
+            files = FindFilesHelper(fileName, "*");
 
             return Trace(nameof(FindFiles), fileName, info, DokanResult.Success);
         }
@@ -353,15 +344,15 @@ namespace DokanNetMirror
         {
             try
             {
-                string path = GetPath(fileName);
+                var filePath = GetPath(fileName);
                 if (creationTime.HasValue)
-                    File.SetCreationTime(path, creationTime.Value);
+                    File.SetCreationTime(filePath, creationTime.Value);
 
                 if (lastAccessTime.HasValue)
-                    File.SetLastAccessTime(path, lastAccessTime.Value);
+                    File.SetLastAccessTime(filePath, lastAccessTime.Value);
 
                 if (lastWriteTime.HasValue)
-                    File.SetLastWriteTime(path, lastWriteTime.Value);
+                    File.SetLastWriteTime(filePath, lastWriteTime.Value);
 
                 return Trace(nameof(SetFileTime), fileName, info, DokanResult.Success, creationTime, lastAccessTime, lastWriteTime);
             }
@@ -377,12 +368,12 @@ namespace DokanNetMirror
 
         public NtStatus DeleteFile(string fileName, DokanFileInfo info)
         {
-            var path = GetPath(fileName);
+            var filePath = GetPath(fileName);
 
-            if (!File.Exists(path))
+            if (!File.Exists(filePath))
                 return Trace(nameof(DeleteFile), fileName, info, DokanResult.FileNotFound);
 
-            if (File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+            if (File.GetAttributes(filePath).HasFlag(FileAttributes.Directory))
                 return Trace(nameof(DeleteFile), fileName, info, DokanResult.AccessDenied);
 
             return Trace(nameof(DeleteFile), fileName, info, DokanResult.Success);
@@ -397,20 +388,13 @@ namespace DokanNetMirror
 
         public NtStatus MoveFile(string oldName, string newName, bool replace, DokanFileInfo info)
         {
-            string oldpath = GetPath(oldName);
-            string newpath = GetPath(newName);
+            var oldpath = GetPath(oldName);
+            var newpath = GetPath(newName);
 
-            if (info.Context != null && info.Context is FileStream)
-            {
-                (info.Context as FileStream).Dispose();
-            }
+            (info.Context as FileStream)?.Dispose();
             info.Context = null;
 
-            bool exist = false;
-            if (info.IsDirectory)
-                exist = Directory.Exists(newpath);
-            else
-                exist = File.Exists(newpath);
+            var exist = info.IsDirectory ? Directory.Exists(newpath) : File.Exists(newpath);
 
             if (!exist)
             {
@@ -489,7 +473,7 @@ namespace DokanNetMirror
 
         public NtStatus GetDiskFreeSpace(out long free, out long total, out long used, DokanFileInfo info)
         {
-            var dinfo = DriveInfo.GetDrives().Where(di => di.RootDirectory.Name == Path.GetPathRoot(path + "\\")).Single();
+            var dinfo = DriveInfo.GetDrives().Single(di => di.RootDirectory.Name == Path.GetPathRoot(path + "\\"));
 
             used = dinfo.AvailableFreeSpace;
             total = dinfo.TotalSize;
@@ -558,7 +542,7 @@ namespace DokanNetMirror
 
         public NtStatus FindStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
         {
-            streamName = String.Empty;
+            streamName = string.Empty;
             streamSize = 0;
             return Trace(nameof(FindStreams), fileName, info, DokanResult.NotImplemented, enumContext.ToString(), "out " + streamName, "out " + streamSize.ToString());
         }
@@ -579,7 +563,7 @@ namespace DokanNetMirror
                     CreationTime = finfo.CreationTime,
                     LastAccessTime = finfo.LastAccessTime,
                     LastWriteTime = finfo.LastWriteTime,
-                    Length = (finfo is FileInfo) ? ((FileInfo)finfo).Length : 0,
+                    Length = (finfo as FileInfo)?.Length ?? 0,
                     FileName = finfo.Name
                 }).ToArray();
 
