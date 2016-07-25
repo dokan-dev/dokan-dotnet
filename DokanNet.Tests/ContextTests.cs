@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,11 +24,11 @@ namespace DokanNet.Tests
         {
             smallData = new byte[4096];
             for (var i = 0; i < smallData.Length; ++i)
-                smallData[i] = (byte)(i % 256);
+                smallData[i] = (byte) (i%256);
 
-            largeData = new byte[5 * FILE_BUFFER_SIZE + 65536];
+            largeData = new byte[5*FILE_BUFFER_SIZE + 65536];
             for (var i = 0; i < largeData.Length; ++i)
-                largeData[i] = (byte)(i % 251);
+                largeData[i] = (byte) (i%251);
         }
 
         [ClassCleanup]
@@ -62,7 +63,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
+            fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None,
+                context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
@@ -132,7 +134,6 @@ namespace DokanNet.Tests
                 {
                     totalReadBytes += stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
                 } while (totalReadBytes < largeData.Length);
-
             }
 
 #if !LOGONLY
@@ -140,7 +141,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_InParallel_PassesContextCorrectly()
         {
@@ -164,7 +165,7 @@ namespace DokanNet.Tests
 
                 Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -190,7 +191,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
+                context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
@@ -218,7 +220,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
+                context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);
@@ -243,7 +246,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_InParallel_PassesContextCorrectly()
         {
@@ -254,7 +257,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
+                context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);
@@ -268,7 +272,7 @@ namespace DokanNet.Tests
 
                 Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {

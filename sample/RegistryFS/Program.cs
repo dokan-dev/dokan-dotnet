@@ -1,8 +1,10 @@
-using DokanNet;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.AccessControl;
+using DokanNet;
+using Microsoft.Win32;
+using FileAccess = DokanNet.FileAccess;
 
 namespace RegistryFS
 {
@@ -35,13 +37,13 @@ namespace RegistryFS
         public NtStatus CreateFile(
             string filename,
             FileAccess access,
-            System.IO.FileShare share,
-            System.IO.FileMode mode,
-            System.IO.FileOptions options,
-            System.IO.FileAttributes attributes,
+            FileShare share,
+            FileMode mode,
+            FileOptions options,
+            FileAttributes attributes,
             DokanFileInfo info)
         {
-            if (info.IsDirectory && mode == System.IO.FileMode.CreateNew)
+            if (info.IsDirectory && mode == FileMode.CreateNew)
                 return DokanResult.AccessDenied;
             return DokanResult.Success;
         }
@@ -96,7 +98,7 @@ namespace RegistryFS
                     var finfo = new FileInformation
                     {
                         FileName = name,
-                        Attributes = System.IO.FileAttributes.Directory,
+                        Attributes = FileAttributes.Directory,
                         LastAccessTime = DateTime.Now,
                         LastWriteTime = null,
                         CreationTime = null
@@ -115,7 +117,7 @@ namespace RegistryFS
                     var finfo = new FileInformation
                     {
                         FileName = name,
-                        Attributes = System.IO.FileAttributes.Directory,
+                        Attributes = FileAttributes.Directory,
                         LastAccessTime = DateTime.Now,
                         LastWriteTime = null,
                         CreationTime = null
@@ -127,7 +129,7 @@ namespace RegistryFS
                     var finfo = new FileInformation
                     {
                         FileName = name,
-                        Attributes = System.IO.FileAttributes.Normal,
+                        Attributes = FileAttributes.Normal,
                         LastAccessTime = DateTime.Now,
                         LastWriteTime = null,
                         CreationTime = null
@@ -147,7 +149,7 @@ namespace RegistryFS
 
             if (filename == "\\")
             {
-                fileinfo.Attributes = System.IO.FileAttributes.Directory;
+                fileinfo.Attributes = FileAttributes.Directory;
                 fileinfo.LastAccessTime = DateTime.Now;
                 fileinfo.LastWriteTime = null;
                 fileinfo.CreationTime = null;
@@ -159,7 +161,7 @@ namespace RegistryFS
             if (key == null)
                 return DokanResult.Error;
 
-            fileinfo.Attributes = System.IO.FileAttributes.Directory;
+            fileinfo.Attributes = FileAttributes.Directory;
             fileinfo.LastAccessTime = DateTime.Now;
             fileinfo.LastWriteTime = null;
             fileinfo.CreationTime = null;
@@ -208,7 +210,7 @@ namespace RegistryFS
 
         public NtStatus SetFileAttributes(
             string filename,
-            System.IO.FileAttributes attr,
+            FileAttributes attr,
             DokanFileInfo info)
         {
             return DokanResult.Error;
@@ -240,14 +242,14 @@ namespace RegistryFS
         }
 
         public NtStatus GetDiskFreeSpace(
-           out long freeBytesAvailable,
-           out long totalBytes,
-           out long totalFreeBytes,
-           DokanFileInfo info)
+            out long freeBytesAvailable,
+            out long totalBytes,
+            out long totalFreeBytes,
+            DokanFileInfo info)
         {
-            freeBytesAvailable = 512 * 1024 * 1024;
-            totalBytes = 1024 * 1024 * 1024;
-            totalFreeBytes = 512 * 1024 * 1024;
+            freeBytesAvailable = 512*1024*1024;
+            totalBytes = 1024*1024*1024;
+            totalFreeBytes = 512*1024*1024;
             return DokanResult.Success;
         }
 
@@ -284,7 +286,8 @@ namespace RegistryFS
             return DokanResult.Error;
         }
 
-        public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName, out long streamSize, DokanFileInfo info)
+        public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName,
+            out long streamSize, DokanFileInfo info)
         {
             streamName = string.Empty;
             streamSize = 0;
@@ -297,7 +300,8 @@ namespace RegistryFS
             return DokanResult.NotImplemented;
         }
 
-        public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+        public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
+            DokanFileInfo info)
         {
             files = new FileInformation[0];
             return DokanResult.NotImplemented;

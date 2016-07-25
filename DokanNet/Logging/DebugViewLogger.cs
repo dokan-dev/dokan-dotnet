@@ -1,7 +1,7 @@
-﻿namespace DokanNet.Logging
-{
-    using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
+namespace DokanNet.Logging
+{
     /// <summary>
     /// To see the output in visual studio 
     /// Project + Properties, Debug tab, check "Enable unmanaged code debugging".
@@ -9,6 +9,7 @@
     public class DebugViewLogger : ILogger
     {
         private string loggerName;
+
         public DebugViewLogger(string loggerName = "")
         {
             this.loggerName = loggerName;

@@ -10,7 +10,8 @@ namespace DokanNet.Logging
         private readonly Action<string, object[]> _error;
         private readonly Action<string, object[]> _fatal;
 
-        public Logger(Action<string, object[]> debug, Action<string, object[]> info, Action<string, object[]> warn, Action<string, object[]> error, Action<string, object[]> fatal)
+        public Logger(Action<string, object[]> debug, Action<string, object[]> info, Action<string, object[]> warn,
+            Action<string, object[]> error, Action<string, object[]> fatal)
         {
             _debug = debug;
             _info = info;

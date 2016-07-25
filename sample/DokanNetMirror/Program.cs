@@ -1,5 +1,5 @@
-using DokanNet;
 using System;
+using DokanNet;
 
 namespace DokanNetMirror
 {

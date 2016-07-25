@@ -10,10 +10,8 @@ namespace DokanNet.Native
         public uint Options;
         public ulong GlobalContext;
 
-        [MarshalAs(UnmanagedType.LPWStr)]
-        public string MountPoint;
-        [MarshalAs(UnmanagedType.LPWStr)]
-        public string UNCName;
+        [MarshalAs(UnmanagedType.LPWStr)] public string MountPoint;
+        [MarshalAs(UnmanagedType.LPWStr)] public string UNCName;
         public uint Timeout;
         public uint AllocationUnitSize;
         public uint SectorSize;

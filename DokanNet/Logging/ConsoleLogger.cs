@@ -5,6 +5,7 @@ namespace DokanNet.Logging
     public class ConsoleLogger : ILogger
     {
         private string loggerName;
+
         public ConsoleLogger(string loggerName = "")
         {
             this.loggerName = loggerName;
@@ -44,7 +45,6 @@ namespace DokanNet.Logging
                 if (args.Length > 0)
                     message = string.Format(message, args);
                 Console.WriteLine(message.FormatMessageForLogging(dateTime: dateTime, loggerName: loggerName));
-
             }
             finally
             {

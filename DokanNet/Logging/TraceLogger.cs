@@ -1,7 +1,7 @@
-﻿namespace DokanNet.Logging
-{
-    using System.Diagnostics;
+﻿using System.Diagnostics;
 
+namespace DokanNet.Logging
+{
     public class TraceLogger : ILogger
     {
         public void Debug(string message, params object[] args)

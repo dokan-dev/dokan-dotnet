@@ -8,9 +8,11 @@ namespace DokanNet
         public static readonly string NullStringRapresentation = "<null>";
 
         public static string DokanFormat(FormattableString formattable)
-             => formattable.ToString(DefaultFormatProvider);
+            => formattable.ToString(DefaultFormatProvider);
 
-        private FormatProviders() { }
+        private FormatProviders()
+        {
+        }
 
         public object GetFormat(Type service)
         {
@@ -23,7 +25,7 @@ namespace DokanNet
             var formattable = arg as IFormattable;
             if (formattable != null)
                 return formattable.ToString(format, provider);
-            
+
             return arg.ToString();
         }
     }

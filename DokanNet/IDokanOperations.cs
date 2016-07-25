@@ -8,17 +8,17 @@ namespace DokanNet
     public interface IDokanOperations
     {
         NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
-                              FileOptions options, FileAttributes attributes, DokanFileInfo info);
+            FileOptions options, FileAttributes attributes, DokanFileInfo info);
 
         void Cleanup(string fileName, DokanFileInfo info);
 
         void CloseFile(string fileName, DokanFileInfo info);
 
         NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset,
-                            DokanFileInfo info);
+            DokanFileInfo info);
 
         NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten,
-                             long offset, DokanFileInfo info);
+            long offset, DokanFileInfo info);
 
         NtStatus FlushFileBuffers(string fileName, DokanFileInfo info);
 
@@ -26,12 +26,13 @@ namespace DokanNet
 
         NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info);
 
-        NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info);
+        NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
+            DokanFileInfo info);
 
         NtStatus SetFileAttributes(string fileName, FileAttributes attributes, DokanFileInfo info);
 
         NtStatus SetFileTime(string fileName, DateTime? creationTime, DateTime? lastAccessTime,
-                               DateTime? lastWriteTime, DokanFileInfo info);
+            DateTime? lastWriteTime, DokanFileInfo info);
 
         NtStatus DeleteFile(string fileName, DokanFileInfo info);
 
@@ -47,17 +48,18 @@ namespace DokanNet
 
         NtStatus UnlockFile(string fileName, long offset, long length, DokanFileInfo info);
 
-        NtStatus GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes,
-                                    DokanFileInfo info);
+        NtStatus GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes,
+            out long totalNumberOfFreeBytes,
+            DokanFileInfo info);
 
         NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
-                                        out string fileSystemName, DokanFileInfo info);
+            out string fileSystemName, DokanFileInfo info);
 
         NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
-                                   DokanFileInfo info);
+            DokanFileInfo info);
 
         NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
-                                   DokanFileInfo info);
+            DokanFileInfo info);
 
         NtStatus Mounted(DokanFileInfo info);
 
