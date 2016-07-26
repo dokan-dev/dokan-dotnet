@@ -89,10 +89,10 @@ namespace DokanNet
         NtStatus FlushFileBuffers(string fileName, DokanFileInfo info);
 
         /// <summary>
-        /// FileInformation struct has to be fill by the file informations requested.
+        /// Get specific informations on a file.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
-        /// <param name="fileInfo">FileInformation struct to fill</param>
+        /// <param name="fileInfo"><see cref="FileInformation"/> struct to fill</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         NtStatus GetFileInformation(string fileName, out FileInformation fileInfo, DokanFileInfo info);
@@ -101,17 +101,17 @@ namespace DokanNet
         /// List all files in the path requested
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
-        /// <param name="files">FileInformation list to fill</param>
+        /// <param name="files"><see cref="FileInformation"/> list to fill</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         NtStatus FindFiles(string fileName, out IList<FileInformation> files, DokanFileInfo info);
 
         /// <summary>
-        /// Like FindFiles but with a search pattern
+        /// Same as <see cref="FindFiles"/> but with a search pattern
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
         /// <param name="searchPattern">Search pattern</param>
-        /// <param name="files">FileInformation list to fill</param>
+        /// <param name="files"><see cref="FileInformation"/> list to fill</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
@@ -291,7 +291,7 @@ namespace DokanNet
         /// This is only called if <see cref="DokanOptions.AltStream"/> is enabled.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
-        /// <param name="streams">List of FileInformation for each streams present on the file.</param>
+        /// <param name="streams">List of <see cref="FileInformation"/> for each streams present on the file.</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns>Return <see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info);
