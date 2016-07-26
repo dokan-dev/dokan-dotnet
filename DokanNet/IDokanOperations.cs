@@ -8,7 +8,7 @@ namespace DokanNet
     public interface IDokanOperations
     {
         /// <summary>
-        /// Called when a file or directory is open or created.
+        /// CreateFile is called each time a request is made on a file.
         /// 
         /// In case <see cref="FileMode.OpenOrCreate"/> & <see cref="FileMode.Create"/> are opening successfully a already
         /// existing file, you have to SetLastError(ERROR_ALREADY_EXISTS).
