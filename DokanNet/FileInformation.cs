@@ -21,15 +21,15 @@ namespace DokanNet
         /// <summary>
         /// When the file or directory was created.
         /// </summary>
-        public DateTime CreationTime { get; set; }
+        public DateTime? CreationTime { get; set; }
         /// <summary>
         /// When the file or directory was last accessed.
         /// </summary>
-        public DateTime LastAccessTime { get; set; }
+        public DateTime? LastAccessTime { get; set; }
         /// <summary>
         /// When the file or directory was last updated.
         /// </summary>
-        public DateTime LastWriteTime { get; set; }
+        public DateTime? LastWriteTime { get; set; }
         public long Length { get; set; }
     }
 }
