@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using DokanNet.Native;
@@ -29,7 +30,9 @@ namespace DokanNet
         [MarshalAs(UnmanagedType.U1)] private bool _writeToEndOfFile;
 
         /// <summary>
-        /// Context that can be used to carry information between operation
+        /// Context that can be used to carry information between operation.
+        /// The Context can carry whatever type like <see cref="FileStream"/>, struct, <see cref="int"/>,
+        /// internal reference that will help the implementation understand the request context of the event.
         /// </summary>
         public object Context
         {
@@ -51,7 +54,8 @@ namespace DokanNet
         public int ProcessId => (int) _processId;
 
         /// <summary>
-        /// Context that can be used to carry information between operation
+        /// Requesting a directory file
+        /// IsDirectory has to be set in CreateFile is the file appear to be a folder.
         /// </summary>
         public bool IsDirectory
         {
@@ -60,7 +64,7 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Flag if the file has to be delete during Cleanup event
+        /// Flag if the file has to be delete during <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
         public bool DeleteOnClose
         {
@@ -77,9 +81,9 @@ namespace DokanNet
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
         /// <summary>
-        /// Request the WindowsIdentity of current operation
+        /// Request the <see cref="WindowsIdentity"/> of current operation
         /// </summary>
-        /// <returns>Return WindowsIdentity of the current request</returns>
+        /// <returns>Return <see cref="WindowsIdentity"/> of the current request</returns>
         public WindowsIdentity GetRequestor()
         {
             try

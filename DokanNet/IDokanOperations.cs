@@ -11,16 +11,16 @@ namespace DokanNet
         /// Create or Open file/Directory.
         /// CreateFile is called each time a request is made on a file.
         /// If the file requested is a directory and DokanFileInfo.IsDirectory is not set
-        /// DokanFileInfo.IsDirectory has to be set to true for informing the kernel.
-        /// DokanFileInfo.Context can be use to store Data (like FileStream)
+        /// <see cref="DokanFileInfo.IsDirectory"/> has to be set to true for informing the kernel.
+        /// <see cref="DokanFileInfo.Context"/> can be use to store Data (like FileStream)
         /// that can be retrieved in all other request related to the Context
         /// </summary>
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
-        /// <param name="access">Access to the file.</param>
-        /// <param name="share">Share access to the other request on the same file</param>
-        /// <param name="mode">Open mode to the file</param>
-        /// <param name="options">Additional option the open</param>
-        /// <param name="attributes">Attribute to set after open</param>
+        /// <param name="access"><see cref="FileAccess"/> to the file.</param>
+        /// <param name="share"><see cref="FileShare"/> of other request on the same file</param>
+        /// <param name="mode">Open <see cref="FileMode"/> for the file</param>
+        /// <param name="options">Additional <see cref="FileOptions"/> for the open</param>
+        /// <param name="attributes"><see cref="FileAttributes"/> to set after open</param>
         /// <param name="info">Dokan file request informations</param>
         /// <returns>Return NtStatus or DokanResult appropriate to the request result.</returns>
         NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
@@ -28,7 +28,7 @@ namespace DokanNet
 
         /// <summary>
         /// Cleanup request before CloseFile is called.
-        /// When DokanFileInfo.DeleteOnClose is true, you must delete the file in Cleanup.
+        /// When <see cref="DokanFileInfo.DeleteOnClose"/> is true, you must delete the file in Cleanup.
         /// </summary>
         /// <param name="fileName">File path associate to the request.</param>
         /// <param name="info">Dokan file request informations</param>
@@ -43,6 +43,7 @@ namespace DokanNet
         void CloseFile(string fileName, DokanFileInfo info);
 
         /// <summary>
+        /// Read event on the file previously opened in <see cref="CreateFile"/>
         /// ReadFile can be called by different thread at the same time.
         /// Therefor the read has to be thread safe.
         /// </summary>
@@ -57,6 +58,7 @@ namespace DokanNet
             DokanFileInfo info);
 
         /// <summary>
+        /// Write event on the file previously opened in <see cref="CreateFile"/>
         /// WriteFile can be called by different thread at the same time.
         /// Therefor the write has to be thread safe.
         /// </summary>
@@ -70,7 +72,7 @@ namespace DokanNet
             long offset, DokanFileInfo info);
 
         /// <summary>
-        /// Flush all pending request on the Context
+        /// Clears buffers for this context and causes any buffered data to be written to the file.
         /// </summary>
         /// <param name="fileName">File path associate to the request.</param>
         /// <param name="info">Dokan file request informations</param>
@@ -130,6 +132,7 @@ namespace DokanNet
 
         /// <summary>
         /// Check if file can be delete.
+        /// The file should not be delete in DeleteFile but in <see cref="Cleanup"/>.
         /// </summary>
         /// <param name="fileName">File path associate to the request.</param>
         /// <param name="info">Dokan file request informations</param>
@@ -138,6 +141,7 @@ namespace DokanNet
 
         /// <summary>
         /// Check if Directory can be delete.
+        /// The directory should not be delete in DeleteFile but in <see cref="Cleanup"/>.
         /// </summary>
         /// <param name="fileName">File path associate to the request.</param>
         /// <param name="info">Dokan file request informations</param>
