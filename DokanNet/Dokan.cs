@@ -69,8 +69,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// If the mount fail a exception is trowed.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, ILogger logger = null)
         {
@@ -82,8 +82,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// if the mount fail throw is fiered with error information.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
@@ -97,8 +97,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// if the mount fail throw is fiered with error information.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
@@ -113,8 +113,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// if the mount fail throw is fiered with error information.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3) (Version "123" is equal to Dokan version 1.2.3).</param>
@@ -132,7 +132,7 @@ namespace DokanNet
         /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3)</param>
@@ -149,8 +149,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// if the mount fail throw is fiered with error information.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3)</param>
@@ -169,8 +169,8 @@ namespace DokanNet
         /// This function block until the device is unmount.
         /// if the mount fail throw is fiered with error information.
         /// </summary>
-        /// <param name="operations">Instance of the class that will be called for each request made by the kernel.</param>
-        /// <param name="mountPoint">Mount point where the volume will be mount (M:\, C:\MyVolume,...)</param>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3)</param>

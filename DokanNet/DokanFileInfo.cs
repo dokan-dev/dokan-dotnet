@@ -51,6 +51,10 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Process id for the thread that originally requested a 
+        /// given I/O operation
+        /// </summary>
         public int ProcessId => (int) _processId;
 
         /// <summary>
@@ -72,18 +76,32 @@ namespace DokanNet
             set { _deleteOnClose = value; }
         }
 
+        /// <summary>
+        /// Read or write is paging IO.
+        /// </summary>
         public bool PagingIo => _pagingIo;
 
+        /// <summary>
+        /// Read or write is synchronous IO.
+        /// </summary>
         public bool SynchronousIo => _synchronousIo;
 
+        /// <summary>
+        /// Read or write directly from data source without cache
+        /// </summary>
         public bool NoCache => _nocache;
 
+        /// <summary>
+        /// If true, write to the current end of file instead 
+        /// of Offset parameter.
+        /// </summary>
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
         /// <summary>
-        /// Request the <see cref="WindowsIdentity"/> of current operation
+        /// This method needs be called in <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
+        /// callback.
         /// </summary>
-        /// <returns>Return <see cref="WindowsIdentity"/> of the current request</returns>
+        /// <returns>An <see cref="WindowsIdentity"/> with the access token, -or- null if the operation was not successful</returns>
         public WindowsIdentity GetRequestor()
         {
             try
@@ -97,10 +115,10 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Ask kernel more time on the current operation
+        /// Extends the time out of the current IO operation in driver.
         /// </summary>
-        /// <param name="milliseconds">Time in milliseconds needed to finish the request</param>
-        /// <returns>Return if kernel accept to give more time</returns>
+        /// <param name="milliseconds">Number of milliseconds to extend with</param>
+        /// <returns>If the operation was successful</returns>
         public bool TryResetTimeout(int milliseconds)
         {
             return NativeMethods.DokanResetTimeout((uint) milliseconds, this);
@@ -113,6 +131,9 @@ namespace DokanNet
         {
         }
 
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
             return
