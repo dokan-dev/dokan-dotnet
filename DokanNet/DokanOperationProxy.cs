@@ -804,6 +804,7 @@ namespace DokanNet
         {
             try
             {
+                logger.Debug("GetDiskFreeSpace:");
                 logger.Debug("GetDiskFr{0}eeSpaceProxy", "ARG0");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
@@ -833,7 +834,7 @@ namespace DokanNet
             rawVolumeSerialNumber = serialNumber;
             try
             {
-                logger.Debug("GetVolumeInformationProxy");
+                logger.Debug("GetVolumeInformationProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
                 string label;
                 string name;
@@ -866,7 +867,7 @@ namespace DokanNet
         {
             try
             {
-                logger.Debug("MountedProxy");
+                logger.Debug("MountedProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 var result = operations.Mounted(rawFileInfo);
@@ -885,7 +886,7 @@ namespace DokanNet
         {
             try
             {
-                logger.Debug("UnmountedProxy");
+                logger.Debug("UnmountedProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 var result = operations.Unmounted(rawFileInfo);
