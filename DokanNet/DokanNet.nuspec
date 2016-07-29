@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>DokanNet</id>
-        <version>1.1.0-rc3</version>
+        <version>1.1.0-rc4</version>
         <title>DokanNet</title>
         <authors>MaximeC</authors>
         <owners>MaximeC</owners>
@@ -13,6 +13,7 @@
     </metadata>
     <files>
         <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
+		<file src="bin\Release\StringInterpolationBridge.dll" target="lib\net40\StringInterpolationBridge.dll" />
 		<file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
 		<file src="bin\Release\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
     </files>
