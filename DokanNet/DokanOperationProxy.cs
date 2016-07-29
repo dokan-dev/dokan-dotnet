@@ -804,8 +804,7 @@ namespace DokanNet
         {
             try
             {
-                logger.Debug("GetDiskFreeSpace:");
-                logger.Debug("GetDiskFr{0}eeSpaceProxy", "ARG0");
+                logger.Debug("GetDiskFreeSpaceProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 var result = operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
