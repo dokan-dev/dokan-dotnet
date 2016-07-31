@@ -404,6 +404,9 @@ namespace DokanNetMirror
         {
             var filePath = GetPath(fileName);
 
+            if (Directory.Exists(filePath))
+                return Trace(nameof(DeleteFile), fileName, info, DokanResult.AccessDenied);
+
             if (!File.Exists(filePath))
                 return Trace(nameof(DeleteFile), fileName, info, DokanResult.FileNotFound);
 
@@ -433,27 +436,36 @@ namespace DokanNetMirror
 
             var exist = info.IsDirectory ? Directory.Exists(newpath) : File.Exists(newpath);
 
-            if (!exist)
+            try
             {
-                info.Context = null;
-                if (info.IsDirectory)
-                    Directory.Move(oldpath, newpath);
-                else
-                    File.Move(oldpath, newpath);
-                return Trace(nameof(MoveFile), oldName, info, DokanResult.Success, newName,
-                    replace.ToString(CultureInfo.InvariantCulture));
-            }
-            else if (replace)
-            {
-                info.Context = null;
 
-                if (info.IsDirectory) //Cannot replace directory destination - See MOVEFILE_REPLACE_EXISTING
-                    return Trace(nameof(MoveFile), oldName, info, DokanResult.AccessDenied, newName,
+                if (!exist)
+                {
+                    info.Context = null;
+                    if (info.IsDirectory)
+                        Directory.Move(oldpath, newpath);
+                    else
+                        File.Move(oldpath, newpath);
+                    return Trace(nameof(MoveFile), oldName, info, DokanResult.Success, newName,
                         replace.ToString(CultureInfo.InvariantCulture));
+                }
+                else if (replace)
+                {
+                    info.Context = null;
 
-                File.Delete(newpath);
-                File.Move(oldpath, newpath);
-                return Trace(nameof(MoveFile), oldName, info, DokanResult.Success, newName,
+                    if (info.IsDirectory) //Cannot replace directory destination - See MOVEFILE_REPLACE_EXISTING
+                        return Trace(nameof(MoveFile), oldName, info, DokanResult.AccessDenied, newName,
+                            replace.ToString(CultureInfo.InvariantCulture));
+
+                    File.Delete(newpath);
+                    File.Move(oldpath, newpath);
+                    return Trace(nameof(MoveFile), oldName, info, DokanResult.Success, newName,
+                        replace.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Trace(nameof(MoveFile), oldName, info, DokanResult.AccessDenied, newName,
                     replace.ToString(CultureInfo.InvariantCulture));
             }
             return Trace(nameof(MoveFile), oldName, info, DokanResult.FileExists, newName,
