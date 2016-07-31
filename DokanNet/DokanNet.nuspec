@@ -10,10 +10,12 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>DotNet Wrapper for Dokan, user mode file system for windows</description>
         <copyright>Copyright (C) 2016</copyright>
+        <dependencies>
+            <dependency id="StringInterpolationBridgeStrong" version="0.9.1" />
+		</dependencies>
     </metadata>
     <files>
         <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
-		<file src="bin\Release\StringInterpolationBridge.dll" target="lib\net40\StringInterpolationBridge.dll" />
 		<file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
 		<file src="bin\Release\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
     </files>
