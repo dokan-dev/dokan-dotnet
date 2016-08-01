@@ -1031,7 +1031,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1060,7 +1060,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1109,7 +1109,7 @@ namespace DokanNet.Tests
             sut.MoveTo(fixture.DestinationDirectoryName.AsDriveBasedPath());
         }
 
-        [TestMethod, TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void MoveTo_WhereTargetExists_Throws()
         {

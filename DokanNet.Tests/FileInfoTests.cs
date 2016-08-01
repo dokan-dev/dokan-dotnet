@@ -540,7 +540,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -571,7 +571,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -621,7 +621,7 @@ namespace DokanNet.Tests
             sut.MoveTo(fixture.DestinationFileName.AsDriveBasedPath());
         }
 
-        [TestMethod, TestCategory(TestCategories.Failure)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void MoveTo_WhereTargetExists_Throws()
         {
@@ -1528,7 +1528,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void Replace_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1571,7 +1571,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Success)]
+        [TestMethod, TestCategory(TestCategories.Manual)]
         public void Replace_WhereParentIsDirectory_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
