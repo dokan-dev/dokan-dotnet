@@ -20,7 +20,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            bool hasUnmatchedInvocations = false;
+            var hasUnmatchedInvocations = false;
             DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
@@ -57,7 +57,8 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL,
+                DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -89,13 +90,14 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
             var anyDateTime = new DateTime(2000, 1, 1, 12, 0, 0);
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
-            fixture.ExpectGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime, lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
+            fixture.ExpectGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime,
+                lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -110,7 +112,7 @@ namespace DokanNet.Tests
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetName_CallsApiCorrectly()
         {
-            string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
+            var path = DokanOperationsFixture.RootName.AsDriveBasedPath();
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
 
@@ -120,7 +122,7 @@ namespace DokanNet.Tests
         [TestMethod, TestCategory(TestCategories.Success)]
         public void GetRootDirectory_CallsApiCorrectly()
         {
-            string path = DokanOperationsFixture.RootName.AsDriveBasedPath();
+            var path = DokanOperationsFixture.RootName.AsDriveBasedPath();
 
 #if LOGONLY
             fixture.SetupAny();
@@ -191,7 +193,8 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL,
+                DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));

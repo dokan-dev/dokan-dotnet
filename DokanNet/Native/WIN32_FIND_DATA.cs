@@ -16,10 +16,8 @@ namespace DokanNet.Native
         private readonly uint dwReserved0;
         private readonly uint dwReserved1;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string cFileName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string cFileName;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
-        private readonly string cAlternateFileName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] private readonly string cAlternateFileName;
     }
 }

@@ -39,7 +39,7 @@ namespace DokanNet.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DokanNet.Properties.Resource", typeof(Resource).Assembly);
+                    var temp = new global::System.Resources.ResourceManager("DokanNet.Properties.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

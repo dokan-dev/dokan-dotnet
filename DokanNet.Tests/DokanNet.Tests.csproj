@@ -60,6 +60,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ContextTests.cs" />
+    <Compile Include="FormatProviderTests.cs" />
     <Compile Include="OverlappedTests.cs" />
     <Compile Include="FileInfoTests.cs" />
     <Compile Include="DirectoryInfoTest.cs" />
