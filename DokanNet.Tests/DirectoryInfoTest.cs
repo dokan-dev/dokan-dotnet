@@ -878,8 +878,7 @@ namespace DokanNet.Tests
 
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
-            "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfosWithFilter_OnRootDirectory_CallsApiCorrectly()
         {
             var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
@@ -921,8 +920,7 @@ namespace DokanNet.Tests
 
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML",
-            "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfos_OnRootDirectory_WhereSearchOptionIsAllDirectories_CallsApiCorrectly()
         {
             var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
@@ -971,7 +969,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Manual)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1000,7 +998,7 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
-        [TestMethod, TestCategory(TestCategories.Manual)]
+        [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1048,7 +1046,7 @@ namespace DokanNet.Tests
             sut.MoveTo(fixture.DestinationDirectoryName.AsDriveBasedPath());
         }
 
-        [TestMethod, TestCategory(TestCategories.Manual)]
+        [TestMethod, TestCategory(TestCategories.Failure)]
         [ExpectedException(typeof(IOException), "Expected IOException not thrown")]
         public void MoveTo_WhereTargetExists_Throws()
         {
