@@ -10,8 +10,7 @@ namespace DokanNet.Tests
         public void NullValuesShouldBeVisibles()
         {
             DateTime? obj = null;
-            Assert.AreEqual(FormatProviders.NullStringRapresentation,
-                string.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
+            Assert.AreEqual(FormatProviders.NullStringRapresentation, string.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
         }
     }
 }

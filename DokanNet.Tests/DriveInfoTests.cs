@@ -57,8 +57,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL,
-                DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -96,8 +95,7 @@ namespace DokanNet.Tests
 #else
             var anyDateTime = new DateTime(2000, 1, 1, 12, 0, 0);
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
-            fixture.ExpectGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime,
-                lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
+            fixture.ExpectGetFileInformation(path, FileAttributes.Directory, creationTime: anyDateTime, lastWriteTime: anyDateTime, lastAccessTime: anyDateTime);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
@@ -193,8 +191,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL,
-                DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
