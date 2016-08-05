@@ -6,7 +6,6 @@ namespace DokanNet.Native
     internal struct WIN32_FIND_STREAM_DATA
     {
         public long StreamSize;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string cStreamName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string cStreamName;
     }
 }

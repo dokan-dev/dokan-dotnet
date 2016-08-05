@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -17,7 +17,7 @@ namespace DokanNet.Tests
 
         private const int SMALL_DATA_SIZE = 4096;
 
-        private const int LARGE_DATA_SIZE = 5 * FILE_BUFFER_SIZE + FILE_BUFFER_SIZE / 4;
+        private const int LARGE_DATA_SIZE = 5*FILE_BUFFER_SIZE + FILE_BUFFER_SIZE/4;
 
         private static byte[] smallData;
 
@@ -49,7 +49,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            bool hasUnmatchedInvocations = false;
+            var hasUnmatchedInvocations = false;
             DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
@@ -59,7 +59,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -96,14 +96,15 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName;
+            var path = fixture.FileName;
 #if LOGONLY
             fixture.SetupAny();
 #endif
 
             var sut = new FileInfo(path.AsDriveBasedPath());
 
-            Assert.AreEqual(DokanOperationsFixture.RootName.AsDriveBasedPath(), sut.Directory.FullName, "Unexpected parent directory");
+            Assert.AreEqual(DokanOperationsFixture.RootName.AsDriveBasedPath(), sut.Directory.FullName,
+                "Unexpected parent directory");
 
 #if !LOGONLY
             fixture.Verify();
@@ -115,7 +116,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -137,7 +138,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -158,7 +159,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -177,7 +178,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -199,7 +200,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -221,7 +222,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(AppendText_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -275,7 +276,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "NonEmpty")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "NonEmpty")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly()
         {
@@ -295,8 +296,8 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectSetEndOfFile(destinationPath, value.Length);
 #if NETWORK_DRIVE
-            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
-            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+            fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+            fixture.ExpectWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
 #else
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
             fixture.ExpectWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length);
@@ -335,8 +336,8 @@ namespace DokanNet.Tests
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectSetEndOfFile(destinationPath, largeData.Length);
 #if NETWORK_DRIVE
-            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
-            fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+            fixture.ExpectWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
 #else
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
             fixture.ExpectWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE);
@@ -364,7 +365,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -403,7 +404,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(Create_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -431,7 +432,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(CreateText_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -459,7 +460,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -482,7 +483,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -503,7 +504,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -520,12 +521,13 @@ namespace DokanNet.Tests
 
 #if !LOGONLY
             Assert.IsNotNull(security, "Security descriptor should be set");
-            Assert.AreEqual(DokanOperationsFixture.DefaultFileSecurity.AsString(), security.AsString(), "Security descriptors should match");
+            Assert.AreEqual(DokanOperationsFixture.DefaultFileSecurity.AsString(), security.AsString(),
+                "Security descriptors should match");
             fixture.Verify();
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
@@ -538,8 +540,8 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectCreateFile(destinationPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
+            fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
@@ -555,7 +557,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
@@ -571,6 +573,7 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectCreateFile(destinationPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
@@ -592,7 +595,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -617,12 +620,12 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
+            fixture.ExpectCreateFile(destinationPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -630,7 +633,7 @@ namespace DokanNet.Tests
             sut.MoveTo(fixture.DestinationFileName.AsDriveBasedPath());
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         private void OpenFile_InSpecifiedMode(FileInfo info, FileMode mode, System.IO.FileAccess[] accessModes)
         {
             foreach (var access in accessModes)
@@ -657,7 +660,7 @@ namespace DokanNet.Tests
                     {
                         Assert.IsTrue(stream.CanRead, "Stream should be readable");
                         var target = new byte[4096];
-                        int readBytes = stream.Read(target, 0, target.Length);
+                        var readBytes = stream.Read(target, 0, target.Length);
 #if !LOGONLY
                         Assert.AreEqual(target.Length, readBytes, "Unexpected read count");
                         CollectionAssert.AreEquivalent(smallData, target, "Unexpected result content");
@@ -672,7 +675,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -685,7 +688,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Append, AccessModes = new[] { System.IO.FileAccess.Write } };
+            var parameters = new {Mode = FileMode.Append, AccessModes = new[] {System.IO.FileAccess.Write}};
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -698,11 +701,11 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Create, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -710,7 +713,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Create, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.Create, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -723,11 +726,11 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.CreateNew, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -735,7 +738,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -749,7 +752,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -758,7 +761,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -767,11 +770,11 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
+            foreach (var access in new[] {ReadAccess, WriteAccess, ReadWriteAccess})
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -779,7 +782,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -793,7 +796,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -802,7 +805,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -811,12 +814,12 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
@@ -826,7 +829,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
+            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -839,7 +842,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -865,7 +868,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -880,7 +883,7 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[value.Length];
-                int readBytes = stream.Read(target, 0, target.Length);
+                var readBytes = stream.Read(target, 0, target.Length);
 
 #if !LOGONLY
                 Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
@@ -898,7 +901,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -913,7 +916,7 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[value.Length];
-                int readBytes = stream.Read(target, 0, target.Length);
+                var readBytes = stream.Read(target, 0, target.Length);
 
 #if !LOGONLY
                 Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
@@ -931,7 +934,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -945,10 +948,10 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[largeData.Length];
-                int totalReadBytes = 0;
+                var totalReadBytes = 0;
                 do
                 {
-                    int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                    var readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
                     Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
                 } while (totalReadBytes < largeData.Length);
@@ -969,7 +972,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -983,11 +986,11 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[largeData.Length];
-                int totalReadBytes = 0;
+                var totalReadBytes = 0;
 
                 do
                 {
-                    int readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+                    var readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
                     Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
                 } while (totalReadBytes < largeData.Length);
@@ -1003,13 +1006,13 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1023,16 +1026,16 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[largeData.Length];
-                int totalReadBytes = 0;
+                var totalReadBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
                         stream.Seek(origin, SeekOrigin.Begin);
-                        int readBytes = stream.Read(target, origin, count);
+                        var readBytes = stream.Read(target, origin, count);
                         Assert.AreEqual(count, readBytes, $"Unexpected empty read at origin {origin}");
                         totalReadBytes += readBytes;
                     }
@@ -1049,13 +1052,13 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenRead_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1069,16 +1072,16 @@ namespace DokanNet.Tests
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[largeData.Length];
-                int totalReadBytes = 0;
+                var totalReadBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
                         stream.Seek(origin, SeekOrigin.Begin);
-                        int readBytes = stream.Read(target, origin, count);
+                        var readBytes = stream.Read(target, origin, count);
                         Assert.AreEqual(count, readBytes, $"Unexpected empty read at origin {origin}");
                         totalReadBytes += readBytes;
                     }
@@ -1095,12 +1098,14 @@ namespace DokanNet.Tests
 #endif
         }
 
+#if USER_MODE_LOCK
         [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1117,7 +1122,7 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
                 var target = new byte[value.Length];
                 stream.Lock(0, target.Length);
-                int readBytes = stream.Read(target, 0, target.Length);
+                var readBytes = stream.Read(target, 0, target.Length);
                 stream.Unlock(0, target.Length);
 
 #if !LOGONLY
@@ -1136,7 +1141,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenText_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1150,7 +1155,7 @@ namespace DokanNet.Tests
             using (var reader = sut.OpenText())
             {
                 var target = new char[value.Length];
-                int readBytes = reader.ReadBlock(target, 0, target.Length);
+                var readBytes = reader.ReadBlock(target, 0, target.Length);
 
 #if !LOGONLY
                 Assert.AreEqual(value.Length, readBytes, "Unexpected read count");
@@ -1168,7 +1173,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1201,7 +1206,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1234,7 +1239,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1249,11 +1254,11 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenWrite())
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                int totalWrittenBytes = 0;
+                var totalWrittenBytes = 0;
 
                 do
                 {
-                    int writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
+                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
                     stream.Write(largeData, totalWrittenBytes, writtenBytes);
                     totalWrittenBytes += writtenBytes;
                 } while (totalWrittenBytes < largeData.Length);
@@ -1273,7 +1278,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1288,11 +1293,11 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenWrite())
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                int totalWrittenBytes = 0;
+                var totalWrittenBytes = 0;
 
                 do
                 {
-                    int writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
+                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
                     stream.Write(largeData, totalWrittenBytes, writtenBytes);
                     totalWrittenBytes += writtenBytes;
                 } while (totalWrittenBytes < largeData.Length);
@@ -1307,13 +1312,13 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFile_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1328,11 +1333,11 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenWrite())
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                int totalWrittenBytes = 0;
+                var totalWrittenBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
@@ -1352,13 +1357,13 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
+        [SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void OpenWrite_WithLargeFileUsingContext_InRandomOrder_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -1373,11 +1378,11 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenWrite())
             {
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                int totalWrittenBytes = 0;
+                var totalWrittenBytes = 0;
 
-                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i * FILE_BUFFER_SIZE;
+                    var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
@@ -1402,7 +1407,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithFlush_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1432,12 +1437,14 @@ namespace DokanNet.Tests
 #endif
         }
 
+#if USER_MODE_LOCK
         [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName.AsRootedPath();
+            var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
             fixture.SetupAny();
@@ -1468,7 +1475,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Replace_WhereParentIsRoot_CallsApiCorrectly()
         {
@@ -1491,10 +1498,11 @@ namespace DokanNet.Tests
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
             fixture.PermitGetFileInformationToFail(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, WriteDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectCreateFile(destinationBackupPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
+            fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectMoveFile(destinationPath, destinationBackupPath, true);
             fixture.PermitGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
+            fixture.ExpectCreateFile(destinationPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.ExpectMoveFile(path, destinationPath, true);
 #endif
 
@@ -1507,7 +1515,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void Replace_WhereParentIsDirectory_CallsApiCorrectly()
         {
@@ -1533,9 +1541,11 @@ namespace DokanNet.Tests
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
             fixture.PermitGetFileInformationToFail(destinationBackupPath, FileAttributes.Normal, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
+            fixture.ExpectCreateFile(destinationBackupPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), WriteDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectMoveFile(destinationPath, destinationBackupPath, true);
             fixture.PermitGetFileInformation(destinationBackupPath, FileAttributes.Normal, false);
+            fixture.ExpectCreateFile(destinationPath, WriteDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.ExpectMoveFile(path, destinationPath, true);
 #endif
 
@@ -1553,7 +1563,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.FileName;
+            var path = fixture.FileName;
 
             var security = new FileSecurity();
             security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
@@ -1573,6 +1583,35 @@ namespace DokanNet.Tests
             sut.SetAccessControl(security);
 
 #if !LOGONLY
+            fixture.Verify();
+#endif
+        }
+
+        [TestMethod, TestCategory(TestCategories.Success)]
+        public void GetFileInformation_WhereDatesIsUnknown_CallsApiCorrectly()
+        {
+            var fixture = DokanOperationsFixture.Instance;
+
+            var path = fixture.FileName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            var attributes = FileAttributes.Normal;
+            fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
+            fixture.ExpectGetFileInformation(path, attributes, creationTime: DateTime.MinValue, lastWriteTime: DateTime.MinValue, lastAccessTime: DateTime.MinValue);
+#endif
+
+            var sut = new DirectoryInfo(path.AsDriveBasedPath());
+
+#if !LOGONLY
+            //As DirectoryInfo do not have any handling om uninitialized date
+            //do we have to use this date insted of DateTime.MinValue
+            var defaultDate = DateTime.FromFileTime(0);
+            Assert.AreEqual(defaultDate, sut.CreationTime, $"File should have unknown {nameof(sut.CreationTime)}.");
+            Assert.AreEqual(defaultDate, sut.LastWriteTime, $"File should have unknown {nameof(sut.LastWriteTime)}.");
+            Assert.AreEqual(defaultDate, sut.LastAccessTime, $"File should have unknown {nameof(sut.LastAccessTime)}.");
+            Assert.AreEqual(attributes, sut.Attributes, $"{nameof(sut.Attributes)} is not initialized.");
+
             fixture.Verify();
 #endif
         }

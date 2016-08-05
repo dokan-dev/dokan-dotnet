@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace DokanNet.Native
 {
@@ -24,8 +23,11 @@ namespace DokanNet.Native
         public DokanOperationProxy.MoveFileDelegate MoveFile;
         public DokanOperationProxy.SetEndOfFileDelegate SetEndOfFile;
         public DokanOperationProxy.SetAllocationSizeDelegate SetAllocationSize;
+
+        // Lockfile & Unlockfile are only used if dokan option UserModeLock is enabled
         public DokanOperationProxy.LockFileDelegate LockFile;
         public DokanOperationProxy.UnlockFileDelegate UnlockFile;
+
         public DokanOperationProxy.GetDiskFreeSpaceDelegate GetDiskFreeSpace;
         public DokanOperationProxy.GetVolumeInformationDelegate GetVolumeInformation;
         public DokanOperationProxy.MountedDelegate Mounted;

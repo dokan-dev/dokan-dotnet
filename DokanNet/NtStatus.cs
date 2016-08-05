@@ -239,6 +239,7 @@
         InvalidParameter11 = 0xc00000f9,
         InvalidParameter12 = 0xc00000fa,
         DirectoryNotEmpty = 0xc0000101,
+        NotADirectory = 0xc0000103,
         MappedFileSizeZero = 0xc000011e,
         TooManyOpenedFiles = 0xc000011f,
         Cancelled = 0xc0000120,
@@ -511,5 +512,4 @@
  
     default:
         return STATUS_UNSUCCESSFUL;*/
-
 }

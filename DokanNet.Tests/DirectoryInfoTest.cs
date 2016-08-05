@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -23,7 +24,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            bool hasUnmatchedInvocations = false;
+            var hasUnmatchedInvocations = false;
             DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
@@ -33,7 +34,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -70,7 +71,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -91,7 +92,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -111,7 +112,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -130,7 +131,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -149,7 +150,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #endif
@@ -168,7 +169,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -189,7 +190,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -211,15 +212,21 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectFindFiles(DokanOperationsFixture.RootName, new[] {
-                new FileInformation() { FileName = path, Attributes = FileAttributes.Normal, Length = 0, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+            fixture.ExpectFindFiles(DokanOperationsFixture.RootName, new[]
+            {
+                new FileInformation()
+                {
+                    FileName = path, Attributes = FileAttributes.Normal,
+                    Length = 0,
+                    CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
+                }
             });
             fixture.ExpectCreateDirectoryToFail(path.AsRootedPath(), DokanResult.FileExists);
 #endif
@@ -313,7 +320,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -337,7 +344,7 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void Delete_WhereRecurseIsTrueAndDirectoryIsNonempty_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
@@ -350,14 +357,29 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectOpenDirectory(path);
-            if (supportsPatternSearch) {
-                fixture.ExpectFindFilesWithPattern(path, "*", DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[] {
-                    new FileInformation() { FileName = subFileName, Attributes = FileAttributes.Normal, Length = 100, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
-                }).ToArray());
-            } else {
+            if (supportsPatternSearch)
+            {
+                fixture.ExpectFindFilesWithPattern(path, "*", DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[]
+                    {
+                        new FileInformation()
+                        {
+                            FileName = subFileName, Attributes = FileAttributes.Normal,
+                            Length = 100,
+                            CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
+                        }
+                    }).ToArray());
+            }
+            else
+            {
                 fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
-                fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[] {
-                    new FileInformation() { FileName = subFileName, Attributes = FileAttributes.Normal, Length = 100, CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today }
+                fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[]
+                {
+                    new FileInformation()
+                    {
+                        FileName = subFileName, Attributes = FileAttributes.Normal,
+                        Length = 100,
+                        CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
+                    }
                 }).ToArray());
             }
             fixture.ExpectCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open, deleteOnClose: true);
@@ -381,20 +403,23 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void Delete_WhereRecurseIsTrueAndDirectoryIsEmpty_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectOpenDirectory(path);
-            if (supportsPatternSearch) {
+            if (supportsPatternSearch)
+            {
                 fixture.ExpectFindFilesWithPattern(path, "*", DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
-            } else {
+            }
+            else
+            {
                 fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
                 fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
             }
@@ -416,7 +441,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -425,7 +450,8 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileSecurity(path.AsRootedPath(), DokanOperationsFixture.DefaultDirectorySecurity);
             fixture.ExpectCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
-            fixture.ExpectGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity);
+            fixture.ExpectGetFileSecurity(DokanOperationsFixture.RootName,
+                DokanOperationsFixture.DefaultDirectorySecurity);
 #endif
 
             var sut = new DirectoryInfo(path.AsDriveBasedPath());
@@ -442,7 +468,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -466,7 +492,9 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetDirectories().Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Directory)).Select(i => i.FileName).ToArray(),
+                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Directory))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetDirectories().Select(d => d.Name).ToArray(),
                 nameof(sut.GetDirectories));
 
@@ -475,27 +503,28 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        private void GetDirectories_OnRootDirectory_WithPatternSearch_CallsApiCorrectly()
+        public void GetDirectories_OnRootDirectory_WithPatternSearch_CallsApiCorrectly()
         {
-
+            GetDirectories_OnRootDirectory_CallsApiCorrectly(true);
         }
 
         [TestMethod, TestCategory(TestCategories.Success), TestCategory(TestCategories.NoPatternSearch)]
-        private void GetDirectories_OnRootDirectory_WithoutPatternSearch_CallsApiCorrectly()
+        public void GetDirectories_OnRootDirectory_WithoutPatternSearch_CallsApiCorrectly()
         {
+            GetDirectories_OnRootDirectory_CallsApiCorrectly(false);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetDirectories_OnSubDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -504,7 +533,8 @@ namespace DokanNet.Tests
             {
                 fixture.ExpectFindFilesWithPattern(path, "*", fixture.DirectoryItems);
             }
-            else {
+            else
+            {
                 fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
                 fixture.ExpectFindFiles(path, fixture.DirectoryItems);
             }
@@ -517,7 +547,9 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetDirectories().Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Directory)).Select(i => i.FileName).ToArray(),
+                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Directory))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetDirectories().Select(d => d.Name).ToArray(),
                 nameof(sut.GetDirectories));
 
@@ -530,18 +562,19 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetDirectoriesWithFilter_OnRootDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*r2";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*r2";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(path);
-            if (supportsPatternSearch) {
+            if (supportsPatternSearch)
+            {
                 fixture.ExpectFindFilesWithPattern(path, filter, fixture.RootDirectoryItems.Where(i => regex.IsMatch(i.FileName)).ToList());
             }
             else
@@ -558,7 +591,10 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetDirectories(filter).Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Directory) && regex.IsMatch(i.FileName)).Select(i => i.FileName).ToArray(),
+                fixture.RootDirectoryItems.Where(
+                    i => i.Attributes.HasFlag(FileAttributes.Directory) && regex.IsMatch(i.FileName))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetDirectories(filter).Select(d => d.Name).ToArray(),
                 nameof(sut.GetDirectories));
 
@@ -571,11 +607,11 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFiles_OnRootDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -598,7 +634,9 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFiles().Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal)).Select(i => i.FileName).ToArray(),
+                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetFiles().Select(f => f.Name).ToArray(),
                 nameof(sut.GetFiles));
 
@@ -606,17 +644,17 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFiles_OnSubDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -639,7 +677,9 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFiles().Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal)).Select(i => i.FileName).ToArray(),
+                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetFiles().Select(f => f.Name).ToArray(),
                 nameof(sut.GetFiles));
 
@@ -652,12 +692,12 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFilesWithFilter_OnRootDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*bD*";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*bD*";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
@@ -681,9 +721,75 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFiles(filter).Length);
 #else
             CollectionAssert.AreEqual(
-                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal) && regex.IsMatch(i.FileName)).Select(i => i.FileName).ToArray(),
+                fixture.RootDirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal) && regex.IsMatch(i.FileName))
+                    .Select(i => i.FileName)
+                    .ToArray(),
                 sut.GetFiles(filter).Select(f => f.Name).ToArray(),
                 nameof(sut.GetFiles));
+
+            fixture.Verify();
+#endif
+        }
+
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
+        [TestMethod, TestCategory(TestCategories.Success)]
+        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
+        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
+        public void GetFiles_UnknownDates_CallsApiCorrectly()
+        {
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
+
+            var fixture = DokanOperationsFixture.Instance;
+
+            var path = fixture.DirectoryName.AsRootedPath();
+#if LOGONLY
+            fixture.SetupAny();
+#else
+            fixture.ExpectOpenDirectory(path);
+            //Remove all dates
+            var files = fixture.RemoveDatesFromFileInformations(fixture.DirectoryItems);
+
+            if (supportsPatternSearch)
+            {
+                fixture.ExpectFindFilesWithPattern(path, "*", files);
+            }
+            else
+            {
+                fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
+                fixture.ExpectFindFiles(path, files);
+            }
+#endif
+
+            var sut = new DirectoryInfo(fixture.DirectoryName.AsDriveBasedPath());
+
+#if LOGONLY
+            Assert.IsNotNull(sut.GetFiles(), nameof(sut.GetFiles));
+            Console.WriteLine(sut.GetFiles().Length);
+#else
+            var receivedFiles = sut.GetFiles();
+
+            // As DirectoryInfo does not handle uninitialized DateTime values correctly
+            // it has to be provided with DateTime.FromFileTime(0) as default minimum date
+            var defaultDate = DateTime.FromFileTime(0);
+            var expectedDateCollection = Enumerable.Repeat(defaultDate, receivedFiles.Length).ToArray();
+
+            CollectionAssert.AreEqual(
+                receivedFiles.Select(f => f.Name).ToArray(),
+                fixture.DirectoryItems.Where(i => i.Attributes.HasFlag(FileAttributes.Normal)).Select(i => i.FileName).ToArray(),
+                nameof(sut.GetFiles));
+
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.CreationTime).ToArray(),
+                nameof(FileInformation.CreationTime));
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.LastWriteTime).ToArray(),
+                nameof(FileInformation.LastWriteTime));
+            CollectionAssert.AreEqual(
+                expectedDateCollection,
+                receivedFiles.Select(x => x.LastAccessTime).ToArray(),
+                nameof(FileInformation.LastAccessTime));
 
             fixture.Verify();
 #endif
@@ -694,11 +800,11 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfos_OnRootDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
+            var path = DokanOperationsFixture.RootName;
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -729,17 +835,17 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
         [TestMethod, TestCategory(TestCategories.Success)]
         [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfos_OnSubDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -775,12 +881,12 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfosWithFilter_OnRootDirectory_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = DokanOperationsFixture.RootName;
-            string filter = "*bD*";
+            var path = DokanOperationsFixture.RootName;
+            var filter = "*bD*";
             var regex = new Regex(filter.Replace('?', '.').Replace("*", ".*"));
 #if LOGONLY
             fixture.SetupAny();
@@ -817,32 +923,17 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void GetFileSystemInfos_OnRootDirectory_WhereSearchOptionIsAllDirectories_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
             var pathsAndItems = new[]
             {
-                new {
-                    Path = DokanOperationsFixture.RootName,
-                    Items = fixture.RootDirectoryItems
-                },
-                new {
-                    Path = fixture.DirectoryName.AsRootedPath(),
-                    Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(fixture.DirectoryItems).ToArray()
-                },
-                new {
-                    Path = Path.Combine(fixture.DirectoryName, fixture.SubDirectoryName).AsRootedPath(),
-                    Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(fixture.SubDirectoryItems).ToArray()
-                },
-                new {
-                    Path = fixture.Directory2Name.AsRootedPath(),
-                    Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(fixture.Directory2Items).ToArray()
-                },
-                new {
-                    Path = Path.Combine(fixture.Directory2Name, fixture.SubDirectory2Name).AsRootedPath(),
-                    Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().ToArray()
-                }
+                new { Path = DokanOperationsFixture.RootName, Items = fixture.RootDirectoryItems },
+                new { Path = fixture.DirectoryName.AsRootedPath(), Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(fixture.DirectoryItems).ToArray() },
+                new { Path = Path.Combine(fixture.DirectoryName, fixture.SubDirectoryName).AsRootedPath(), Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles() .Concat(fixture.SubDirectoryItems) .ToArray() },
+                new { Path = fixture.Directory2Name.AsRootedPath(), Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(fixture.Directory2Items).ToArray() },
+                new { Path = Path.Combine(fixture.Directory2Name, fixture.SubDirectory2Name).AsRootedPath(), Items = DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().ToArray() }
             };
 #if LOGONLY
             fixture.SetupAny();
@@ -869,9 +960,7 @@ namespace DokanNet.Tests
             Console.WriteLine(sut.GetFileSystemInfos().Length);
 #else
             CollectionAssert.AreEqual(
-                pathsAndItems.Select(p => p.Items.Where(f => !f.FileName.All(c => c == '.')))
-                    .Aggregate((i1, i2) => i1.Union(i2).ToArray())
-                    .Select(i => i.FileName).ToArray(),
+                pathsAndItems.Select(p => p.Items.Where(f => f.FileName.Any(c => c != '.'))).Aggregate((i1, i2) => i1.Union(i2).ToArray()).Select(i => i.FileName).ToArray(),
                 sut.GetFileSystemInfos("*", SearchOption.AllDirectories).Select(f => f.Name).ToArray(),
                 nameof(sut.GetFileSystemInfos));
 
@@ -879,7 +968,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsRoot_CallsApiCorrectly()
         {
@@ -892,8 +981,8 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectCreateFile(destinationPath, AppendToDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
+            fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, AppendToDirectoryAccess, FileShare.ReadWrite);
             fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
@@ -908,7 +997,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
+        [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ParentIs")]
         [TestMethod, TestCategory(TestCategories.Success)]
         public void MoveTo_WhereParentIsDirectory_CallsApiCorrectly()
         {
@@ -924,6 +1013,7 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectCreateFile(destinationPath, AppendToDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Directory, DokanResult.PathNotFound);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
@@ -944,7 +1034,7 @@ namespace DokanNet.Tests
         {
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName.AsRootedPath();
+            var path = fixture.DirectoryName.AsRootedPath();
 #if LOGONLY
             fixture.SetupAny();
 #else
@@ -964,14 +1054,13 @@ namespace DokanNet.Tests
 
             string path = fixture.DirectoryName.AsRootedPath(),
                 destinationPath = fixture.DestinationDirectoryName.AsRootedPath();
-    #if LOGONLY
+#if LOGONLY
                 fixture.SetupAny();
     #else
             fixture.ExpectCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists);
-            // WARNING: This is probably an error in the Dokan driver!
-            fixture.ExpectOpenDirectoryWithoutCleanup(string.Empty, AppendToDirectoryAccess, FileShare.ReadWrite);
+            fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, AppendToDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Directory);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
@@ -981,9 +1070,9 @@ namespace DokanNet.Tests
 
             sut.MoveTo(fixture.DestinationDirectoryName.AsDriveBasedPath());
 
-    #if !LOGONLY
+#if !LOGONLY
             fixture.Verify();
-    #endif
+#endif
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
@@ -991,13 +1080,15 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
         public void SetAccessControl_CallsApiCorrectly()
         {
-            var supportsPatternSearch = bool.Parse((string)TestContext.DataRow["SupportsPatternSearch"]);
+            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
-            string path = fixture.DirectoryName;
+            var path = fixture.DirectoryName;
             var security = new DirectorySecurity();
-            security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null), FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null),
+                FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
 #if LOGONLY
             fixture.SetupAny();
 #else
