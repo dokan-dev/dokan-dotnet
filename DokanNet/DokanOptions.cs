@@ -8,6 +8,9 @@ namespace DokanNet
     [Flags]
     public enum DokanOptions : long
     {
+        /// <summary>Fixed Drive</summary>
+        FixedDrive = 0,
+
         /// <summary>Enable ouput debug message</summary>
         DebugMode = 1,
 
@@ -33,9 +36,6 @@ namespace DokanNet
         CurrentSession = 128,
 
         /// <summary>Enable Lockfile/Unlockfile operations</summary>
-        UserModeLock = 256,
-
-        /// <summary>Fixed Driver</summary>
-        FixedDrive = 0,
+        UserModeLock = 256
     }
 }

@@ -377,7 +377,7 @@ namespace DokanNet.Tests
             fixture.ExpectSetAllocationSize(path, testData.Length);
             fixture.ExpectSetEndOfFile(path, testData.Length);
 #if NETWORK_DRIVE
-            fixture.SetupWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
+            fixture.ExpectWriteFileInChunks(path, testData, bufferSize, context: testData, synchronousIo: false);
 #else
             fixture.ExpectWriteFileInChunks(path, testData, bufferSize, context: testData);
 #endif
