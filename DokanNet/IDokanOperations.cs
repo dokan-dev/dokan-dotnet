@@ -53,7 +53,7 @@ namespace DokanNet
 
         /// <summary>
         /// Read event on the file previously opened in <see cref="CreateFile"/>
-        /// ReadFile can be called by different thread at the same time.
+        /// It can be called by different thread at the same time.
         /// Therefor the read has to be thread safe.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
@@ -74,7 +74,7 @@ namespace DokanNet
         /// <param name="fileName">File or directory name.</param>
         /// <param name="buffer">Data that has to be written</param>
         /// <param name="bytesWritten">Total byte that has been write</param>
-        /// <param name="offset">Offset from where the read has to be proceed</param>
+        /// <param name="offset">Offset from where the write has to be proceed</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten,
@@ -99,6 +99,9 @@ namespace DokanNet
 
         /// <summary>
         /// List all files in the path requested
+        /// 
+        /// <see cref="FindFilesWithPattern"/> is checking first. If it is not implemented or
+        /// returns <see cref="NtStatus.NotImplemented"/>, then FindFiles is called, if implemented.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
         /// <param name="files"><see cref="FileInformation"/> list to fill</param>
@@ -210,7 +213,7 @@ namespace DokanNet
         /// This is only used if DokanOptions.UserModeLock is enabled.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
-        /// <param name="offset"></param>
+        /// <param name="offset">Offset from where the lock has to be proceed</param>
         /// <param name="length">Data length to lock</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
@@ -221,7 +224,7 @@ namespace DokanNet
         /// This is only used if DokanOptions.UserModeLock is enabled.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
-        /// <param name="offset"></param>
+        /// <param name="offset">Offset from where the unlock has to be proceed</param>
         /// <param name="length">Data length to lock</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>

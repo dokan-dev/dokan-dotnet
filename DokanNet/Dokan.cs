@@ -261,7 +261,7 @@ namespace DokanNet
         /// Unmount a dokan device from a driver letter
         /// </summary>
         /// <param name="driveLetter">Driver letter to unmount</param>
-        /// <returns>Return if volume has been unmount</returns>
+        /// <returns>True if device was unmount or False in case of failure or device not found.</returns>
         public static bool Unmount(char driveLetter)
         {
             return NativeMethods.DokanUnmount(driveLetter);
@@ -271,7 +271,7 @@ namespace DokanNet
         /// Unmount a dokan device from a mount point
         /// </summary>
         /// <param name="mountPoint">Mount point to unmount ("Z", "Z:", "Z:\", Z:\MyMountPoint).</param>
-        /// <returns>Return if volume has been unmount</returns>
+        /// <returns>True if device was unmount or False in case of failure or device not found.</returns>
         public static bool RemoveMountPoint(string mountPoint)
         {
             return NativeMethods.DokanRemoveMountPoint(mountPoint);
