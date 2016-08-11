@@ -13,29 +13,29 @@ namespace DokanNet.Tests
     {
         private const int FILE_BUFFER_SIZE = 262144;
 
-        private static byte[] smallData;
+        private static byte[] _smallData;
 
-        private static byte[] largeData;
+        private static byte[] _largeData;
 
         public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            smallData = new byte[4096];
-            for (var i = 0; i < smallData.Length; ++i)
-                smallData[i] = (byte) (i%256);
+            _smallData = new byte[4096];
+            for (var i = 0; i < _smallData.Length; ++i)
+                _smallData[i] = (byte) (i%256);
 
-            largeData = new byte[5*FILE_BUFFER_SIZE + 65536];
-            for (var i = 0; i < largeData.Length; ++i)
-                largeData[i] = (byte) (i%251);
+            _largeData = new byte[5*FILE_BUFFER_SIZE + 65536];
+            for (var i = 0; i < _largeData.Length; ++i)
+                _largeData[i] = (byte) (i%251);
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            largeData = null;
-            smallData = null;
+            _largeData = null;
+            _smallData = null;
         }
 
         [TestInitialize]
@@ -120,19 +120,19 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
-            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: context);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenRead())
             {
-                var target = new byte[largeData.Length];
+                var target = new byte[_largeData.Length];
                 var totalReadBytes = 0;
                 do
                 {
                     totalReadBytes += stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
-                } while (totalReadBytes < largeData.Length);
+                } while (totalReadBytes < _largeData.Length);
             }
 
 #if !LOGONLY
@@ -152,17 +152,17 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
-            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: context);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
             using (var stream = sut.OpenRead())
             {
-                var target = new byte[largeData.Length];
+                var target = new byte[_largeData.Length];
                 var totalReadBytes = 0;
 
-                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
+                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, _largeData.Length), i =>
                 {
                     var origin = i*FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
@@ -219,9 +219,9 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
-            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: context);
 
-            fixture.PermitProbeFile(path, largeData);
+            fixture.PermitProbeFile(path, _largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -232,10 +232,10 @@ namespace DokanNet.Tests
 
                 do
                 {
-                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
-                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
+                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - totalWrittenBytes);
+                    stream.Write(_largeData, totalWrittenBytes, writtenBytes);
                     totalWrittenBytes += writtenBytes;
-                } while (totalWrittenBytes < largeData.Length);
+                } while (totalWrittenBytes < _largeData.Length);
             }
 
 #if !LOGONLY
@@ -255,9 +255,9 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
-            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
+            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: context);
 
-            fixture.PermitProbeFile(path, largeData);
+            fixture.PermitProbeFile(path, _largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -266,14 +266,14 @@ namespace DokanNet.Tests
             {
                 var totalWrittenBytes = 0;
 
-                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
+                Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, _largeData.Length), i =>
                 {
                     var origin = i*FILE_BUFFER_SIZE;
-                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
+                    var count = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - origin);
                     lock (stream)
                     {
                         stream.Seek(origin, SeekOrigin.Begin);
-                        stream.Write(largeData, origin, count);
+                        stream.Write(_largeData, origin, count);
                         totalWrittenBytes += count;
                     }
                 });

@@ -8,7 +8,7 @@ namespace DokanNet.Tests
     [TestClass]
     public static class Mounter
     {
-        private static Thread mounterThread;
+        private static Thread _mounterThread;
 
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext context)
@@ -16,12 +16,11 @@ namespace DokanNet.Tests
 #if NETWORK_DRIVE
             (mounterThread = new Thread(new ThreadStart(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT, DokanOptions.DebugMode | DokanOptions.NetworkDrive, 5)))).Start();
 #else
-            (mounterThread =
+            (_mounterThread =
                 new Thread(
-                    new ThreadStart(
-                        () =>
-                            DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT,
-                                DokanOptions.DebugMode | DokanOptions.RemovableDrive, 5)))).Start();
+                    () =>
+                        DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT,
+                            DokanOptions.DebugMode | DokanOptions.RemovableDrive, 5))).Start();
 #endif
             var drive = new DriveInfo(DokanOperationsFixture.MOUNT_POINT);
             while (!drive.IsReady)
@@ -31,7 +30,7 @@ namespace DokanNet.Tests
         [AssemblyCleanup]
         public static void AssemblyCleanup()
         {
-            mounterThread.Abort();
+            _mounterThread.Abort();
             Dokan.Unmount(DokanOperationsFixture.MOUNT_POINT[0]);
             Dokan.RemoveMountPoint(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
         }

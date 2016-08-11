@@ -67,11 +67,11 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// If the mount fail a exception is trowed.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, ILogger logger = null)
         {
             Mount(operations, mountPoint, DokanOptions.FixedDrive, logger);
@@ -80,12 +80,12 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             ILogger logger = null)
         {
@@ -95,13 +95,13 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount</param>
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             int threadCount, ILogger logger = null)
         {
@@ -111,7 +111,6 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
@@ -119,6 +118,7 @@ namespace DokanNet
         /// <param name="threadCount">Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3) (Version "123" is equal to Dokan version 1.2.3).</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             int threadCount, int version, ILogger logger = null)
         {
@@ -129,7 +129,6 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
@@ -138,6 +137,7 @@ namespace DokanNet
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to Dokan version 1.2.3)</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             int threadCount, int version, TimeSpan timeout, ILogger logger = null)
         {
@@ -147,7 +147,6 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
@@ -157,6 +156,7 @@ namespace DokanNet
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="uncName">UNC name used for network volume</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
         {
@@ -167,7 +167,6 @@ namespace DokanNet
         /// <summary>
         /// Mount a new Dokan Volume.
         /// This function block until the device is unmount.
-        /// if the mount fail throw is fiered with error information.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be "M:\" (drive letter) or "C:\mount\dokan" (path in NTFS)</param>
@@ -179,6 +178,7 @@ namespace DokanNet
         /// <param name="allocationUnitSize">Allocation Unit Size of the volume. This will behave on the file size.</param>
         /// <param name="sectorSize">Sector Size of the volume. This will behave on the file size.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             int threadCount, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)

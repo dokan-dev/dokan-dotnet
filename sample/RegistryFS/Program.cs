@@ -12,11 +12,11 @@ namespace RegistryFS
     {
         #region DokanOperations member
 
-        private readonly Dictionary<string, RegistryKey> TopDirectory;
+        private readonly Dictionary<string, RegistryKey> _topDirectory;
 
         public RFS()
         {
-            TopDirectory = new Dictionary<string, RegistryKey>
+            _topDirectory = new Dictionary<string, RegistryKey>
             {
                 ["ClassesRoot"] = Registry.ClassesRoot,
                 ["CurrentUser"] = Registry.CurrentUser,
@@ -58,7 +58,7 @@ namespace RegistryFS
             return DokanResult.Error;
         }
 
-        private RegistryKey GetRegistoryEntry(string name)
+        private RegistryKey GetRegistryEntry(string name)
         {
             Console.WriteLine($"GetRegistoryEntry : {name}");
             var top = name.IndexOf('\\', 1) - 1;
@@ -68,12 +68,12 @@ namespace RegistryFS
             var topname = name.Substring(1, top);
             var sub = name.IndexOf('\\', 1);
 
-            if (TopDirectory.ContainsKey(topname))
+            if (_topDirectory.ContainsKey(topname))
             {
                 if (sub == -1)
-                    return TopDirectory[topname];
+                    return _topDirectory[topname];
                 else
-                    return TopDirectory[topname].OpenSubKey(name.Substring(sub + 1));
+                    return _topDirectory[topname].OpenSubKey(name.Substring(sub + 1));
             }
             return null;
         }
@@ -93,7 +93,7 @@ namespace RegistryFS
             files = new List<FileInformation>();
             if (filename == "\\")
             {
-                foreach (var name in TopDirectory.Keys)
+                foreach (var name in _topDirectory.Keys)
                 {
                     var finfo = new FileInformation
                     {
@@ -109,7 +109,7 @@ namespace RegistryFS
             }
             else
             {
-                var key = GetRegistoryEntry(filename);
+                var key = GetRegistryEntry(filename);
                 if (key == null)
                     return DokanResult.Error;
                 foreach (var name in key.GetSubKeyNames())
@@ -157,7 +157,7 @@ namespace RegistryFS
                 return DokanResult.Success;
             }
 
-            var key = GetRegistoryEntry(filename);
+            var key = GetRegistryEntry(filename);
             if (key == null)
                 return DokanResult.Error;
 

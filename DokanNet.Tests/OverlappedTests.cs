@@ -154,7 +154,7 @@ namespace DokanNet.Tests
                             waitHandles[i].Set();
                         }).ToArray();
 
-                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
+                var awaiterThread = new Thread(() => WaitHandle.WaitAll(waitHandles));
                 awaiterThread.Start();
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_READ, ShareMode.FILE_SHARE_READ | ShareMode.FILE_SHARE_DELETE, IntPtr.Zero,
@@ -181,7 +181,7 @@ namespace DokanNet.Tests
 
                 awaiterThread.Join();
 
-                Array.ForEach(completions, c => GC.KeepAlive(c));
+                Array.ForEach(completions, GC.KeepAlive);
 
                 return chunks;
             }
@@ -200,7 +200,7 @@ namespace DokanNet.Tests
                             waitHandles[i].Set();
                         }).ToArray();
 
-                var awaiterThread = new Thread(new ThreadStart(() => WaitHandle.WaitAll(waitHandles)));
+                var awaiterThread = new Thread(() => WaitHandle.WaitAll(waitHandles));
                 awaiterThread.Start();
 
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE,
@@ -232,24 +232,24 @@ namespace DokanNet.Tests
 
                 awaiterThread.Join();
 
-                Array.ForEach(completions, c => GC.KeepAlive(c));
+                Array.ForEach(completions, GC.KeepAlive);
             }
         }
 
-        private static byte[] testData;
+        private static byte[] _testData;
 
         public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            testData = DokanOperationsFixture.InitBlockTestData(FILE_BUFFER_SIZE, 5*FILE_BUFFER_SIZE + 65536);
+            _testData = DokanOperationsFixture.InitBlockTestData(FILE_BUFFER_SIZE, 5*FILE_BUFFER_SIZE + 65536);
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            testData = null;
+            _testData = null;
         }
 
         [TestInitialize]
@@ -275,18 +275,18 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
-            fixture.ExpectReadFileInChunks(path, testData, (int) FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: _testData);
+            fixture.ExpectReadFileInChunks(path, _testData, (int) FILE_BUFFER_SIZE, context: _testData, synchronousIo: false);
 #endif
 
-            var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length);
+            var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, _testData.Length);
 
 #if !LOGONLY
             for (var i = 0; i < outputs.Length; ++i)
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i}");
-                Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i}");
-                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte) i + 1), $"Unexpected data in output {i}");
+                Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, _testData.Length, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i}");
+                Assert.IsTrue(outputs[i].Buffer.All(b => b == (byte) i + 1), $"Unexpected data in output {i}");
             }
 
             fixture.Verify();
@@ -302,23 +302,23 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
-            fixture.ExpectSetAllocationSize(path, testData.Length);
-            fixture.ExpectSetEndOfFile(path, testData.Length);
-            fixture.ExpectWriteFileInChunks(path, testData, (int) FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: _testData);
+            fixture.ExpectSetAllocationSize(path, _testData.Length);
+            fixture.ExpectSetEndOfFile(path, _testData.Length);
+            fixture.ExpectWriteFileInChunks(path, _testData, (int) FILE_BUFFER_SIZE, context: _testData, synchronousIo: false);
 #endif
 
-            var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(FILE_BUFFER_SIZE, testData.Length))
-                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte) (i + 1), NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i)).ToArray()))
+            var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(FILE_BUFFER_SIZE, _testData.Length))
+                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte) (i + 1), NativeMethods.BufferSize(FILE_BUFFER_SIZE, _testData.Length, i)).ToArray()))
                 .ToArray();
 
-            NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length, inputs);
+            NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, _testData.Length, inputs);
 
 #if !LOGONLY
             for (var i = 0; i < inputs.Length; ++i)
             {
                 Assert.AreEqual(0, inputs[i].Win32Error, $"Unexpected Win32 error in input {i}");
-                Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i}");
+                Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, _testData.Length, i), inputs[i].BytesTransferred, $"Unexpected number of bytes written in input {i}");
             }
 
             fixture.Verify();
@@ -351,7 +351,7 @@ namespace DokanNet.Tests
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
                 Assert.AreEqual(NativeMethods.BufferSize(bufferSize, fileSize, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
-                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte) i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
+                Assert.IsTrue(outputs[i].Buffer.All(b => b == (byte) i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
             }
 
             fixture.Verify();

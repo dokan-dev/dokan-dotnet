@@ -14,7 +14,7 @@ namespace DokanNetMirror
 {
     internal class Mirror : IDokanOperations
     {
-        private readonly string path;
+        private readonly string _path;
 
         private const FileAccess DataAccess = FileAccess.ReadData | FileAccess.WriteData | FileAccess.AppendData |
                                               FileAccess.Execute |
@@ -25,18 +25,18 @@ namespace DokanNetMirror
                                                    FileAccess.Delete |
                                                    FileAccess.GenericWrite;
 
-        private ConsoleLogger logger = new ConsoleLogger("[Mirror] ");
+        private readonly ConsoleLogger _logger = new ConsoleLogger("[Mirror] ");
 
         public Mirror(string path)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException(nameof(path));
-            this.path = path;
+            this._path = path;
         }
 
         private string GetPath(string fileName)
         {
-            return path + fileName;
+            return _path + fileName;
         }
 
         private NtStatus Trace(string method, string fileName, DokanFileInfo info, NtStatus result,
@@ -47,7 +47,7 @@ namespace DokanNetMirror
                 ? ", " + string.Join(", ", parameters.Select(x => string.Format(DefaultFormatProvider, "{0}", x)))
                 : string.Empty;
 
-            logger.Debug(DokanFormat($"{method}('{fileName}', {info}{extraParameters}) -> {result}"));
+            _logger.Debug(DokanFormat($"{method}('{fileName}', {info}{extraParameters}) -> {result}"));
 #endif
 
             return result;
@@ -58,7 +58,7 @@ namespace DokanNetMirror
             NtStatus result)
         {
 #if TRACE
-            logger.Debug(
+            _logger.Debug(
                 DokanFormat(
                     $"{method}('{fileName}', {info}, [{access}], [{share}], [{mode}], [{options}], [{attributes}]) -> {result}"));
 #endif
@@ -534,7 +534,7 @@ namespace DokanNetMirror
 
         public NtStatus GetDiskFreeSpace(out long free, out long total, out long used, DokanFileInfo info)
         {
-            var dinfo = DriveInfo.GetDrives().Single(di => di.RootDirectory.Name == Path.GetPathRoot(path + "\\"));
+            var dinfo = DriveInfo.GetDrives().Single(di => di.RootDirectory.Name == Path.GetPathRoot(_path + "\\"));
 
             used = dinfo.AvailableFreeSpace;
             total = dinfo.TotalSize;

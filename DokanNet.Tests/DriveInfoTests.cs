@@ -132,7 +132,7 @@ namespace DokanNet.Tests
             Assert.IsNotNull(sut.RootDirectory, nameof(sut.RootDirectory));
             Console.WriteLine(sut.RootDirectory);
 #else
-            Assert.AreEqual(path, sut.RootDirectory?.Name, nameof(sut.RootDirectory));
+            Assert.AreEqual(path, sut.RootDirectory.Name, nameof(sut.RootDirectory));
 #endif
         }
 

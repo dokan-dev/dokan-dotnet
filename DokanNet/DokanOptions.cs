@@ -8,10 +8,10 @@ namespace DokanNet
     [Flags]
     public enum DokanOptions : long
     {
-        /// <summary>Enable ouput debug message</summary>
+        /// <summary>Enable output debug message</summary>
         DebugMode = 1,
 
-        /// <summary>Enable ouput debug message to stderr</summary>
+        /// <summary>Enable output debug message to stderr</summary>
         StderrOutput = 2,
 
         /// <summary>Use alternate stream</summary>
