@@ -10,7 +10,7 @@ namespace DokanNet.Logging
     /// </summary>
     public class DebugViewLogger : ILogger
     {
-        private string loggerName;
+        private readonly string _loggerName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugViewLogger"/> class.
@@ -18,7 +18,7 @@ namespace DokanNet.Logging
         /// <param name="loggerName">Optional name to be added to each log line.</param>
         public DebugViewLogger(string loggerName = "")
         {
-            this.loggerName = loggerName;
+            _loggerName = loggerName;
         }
 
         /// <inheritdoc />
@@ -58,7 +58,7 @@ namespace DokanNet.Logging
         {
             if (args?.Length > 0)
                 message = string.Format(message, args);
-            OutputDebugString(message.FormatMessageForLogging(category, loggerName));
+            OutputDebugString(message.FormatMessageForLogging(category, _loggerName));
         }
     }
 }

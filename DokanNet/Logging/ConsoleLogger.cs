@@ -7,7 +7,7 @@ namespace DokanNet.Logging
     /// </summary>
     public class ConsoleLogger : ILogger
     {
-        private string loggerName;
+        private readonly string _loggerName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleLogger"/> class.
@@ -15,40 +15,40 @@ namespace DokanNet.Logging
         /// <param name="loggerName">Optional name to be added to each log line.</param>
         public ConsoleLogger(string loggerName = "")
         {
-            this.loggerName = loggerName;
+            _loggerName = loggerName;
         }
 
         /// <inheritdoc />
         public void Debug(string message, params object[] args)
         {
-            WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
+            WriteToConsole(Console.ForegroundColor, message, args);
         }
 
         /// <inheritdoc />
         public void Info(string message, params object[] args)
         {
-            WriteToConsole(Console.ForegroundColor, DateTime.Now, message, args);
+            WriteToConsole(Console.ForegroundColor, message, args);
         }
 
         /// <inheritdoc />
         public void Warn(string message, params object[] args)
         {
-            WriteToConsole(ConsoleColor.DarkYellow, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.DarkYellow, message, args);
         }
 
         /// <inheritdoc />
         public void Error(string message, params object[] args)
         {
-            WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.Red, message, args);
         }
 
         /// <inheritdoc />
         public void Fatal(string message, params object[] args)
         {
-            WriteToConsole(ConsoleColor.Red, DateTime.Now, message, args);
+            WriteToConsole(ConsoleColor.Red, message, args);
         }
 
-        private void WriteToConsole(ConsoleColor newColor, DateTime dateTime, string message, params object[] args)
+        private void WriteToConsole(ConsoleColor newColor, string message, params object[] args)
         {
             var origForegroundColor = Console.ForegroundColor;
             try
@@ -56,7 +56,7 @@ namespace DokanNet.Logging
                 Console.ForegroundColor = newColor;
                 if (args.Length > 0)
                     message = string.Format(message, args);
-                Console.WriteLine(message.FormatMessageForLogging(dateTime: dateTime, loggerName: loggerName));
+                Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
             }
             finally
             {
