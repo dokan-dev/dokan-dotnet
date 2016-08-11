@@ -14,7 +14,9 @@ namespace DokanNet.Tests
 
         public const FileAccess ReadAccess = FileAccess.ReadData | FileAccess.ReadExtendedAttributes | FileAccess.ReadAttributes | FileAccess.ReadPermissions | FileAccess.Synchronize;
 
-        public const FileAccess WriteAccess = FileAccess.WriteData | FileAccess.AppendData | FileAccess.WriteExtendedAttributes | FileAccess.ReadAttributes | FileAccess.WriteAttributes | FileAccess.ReadPermissions | FileAccess.Synchronize;
+        public const FileAccess WriteAccess =
+            FileAccess.WriteData | FileAccess.AppendData | FileAccess.WriteExtendedAttributes |
+            FileAccess.ReadAttributes | FileAccess.WriteAttributes | FileAccess.ReadPermissions | FileAccess.Synchronize;
 
         public const FileAccess ReadWriteAccess = ReadAccess | WriteAccess;
 
@@ -52,8 +54,8 @@ namespace DokanNet.Tests
 
         public const FileOptions WriteFileOptions = FileOptions.None;
 
-        public const FileOptions OpenReparsePointOptions = (FileOptions)0x00200000;
+        public const FileOptions OpenReparsePointOptions = (FileOptions) 0x00200000;
 
-        public const FileOptions OpenNoBufferingOptions = (FileOptions)0x20000000;
+        public const FileOptions OpenNoBufferingOptions = (FileOptions) 0x20000000;
     }
 }

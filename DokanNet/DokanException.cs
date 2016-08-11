@@ -12,7 +12,7 @@ namespace DokanNet
         /// <param name="message">The error message</param>
         internal DokanException(int status, string message) : base(message)
         {
-            base.HResult = status;
+            HResult = status;
         }
     }
 }

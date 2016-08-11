@@ -12,26 +12,45 @@ namespace DokanNet
         /// <summary>
         /// Read access right to an object
         /// </summary>
-        ReadData                = 0x00000001,
+        ReadData = 0x00000001,
         /// <summary>
         /// Write access right to an object
         /// </summary>
-        WriteData               = 0x00000002,
-        AppendData              = 0x00000004,
-        ReadExtendedAttributes  = 0x00000008,
+        WriteData = 0x00000002,
+        /// <summary>
+        /// For a file object, the right to append data to the file.
+        /// </summary>
+        AppendData = 0x00000004,
+        /// <summary>
+        /// The right to read extended file attributes.
+        /// </summary>
+        ReadExtendedAttributes = 0x00000008,
+        /// <summary>
+        /// The right to write extended file attributes.
+        /// </summary>
         WriteExtendedAttributes = 0x00000010,
-        Execute                 = 0x00000020,
-        ReadAttributes          = 0x00000080,
-        WriteAttributes         = 0x00000100,
+        /// <summary>
+        /// For a native code file, the right to execute the file.
+        /// This access right given to scripts may cause the script to be executable, depending on the script interpreter.
+        /// </summary>
+        Execute = 0x00000020,
+        /// <summary>
+        /// The right to read file attributes.
+        /// </summary>
+        ReadAttributes = 0x00000080,
+        /// <summary>
+        /// The right to write file attributes.
+        /// </summary>
+        WriteAttributes = 0x00000100,
         /// <summary>
         /// The right to delete the object.
         /// </summary>
-        Delete                  = 0x00010000,
+        Delete = 0x00010000,
         /// <summary>
         /// The right to read the information in the object's security descriptor, 
         /// not including the information in the system access control list (SACL).
         /// </summary>
-        ReadPermissions         = 0x00020000,
+        ReadPermissions = 0x00020000,
         /// <summary>
         /// The right to modify the discretionary access control list (DACL) in 
         /// the object's security descriptor.
@@ -56,21 +75,21 @@ namespace DokanNet
         /// the access mask of an audit access ACE (successful or unsuccessful access), 
         /// the SACL access will be audited.
         /// </summary>
-        Reserved                = 0x01000000,
+        Reserved = 0x01000000,
         //MaximumAllowed        = 0x02000000,
 
         //GenericAll            = 0x10000000,
         /// <summary>
         /// Generic execute access
         /// </summary>
-        GenericExecute          = 0x20000000,
+        GenericExecute = 0x20000000,
         /// <summary>
         /// Generic write access
         /// </summary>
-        GenericWrite            = 0x40000000,
+        GenericWrite = 0x40000000,
         /// <summary>
         /// Generic read access
         /// </summary>
-        GenericRead             = 0x80000000,
+        GenericRead = 0x80000000,
     }
 }

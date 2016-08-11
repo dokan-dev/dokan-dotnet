@@ -1,26 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace DokanNet
 {
     public class FormatProviders : IFormatProvider, ICustomFormatter
     {
         public static readonly FormatProviders DefaultFormatProvider = new FormatProviders();
-        public static readonly String NullStringRapresentation = "<null>";
+        public static readonly string NullStringRapresentation = "<null>";
 
-        public static String DokanFormat(FormattableString formattable)
-             => formattable.ToString(DefaultFormatProvider);
+        public static string DokanFormat(FormattableString formattable)
+            => formattable.ToString(DefaultFormatProvider);
 
-        private FormatProviders() { }
+        private FormatProviders()
+        {
+        }
 
         public object GetFormat(Type service)
         {
-            if (service == typeof(ICustomFormatter))
-                return this;
-            else
-                return null;
+            return service == typeof(ICustomFormatter) ? this : null;
         }
 
         public string Format(string format, object arg, IFormatProvider provider)
@@ -29,7 +25,7 @@ namespace DokanNet
             var formattable = arg as IFormattable;
             if (formattable != null)
                 return formattable.ToString(format, provider);
-            
+
             return arg.ToString();
         }
     }

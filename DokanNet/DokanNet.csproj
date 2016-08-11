@@ -71,11 +71,10 @@
     </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DokanOptions.cs" />
@@ -129,8 +128,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StringInterpolationBridge.0.9.1\lib\net40\StringInterpolationBridge.dll</HintPath>
+    <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, PublicKeyToken=761dcf67ba0bf74d, processorArchitecture=MSIL">
+      <HintPath>..\packages\StringInterpolationBridgeStrong.0.9.1\lib\net40\StringInterpolationBridge.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -144,6 +143,7 @@
     <EmbeddedResource Include="Properties\Resource.fr.resx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dokan.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

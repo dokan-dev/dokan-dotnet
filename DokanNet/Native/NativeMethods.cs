@@ -53,7 +53,8 @@ namespace DokanNet.Native
         public static extern IntPtr DokanOpenRequestorToken(DokanFileInfo rawFileInfo);
 
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern void DokanMapKernelToUserCreateFileFlags(uint FileAttributes, uint CreateOptions, uint CreateDisposition, ref int outFileAttributesAndFlags, ref int outCreationDisposition);
+        public static extern void DokanMapKernelToUserCreateFileFlags(uint fileAttributes, uint createOptions,
+            uint createDisposition, ref int outFileAttributesAndFlags, ref int outCreationDisposition);
 
         /*
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
