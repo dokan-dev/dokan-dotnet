@@ -36,12 +36,12 @@ namespace DokanNet
         /// </summary>
         public object Context
         {
-            get { return _context != 0 ? ((GCHandle) ((IntPtr) _context)).Target : null; }
+            get { return _context != 0 ? ((GCHandle) (IntPtr) _context).Target : null; }
             set
             {
                 if (_context != 0)
                 {
-                    ((GCHandle) ((IntPtr) _context)).Free();
+                    ((GCHandle) (IntPtr) _context).Free();
                     _context = 0;
                 }
                 if (value != null)

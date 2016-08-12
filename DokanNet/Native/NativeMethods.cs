@@ -14,18 +14,18 @@ namespace DokanNet.Native
         public static extern bool DokanUnmount(char driveLetter);
 
         /// <summary>
-        /// Get the version of Dockan.
+        /// Get the version of Dokan.
         /// The returned <see cref="uint"/> is the version number without the dots.
         /// </summary>
-        /// <returns>The version of dockan</returns>
+        /// <returns>The version of Dokan</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern uint DokanVersion();
 
         /// <summary>
-        /// Get the version of Dockan driver
+        /// Get the version of Dokan driver
         /// The returned <see cref="uint"/> is the version number without the dots.
         /// </summary>
-        /// <returns>The version of dockan driver</returns>
+        /// <returns>The version of Dokan driver</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern uint DokanDriverVersion();
 
@@ -47,13 +47,22 @@ namespace DokanNet.Native
         /// This method needs be called in <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
         /// callback.
         /// </summary>
-        /// <returns>The account token for the user on whose behalf the code is running.</returns>
+        /// <param name="rawFileInfo">
+        /// The raw File Info.
+        /// </param>
+        /// <returns>
+        /// The account token for the user on whose behalf the code is running.
+        /// </returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern IntPtr DokanOpenRequestorToken(DokanFileInfo rawFileInfo);
 
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern void DokanMapKernelToUserCreateFileFlags(uint fileAttributes, uint createOptions,
-            uint createDisposition, ref int outFileAttributesAndFlags, ref int outCreationDisposition);
+        public static extern void DokanMapKernelToUserCreateFileFlags(
+            uint fileAttributes,
+            uint createOptions,
+            uint createDisposition,
+            ref int outFileAttributesAndFlags,
+            ref int outCreationDisposition);
 
         /*
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]

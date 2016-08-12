@@ -5,7 +5,7 @@ namespace DokanNet
     public class FormatProviders : IFormatProvider, ICustomFormatter
     {
         public static readonly FormatProviders DefaultFormatProvider = new FormatProviders();
-        public static readonly string NullStringRapresentation = "<null>";
+        public static readonly string NullStringRepresentation = "<null>";
 
         public static string DokanFormat(FormattableString formattable)
             => formattable.ToString(DefaultFormatProvider);
@@ -21,7 +21,7 @@ namespace DokanNet
 
         public string Format(string format, object arg, IFormatProvider provider)
         {
-            if (arg == null) return NullStringRapresentation;
+            if (arg == null) return NullStringRepresentation;
             var formattable = arg as IFormattable;
             if (formattable != null)
                 return formattable.ToString(format, provider);

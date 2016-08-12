@@ -4,10 +4,11 @@ namespace DokanNet.Logging
 {
     /// <summary>
     /// Write log using OutputDebugString 
-    /// 
+    /// </summary>
+    /// <remarks>
     /// To see the output in visual studio 
     /// Project + Properties, Debug tab, check "Enable unmanaged code debugging".
-    /// </summary>
+    /// </remarks> 
     public class DebugViewLogger : ILogger
     {
         private readonly string _loggerName;

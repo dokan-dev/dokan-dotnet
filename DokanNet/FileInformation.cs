@@ -16,20 +16,24 @@ namespace DokanNet
         /// Name on the file or directory.
         /// </summary>
         public string FileName { get; set; }
+
         /// <summary>
         /// <see cref="FileAttributes"/> for the file or directory.
         /// </summary>
         public FileAttributes Attributes { get; set; }
+
         /// <summary>
         /// File creation time.
         /// If equal to null, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? CreationTime { get; set; }
+
         /// <summary>
-        /// File alst access time.
+        /// File last access time.
         /// If equal to null, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? LastAccessTime { get; set; }
+
         /// <summary>
         /// File last write time.
         /// If equal to null, the value will not be set or the file has no last write time.

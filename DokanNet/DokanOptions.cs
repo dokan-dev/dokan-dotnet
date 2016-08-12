@@ -3,7 +3,7 @@
 namespace DokanNet
 {
     /// <summary>
-    /// Dokan mount options used to describe dokan device behaviour.
+    /// Dokan mount options used to describe dokan device behavior.
     /// </summary>
     [Flags]
     public enum DokanOptions : long
@@ -36,6 +36,6 @@ namespace DokanNet
         UserModeLock = 256,
 
         /// <summary>Fixed Driver</summary>
-        FixedDrive = 0,
+        FixedDrive = 0
     }
 }

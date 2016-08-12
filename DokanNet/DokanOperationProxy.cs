@@ -416,7 +416,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -464,7 +464,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -478,7 +478,7 @@ namespace DokanNet
             }
         }
 
-        private static void Addto(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void AddTo(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!string.IsNullOrEmpty(fi.FileName));
             var ctime = ToFileTime(fi.CreationTime);
@@ -539,7 +539,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -553,7 +553,7 @@ namespace DokanNet
             }
         }
 
-        private static void Addto(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void AddTo(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!string.IsNullOrEmpty(fi.FileName));
             var data = new WIN32_FIND_STREAM_DATA

@@ -16,13 +16,17 @@ namespace DokanNet.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class.
         /// </summary>
-        /// <param name="debug">An <see cref="Action{T}"/> that are called when a debug log message are arriveing.</param>
-        /// <param name="info">An <see cref="Action{T}"/> that are called when a information log message are arriveing</param>
-        /// <param name="warn">An <see cref="Action{T}"/> that are called when a warning log message are arriveing</param>
-        /// <param name="error">An <see cref="Action{T}"/> that are called when a error log message are arriveing</param>
-        /// <param name="fatal">An <see cref="Action{T}"/> that are called when a fatal error log message are arriveing</param>
-        public Logger(Action<string, object[]> debug, Action<string, object[]> info, Action<string, object[]> warn,
-            Action<string, object[]> error, Action<string, object[]> fatal)
+        /// <param name="debug">An <see cref="Action{T}"/> that are called when a debug log message are arriving.</param>
+        /// <param name="info">An <see cref="Action{T}"/> that are called when a information log message are arriving</param>
+        /// <param name="warn">An <see cref="Action{T}"/> that are called when a warning log message are arriving</param>
+        /// <param name="error">An <see cref="Action{T}"/> that are called when a error log message are arriving</param>
+        /// <param name="fatal">An <see cref="Action{T}"/> that are called when a fatal error log message are arriving</param>
+        public Logger(
+            Action<string, object[]> debug,
+            Action<string, object[]> info,
+            Action<string, object[]> warn,
+            Action<string, object[]> error,
+            Action<string, object[]> fatal)
         {
             _debug = debug;
             _info = info;
