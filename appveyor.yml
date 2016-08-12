@@ -58,6 +58,10 @@ test:
 on_success:
     - ps: |
           if ($env:CONFIGURATION -eq "Release") {
+              if ("$env:APPVEYOR_PULL_REQUEST_TITLE" -or "$env:APPVEYOR_REPO_BRANCH" -ne "master") {
+                return;
+              }
+              
               cd $env:APPVEYOR_BUILD_FOLDER\DokanNet\documentations
               git config --global user.email "appveyor@appveyor.org"
               git config --global user.name "appveyor"
