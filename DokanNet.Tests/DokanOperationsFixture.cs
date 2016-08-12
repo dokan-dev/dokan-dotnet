@@ -361,7 +361,7 @@ namespace DokanNet.Tests
 
         private string currentTestName;
 
-        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>(MockBehavior.Strict);
+        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>(MockBehavior.Default);
 
         private long pendingFiles;
 
