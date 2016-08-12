@@ -1,5 +1,8 @@
 ﻿namespace DokanNet.Logging
 {
+    /// <summary>
+    /// The Logger interface.
+    /// </summary>
     public interface ILogger
     {
         /// <summary>

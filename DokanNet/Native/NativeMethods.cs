@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace DokanNet.Native
 {
+    /// <summary>
+    /// Native API to the kernel Dokan driver.
+    /// </summary>
     internal static class NativeMethods
     {
         private const string DOKAN_DLL = "dokan1.dll";

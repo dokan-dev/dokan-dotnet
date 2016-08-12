@@ -4,7 +4,7 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace DokanNet.Native
 {
     /// <summary>
-    /// Contains information that the<see cref="DokanOperationProxy.GetFileInformationProxy"/>function retrieves.
+    /// Contains information that the <see cref="DokanOperationProxy.GetFileInformationProxy"/> function retrieves.
     /// See https://msdn.microsoft.com/en-us/library/windows/desktop/aa363788%28v=vs.85%29.aspx?f=255&amp;MSPPError=-2147217396
     /// </summary>
     /// <remarks>

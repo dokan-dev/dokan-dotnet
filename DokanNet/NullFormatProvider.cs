@@ -2,6 +2,9 @@
 
 namespace DokanNet
 {
+    /// <summary>
+    /// Provide support to format object with <see langword="null" />
+    /// </summary>
     public class FormatProviders : IFormatProvider, ICustomFormatter
     {
         public static readonly FormatProviders DefaultFormatProvider = new FormatProviders();

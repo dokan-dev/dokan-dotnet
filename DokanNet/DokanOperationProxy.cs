@@ -12,6 +12,9 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace DokanNet
 {
+    /// <summary>
+    /// The dokan operation proxy.
+    /// </summary>
     internal sealed class DokanOperationProxy
     {
         #region Delegates
@@ -149,6 +152,15 @@ namespace DokanNet
 
         private readonly uint _serialNumber;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DokanOperationProxy"/> class.
+        /// </summary>
+        /// <param name="operations">
+        /// A <seealso cref="IDokanOperations"/> that contains the custom implementation of the driver.
+        /// </param>
+        /// <param name="logger">
+        /// A <seealso cref="ILogger"/> that handle all logging.
+        /// </param>
         public DokanOperationProxy(IDokanOperations operations, ILogger logger)
         {
             _operations = operations;
@@ -158,8 +170,8 @@ namespace DokanNet
 
         /// <summary>
         /// Called when a file is to be created
-        /// See https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
         /// </summary>
+        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</seealso>
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr securityContext, uint rawDesiredAccess,
             uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
@@ -1009,14 +1021,19 @@ namespace DokanNet
 
         /// <summary>
         /// Converts the value of <paramref name="dateTime"/> to a Windows file time.
-        /// If <paramref name="dateTime"/> is null or before 12:00 midnight January 1, 1601 C.E. UTC, it returns 0
+        /// If <paramref name="dateTime"/> is <see langword="null"/> or before 12:00 midnight January 1, 1601 C.E. UTC, it returns <c>0</c>.
         /// </summary>
-        /// <returns>The value of <paramref name="dateTime"/> expressed as a Windows file time
-        ///  -or- it returns 0 if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or null.</returns>
+        /// <param name="dateTime">
+        /// The date Time.
+        /// </param>
+        /// <returns>
+        /// The value of <paramref name="dateTime"/> expressed as a Windows file time
+        /// -or- it returns <c>0</c> if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or <see langword="null"/>.
+        /// </returns>
+        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx">WIN32_FILE_ATTRIBUTE_DATA structure (MSDN)</seealso>
         [Pure]
         private static long ToFileTime(DateTime? dateTime)
         {
-            //See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx
             return dateTime.HasValue && (dateTime.Value >= DateTime.FromFileTime(0))
                 ? dateTime.Value.ToFileTime()
                 : 0;
