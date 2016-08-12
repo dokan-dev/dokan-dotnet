@@ -9,6 +9,12 @@ using static DokanNet.FormatProviders;
 
 namespace DokanNet
 {
+    /// <summary>
+    /// Contains information about a specific file or directory.
+    /// </summary>
+    /// <remarks>
+    /// This class cannot be instantiated in C#, it is created by the kernel Dokan driver.
+    /// </remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public sealed class DokanFileInfo
     {
@@ -31,17 +37,17 @@ namespace DokanNet
 
         /// <summary>
         /// Context that can be used to carry information between operation.
-        /// The Context can carry whatever type like <see cref="FileStream"/>, struct, <see cref="int"/>,
-        /// internal reference that will help the implementation understand the request context of the event.
+        /// The Context can carry whatever type like <see cref="FileStream"/>, <c>struct</c>, <c>int</c>,
+        /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
         public object Context
         {
-            get { return _context != 0 ? ((GCHandle) ((IntPtr) _context)).Target : null; }
+            get { return _context != 0 ? ((GCHandle) (IntPtr) _context).Target : null; }
             set
             {
                 if (_context != 0)
                 {
-                    ((GCHandle) ((IntPtr) _context)).Free();
+                    ((GCHandle) (IntPtr) _context).Free();
                     _context = 0;
                 }
                 if (value != null)
@@ -59,7 +65,8 @@ namespace DokanNet
 
         /// <summary>
         /// Requesting a directory file
-        /// IsDirectory has to be set in CreateFile is the file appear to be a folder.
+        /// <c>IsDirectory</c> has to be set in <seealso cref="IDokanOperations.CreateFile"/> 
+        /// if the file appear to be a folder.
         /// </summary>
         public bool IsDirectory
         {
@@ -68,7 +75,7 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Flag if the file has to be delete during <see cref="IDokanOperations.Cleanup"/> event.
+        /// Indicate if the file has to be delete during the <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
         public bool DeleteOnClose
         {
@@ -87,21 +94,22 @@ namespace DokanNet
         public bool SynchronousIo => _synchronousIo;
 
         /// <summary>
-        /// Read or write directly from data source without cache
+        /// Read or write directly from data source without cache.
         /// </summary>
         public bool NoCache => _nocache;
 
         /// <summary>
-        /// If true, write to the current end of file instead 
-        /// of Offset parameter.
+        /// If <c>true</c>, write to the current end of file instead 
+        /// of using the Offset parameter.
         /// </summary>
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
         /// <summary>
-        /// This method needs be called in <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
+        /// This method needs to be called in the <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
         /// callback.
         /// </summary>
-        /// <returns>An <see cref="WindowsIdentity"/> with the access token, -or- null if the operation was not successful</returns>
+        /// <returns>An <see cref="WindowsIdentity"/> with the access token, 
+        /// -or- <c>null</c> if the operation was not successful</returns>
         public WindowsIdentity GetRequestor()
         {
             try
@@ -125,7 +133,8 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Dokan informations on the current operation
+        /// Prevent instantiation of the class.
+        /// The class is created by the Dokan kernel driver.
         /// </summary>
         private DokanFileInfo()
         {
@@ -133,7 +142,6 @@ namespace DokanNet
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>
-        /// <filterpriority>2</filterpriority>
         public override string ToString()
         {
             return

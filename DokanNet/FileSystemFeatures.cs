@@ -22,6 +22,6 @@ namespace DokanNet
         NamedStreams = 262144,
         ReadOnlyVolume = 524288,
         SequentialWriteOnce = 1048576,
-        SupportsTransactions = 2097152,
+        SupportsTransactions = 2097152
     }
 }
