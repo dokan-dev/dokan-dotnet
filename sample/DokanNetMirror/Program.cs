@@ -3,7 +3,7 @@ using DokanNet;
 
 namespace DokanNetMirror
 {
-    internal class Programm
+    internal class Program
     {
         private static void Main()
         {
