@@ -1,3 +1,7 @@
+environment:
+    AccessTokenDokanDoc:
+      secure: Z8Htovf0nHmWVj+JNOF4H7ozQ5+sS3TkgUu+nyVU414AUlog4kzBhxCSJxIl5t+I
+
 version: 1.0.0-{build}
 configuration:
 - Release
@@ -8,6 +12,7 @@ os: Visual Studio 2015
 branches:
   only:
     - master
+
 install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -15,6 +20,8 @@ install:
               'https://github.com/dokan-dev/dokany/releases/download/v1.0.0-RC4/DokanSetup.exe',
               'C:\projects\dokan-dotnet\DokanSetup.exe'
             )
+            
+      & choco install doxygen.portable
  - cmd: |
      C:\projects\dokan-dotnet\DokanSetup.exe /quiet
 
@@ -47,3 +54,23 @@ test:
     except:
       - Manual
       - Timing
+      
+on_success:
+    - ps: |
+          if ($env:CONFIGURATION -eq "Release") {
+              cd $env:APPVEYOR_BUILD_FOLDER\DokanNet\documentations
+              git config --global user.email "appveyor@appveyor.org"
+              git config --global user.name "appveyor"
+              git.exe clone -b gh-pages --single-branch  https://$($env:AccessTokenDokanDoc)@github.com/dokan-dev/dokan-dotnet-doc.git doc
+              doxygen.exe Doxyfile
+              cd doc
+              if ($(git status --porcelain)) {
+                Write-Host "Update documentation..." -ForegroundColor Green
+                git add -A
+                git commit -m "Latest documentation on successful appveyor build $env:APPVEYOR_BUILD_VERSION auto-pushed to gh-pages"
+                git push -fq origin gh-pages
+                Write-Host "Documentation updated!" -ForegroundColor Green
+              } else {
+                Write-Host "No documentation changes detected." -ForegroundColor Green
+              }
+          }
