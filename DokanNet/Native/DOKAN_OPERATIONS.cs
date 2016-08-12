@@ -2,6 +2,10 @@
 
 namespace DokanNet.Native
 {
+    /// <summary>
+    /// Delegates that the kernel Dokan driver use to do callbacks to DokanNet.
+    /// Se <seealso cref="IDokanOperations"/> for more information about the fields.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct DOKAN_OPERATIONS
     {
