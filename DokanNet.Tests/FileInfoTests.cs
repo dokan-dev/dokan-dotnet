@@ -17,7 +17,7 @@ namespace DokanNet.Tests
 
         private const int SMALL_DATA_SIZE = 4096;
 
-        private const int LARGE_DATA_SIZE = 5*FILE_BUFFER_SIZE + FILE_BUFFER_SIZE/4;
+        private const int LARGE_DATA_SIZE = 5 * FILE_BUFFER_SIZE + FILE_BUFFER_SIZE / 4;
 
         private static byte[] smallData;
 
@@ -688,7 +688,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new {Mode = FileMode.Append, AccessModes = new[] {System.IO.FileAccess.Write}};
+            var parameters = new { Mode = FileMode.Append, AccessModes = new[] { System.IO.FileAccess.Write } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -705,7 +705,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Create, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -713,7 +713,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Create, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Create, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -730,7 +730,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.CreateNew, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -738,7 +738,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -761,7 +761,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -774,7 +774,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {ReadAccess, WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
@@ -782,7 +782,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -805,7 +805,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -819,7 +819,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
@@ -829,7 +829,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -1028,9 +1028,9 @@ namespace DokanNet.Tests
                 var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
 
-                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -1074,9 +1074,9 @@ namespace DokanNet.Tests
                 var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
 
-                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -1333,9 +1333,9 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 var totalWrittenBytes = 0;
 
-                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
@@ -1378,9 +1378,9 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 var totalWrittenBytes = 0;
 
-                Parallel.For(0, largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {

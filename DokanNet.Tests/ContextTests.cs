@@ -24,11 +24,11 @@ namespace DokanNet.Tests
         {
             smallData = new byte[4096];
             for (var i = 0; i < smallData.Length; ++i)
-                smallData[i] = (byte) (i%256);
+                smallData[i] = (byte)(i % 256);
 
-            largeData = new byte[5*FILE_BUFFER_SIZE + 65536];
+            largeData = new byte[5 * FILE_BUFFER_SIZE + 65536];
             for (var i = 0; i < largeData.Length; ++i)
-                largeData[i] = (byte) (i%251);
+                largeData[i] = (byte)(i % 251);
         }
 
         [ClassCleanup]
@@ -164,7 +164,7 @@ namespace DokanNet.Tests
 
                 Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -268,7 +268,7 @@ namespace DokanNet.Tests
 
                 Parallel.For(0, DokanOperationsFixture.NumberOfChunks(FILE_BUFFER_SIZE, largeData.Length), i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
