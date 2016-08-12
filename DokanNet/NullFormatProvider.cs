@@ -3,7 +3,7 @@
 namespace DokanNet
 {
     /// <summary>
-    /// Provide support to format object with <see langword="null" />
+    /// Provide support to format object with <c>null</c>
     /// </summary>
     public class FormatProviders : IFormatProvider, ICustomFormatter
     {

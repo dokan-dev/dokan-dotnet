@@ -37,7 +37,7 @@ namespace DokanNet
 
         /// <summary>
         /// Context that can be used to carry information between operation.
-        /// The Context can carry whatever type like <see cref="FileStream"/>, <see langword="struct" />, <see langword="int" />,
+        /// The Context can carry whatever type like <see cref="FileStream"/>, <c>struct</c>, <c>int</c>,
         /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
         public object Context
@@ -99,7 +99,7 @@ namespace DokanNet
         public bool NoCache => _nocache;
 
         /// <summary>
-        /// If <see langword="true" />, write to the current end of file instead 
+        /// If <c>true</c>, write to the current end of file instead 
         /// of using the Offset parameter.
         /// </summary>
         public bool WriteToEndOfFile => _writeToEndOfFile;
@@ -109,7 +109,7 @@ namespace DokanNet
         /// callback.
         /// </summary>
         /// <returns>An <see cref="WindowsIdentity"/> with the access token, 
-        /// -or- <see langword="null" /> if the operation was not successful</returns>
+        /// -or- <c>null</c> if the operation was not successful</returns>
         public WindowsIdentity GetRequestor()
         {
             try

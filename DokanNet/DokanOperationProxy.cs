@@ -1021,14 +1021,14 @@ namespace DokanNet
 
         /// <summary>
         /// Converts the value of <paramref name="dateTime"/> to a Windows file time.
-        /// If <paramref name="dateTime"/> is <see langword="null"/> or before 12:00 midnight January 1, 1601 C.E. UTC, it returns <c>0</c>.
+        /// If <paramref name="dateTime"/> is <c>null</c> or before 12:00 midnight January 1, 1601 C.E. UTC, it returns <c>0</c>.
         /// </summary>
         /// <param name="dateTime">
         /// The date Time.
         /// </param>
         /// <returns>
         /// The value of <paramref name="dateTime"/> expressed as a Windows file time
-        /// -or- it returns <c>0</c> if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or <see langword="null"/>.
+        /// -or- it returns <c>0</c> if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or <c>null</c>.
         /// </returns>
         /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx">WIN32_FILE_ATTRIBUTE_DATA structure (MSDN)</seealso>
         [Pure]

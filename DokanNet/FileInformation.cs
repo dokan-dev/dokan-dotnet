@@ -24,19 +24,19 @@ namespace DokanNet
 
         /// <summary>
         /// Gets or sets the creation time of the file or directory.
-        /// If equal to <see langword="null" />, the value will not be set or the file has no creation time.
+        /// If equal to <c>null</c>, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? CreationTime { get; set; }
 
         /// <summary>
         /// Gets or sets the last access time of the file or directory.
-        /// If equal to <see langword="null" />, the value will not be set or the file has no creation time.
+        /// If equal to <c>null</c>, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? LastAccessTime { get; set; }
 
         /// <summary>
         /// Gets or sets the last write time of the file or directory.
-        /// If equal to <see langword="null" />, the value will not be set or the file has no last write time.
+        /// If equal to <c>null</c>, the value will not be set or the file has no last write time.
         /// </summary>
         public DateTime? LastWriteTime { get; set; }
 

@@ -17,7 +17,7 @@ namespace DokanNet
         /// <see cref="FileMode.Create"/> are opening successfully a already
         /// existing file, you have to SetLastError(ERROR_ALREADY_EXISTS).
         /// 
-        /// You should set <see cref="DokanFileInfo.IsDirectory"/> to <see langword="true" /> when 
+        /// You should set <see cref="DokanFileInfo.IsDirectory"/> to <c>true</c> when 
         /// it is a file is a directory.
         /// 
         /// <see cref="DokanFileInfo.Context"/> can be use to store data (like <see cref="FileStream"/>)
@@ -41,7 +41,7 @@ namespace DokanNet
         /// Cleanup request before <see cref="CloseFile"/> is called.
         /// </summary>
         /// <remarks>
-        /// When <see cref="DokanFileInfo.DeleteOnClose"/> is <see langword="true" />, you must delete the file in <see cref="Cleanup"/>.
+        /// When <see cref="DokanFileInfo.DeleteOnClose"/> is <c>true</c>, you must delete the file in <see cref="Cleanup"/>.
         /// Refer to comment at <see cref="DeleteFile"/> for explanation.
         /// </remarks>
         /// <param name="fileName">File or directory name.</param>
@@ -142,7 +142,7 @@ namespace DokanNet
 
         /// <summary>
         /// Set file times on a specific file.
-        /// If <see cref="DateTime"/> is <see langword="null" />, this should not be updated.
+        /// If <see cref="DateTime"/> is <c>null</c>, this should not be updated.
         /// </summary>
         /// <param name="fileName">File or directory name.</param>
         /// <param name="creationTime"><see cref="DateTime"/> when the file was created.</param>
@@ -164,7 +164,7 @@ namespace DokanNet
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectPathNotFound"/>,
         /// <see cref="NtStatus.ObjectNameNotFound"/>.
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
-        /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <see langword="true" /> and only then you have to actually
+        /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
         /// delete the file being closed.
         /// </remarks>
         /// <param name="fileName">File or directory name.</param>
@@ -185,7 +185,7 @@ namespace DokanNet
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectPathNotFound"/>,
         /// <see cref="NtStatus.ObjectNameNotFound"/>.
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
-        /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <see langword="true" /> and only then you have to actually
+        /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
         /// delete the file being closed.
         /// </remarks>
         /// <param name="fileName">File or directory name.</param>
