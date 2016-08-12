@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace DokanNet
 {
     /// <summary>
-    /// Use to provide file informations to Dokan during operations
+    /// Use to provide file information to Dokan during operations
     /// <see cref="IDokanOperations.GetFileInformation"/>, <see cref="IDokanOperations.FindFiles"/>,
     /// <see cref="IDokanOperations.FindStreams"/> or <see cref="IDokanOperations.FindFilesWithPattern"/>
     /// </summary>
@@ -13,31 +13,35 @@ namespace DokanNet
     public struct FileInformation
     {
         /// <summary>
-        /// Name on the file or directory.
+        /// Gets or sets the name of the file or directory.
         /// </summary>
         public string FileName { get; set; }
+
         /// <summary>
-        /// <see cref="FileAttributes"/> for the file or directory.
+        /// Gets or sets the <see cref="FileAttributes"/> for the file or directory.
         /// </summary>
         public FileAttributes Attributes { get; set; }
+
         /// <summary>
-        /// File creation time.
-        /// If equal to null, the value will not be set or the file has no creation time.
+        /// Gets or sets the creation time of the file or directory.
+        /// If equal to <c>null</c>, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? CreationTime { get; set; }
+
         /// <summary>
-        /// File alst access time.
-        /// If equal to null, the value will not be set or the file has no creation time.
+        /// Gets or sets the last access time of the file or directory.
+        /// If equal to <c>null</c>, the value will not be set or the file has no creation time.
         /// </summary>
         public DateTime? LastAccessTime { get; set; }
+
         /// <summary>
-        /// File last write time.
-        /// If equal to null, the value will not be set or the file has no last write time.
+        /// Gets or sets the last write time of the file or directory.
+        /// If equal to <c>null</c>, the value will not be set or the file has no last write time.
         /// </summary>
         public DateTime? LastWriteTime { get; set; }
 
         /// <summary>
-        /// File length.
+        /// Gets or sets the length of the file.
         /// </summary>
         public long Length { get; set; }
     }

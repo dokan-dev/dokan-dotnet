@@ -76,7 +76,7 @@
         // * Informational *
         // *****************
         /// <summary>
-        /// General infromation
+        /// General information
         /// </summary>
         Informational = 0x40000000,
         /// <summary>

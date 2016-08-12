@@ -3,15 +3,15 @@
 namespace DokanNet
 {
     /// <summary>
-    /// Dokan mount options used to describe dokan device behaviour.
+    /// Dokan mount options used to describe dokan device behavior.
     /// </summary>
     [Flags]
     public enum DokanOptions : long
     {
-        /// <summary>Enable ouput debug message</summary>
+        /// <summary>Enable output debug message</summary>
         DebugMode = 1,
 
-        /// <summary>Enable ouput debug message to stderr</summary>
+        /// <summary>Enable output debug message to stderr</summary>
         StderrOutput = 2,
 
         /// <summary>Use alternate stream</summary>
@@ -36,6 +36,6 @@ namespace DokanNet
         UserModeLock = 256,
 
         /// <summary>Fixed Driver</summary>
-        FixedDrive = 0,
+        FixedDrive = 0
     }
 }
