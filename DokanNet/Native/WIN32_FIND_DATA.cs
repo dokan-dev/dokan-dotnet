@@ -6,7 +6,6 @@ namespace DokanNet.Native
 {
     /// <summary>
     /// Contains information about the file that is found by the FindFirstFile, FindFirstFileEx, or FindNextFile function.
-    /// See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740%28v=vs.85%29.aspx?f=255&amp;MSPPError=-2147217396
     /// </summary>
     /// <remarks>
     /// If a file has a long file name, the complete name appears in the cFileName member, and the 8.3 format truncated version
@@ -14,17 +13,20 @@ namespace DokanNet.Native
     /// was called with a value of FindExInfoBasic in the fInfoLevelId parameter, the<see cref="cAlternateFileName"/>member will always contain
     /// a NULL string value. This remains true for all subsequent calls to the FindNextFile function. As an alternative method of
     /// retrieving the 8.3 format version of a file name, you can use the GetShortPathName function. For more information about
-    /// file names, see https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx.
+    /// file names, see <see href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx">Naming Files, Paths, and Namespaces (MSDN)</see>.
+    /// 
     /// Not all file systems can record creation and last access times, and not all file systems record them in the same manner.
     /// For example, on the FAT file system, create time has a resolution of 10 milliseconds, write time has a resolution of
     /// 2 seconds, and access time has a resolution of 1 day. The NTFS file system delays updates to the last access time for
-    /// a file by up to 1 hour after the last access.For more information, see https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx.
+    /// a file by up to 1 hour after the last access.For more information, see <see href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times (MSDN)</see>.
     /// </remarks>
+    /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">WIN32_FIND_DATA structure (MSDN)</seealso>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
     internal struct WIN32_FIND_DATA
     {
         /// <summary>
         /// The file attributes of a file.
+        /// 
         /// For possible values and their descriptions, see <see cref="FileAttributes"/>.
         /// The <see cref="FileAttributes.SparseFile"/> attribute on the file is set if any of 
         /// the streams of the file have ever been sparse.
@@ -80,10 +82,10 @@ namespace DokanNet.Native
 
         /// <summary>
         /// If the <see cref="dwFileAttributes"/> member includes the <see cref="FileAttributes.ReparsePoint"/> attribute, 
-        /// this member specifies the reparse point tag.
+        /// this member specifies the reparse point tag. 
         /// Otherwise, this value is undefined and should not be used.
-        /// See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx
         /// </summary>
+        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx">Reparse Point Tags (MSDN)</seealso>
         private readonly uint dwReserved0;
 
         /// <summary>

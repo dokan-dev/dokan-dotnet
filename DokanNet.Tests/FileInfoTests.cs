@@ -17,27 +17,27 @@ namespace DokanNet.Tests
 
         private const int SMALL_DATA_SIZE = 4096;
 
-        private const int LARGE_DATA_SIZE = 5*FILE_BUFFER_SIZE + FILE_BUFFER_SIZE/4;
+        private const int LARGE_DATA_SIZE = 5 * FILE_BUFFER_SIZE + FILE_BUFFER_SIZE / 4;
 
-        private static byte[] _smallData;
+        private static byte[] smallData;
 
-        private static byte[] _largeData;
+        private static byte[] largeData;
 
         public TestContext TestContext { get; set; }
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            _smallData = DokanOperationsFixture.InitPeriodicTestData(SMALL_DATA_SIZE);
+            smallData = DokanOperationsFixture.InitPeriodicTestData(SMALL_DATA_SIZE);
 
-            _largeData = DokanOperationsFixture.InitPeriodicTestData(LARGE_DATA_SIZE);
+            largeData = DokanOperationsFixture.InitPeriodicTestData(LARGE_DATA_SIZE);
         }
 
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            _largeData = null;
-            _smallData = null;
+            largeData = null;
+            smallData = null;
         }
 
         [TestInitialize]
@@ -329,24 +329,24 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
-            fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: _largeData.Length);
+            fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
             fixture.ExpectCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
-            fixture.ExpectSetEndOfFile(destinationPath, _largeData.Length);
+            fixture.ExpectSetEndOfFile(destinationPath, largeData.Length);
 #if NETWORK_DRIVE
             fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
             fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
 #else
-            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE);
-            fixture.ExpectWriteFileInChunks(destinationPath, _largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE);
 #endif
             fixture.ExpectSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.ExpectSetFileTime(destinationPath);
 
-            fixture.PermitProbeFile(path, _largeData);
-            fixture.PermitProbeFile(destinationPath, _largeData);
+            fixture.PermitProbeFile(path, largeData);
+            fixture.PermitProbeFile(destinationPath, largeData);
             fixture.PermitCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
 #endif
 
@@ -647,9 +647,9 @@ namespace DokanNet.Tests
                     if (access.HasFlag(System.IO.FileAccess.Write))
                     {
                         Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                        stream.Write(_smallData, 0, _smallData.Length);
+                        stream.Write(smallData, 0, smallData.Length);
 #if !LOGONLY
-                        Assert.AreEqual(_smallData.Length, stream.Position, "Unexpected write count");
+                        Assert.AreEqual(smallData.Length, stream.Position, "Unexpected write count");
 #endif
                     }
 
@@ -663,7 +663,7 @@ namespace DokanNet.Tests
                         var readBytes = stream.Read(target, 0, target.Length);
 #if !LOGONLY
                         Assert.AreEqual(target.Length, readBytes, "Unexpected read count");
-                        CollectionAssert.AreEquivalent(_smallData, target, "Unexpected result content");
+                        CollectionAssert.AreEquivalent(smallData, target, "Unexpected result content");
 #endif
                     }
                 }
@@ -681,14 +681,14 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
-            fixture.PermitProbeFile(path, _smallData);
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new {Mode = FileMode.Append, AccessModes = new[] {System.IO.FileAccess.Write}};
+            var parameters = new { Mode = FileMode.Append, AccessModes = new[] { System.IO.FileAccess.Write } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -705,15 +705,15 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Create, FileOptions.None);
-            fixture.ExpectReadFile(path, _smallData, _smallData.Length);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectReadFile(path, smallData, smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Create, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Create, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -730,15 +730,15 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.CreateNew, FileOptions.None);
-            fixture.ExpectReadFile(path, _smallData, _smallData.Length);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectReadFile(path, smallData, smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -761,7 +761,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] {System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.CreateNew, AccessModes = new[] { System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -774,15 +774,15 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            foreach (var access in new[] {ReadAccess, WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Open, FileOptions.None);
-            fixture.ExpectReadFile(path, _smallData, _smallData.Length);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectReadFile(path, smallData, smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -805,7 +805,7 @@ namespace DokanNet.Tests
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.Open, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.Open, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
         }
 
@@ -819,17 +819,17 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            foreach (var access in new[] {WriteAccess, ReadWriteAccess})
+            foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
-            fixture.PermitProbeFile(path, _smallData, _smallData.Length);
-            fixture.PermitProbeFile(path, _smallData);
+            fixture.PermitProbeFile(path, smallData, smallData.Length);
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
 
-            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] {System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite} };
+            var parameters = new { Mode = FileMode.OpenOrCreate, AccessModes = new[] { System.IO.FileAccess.Read, System.IO.FileAccess.Write, System.IO.FileAccess.ReadWrite } };
             OpenFile_InSpecifiedMode(sut, parameters.Mode, parameters.AccessModes);
 
 #if !LOGONLY
@@ -848,9 +848,9 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectSetAllocationSize(path, 0);
-            fixture.ExpectWriteFile(path, _smallData, _smallData.Length);
+            fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
-            fixture.PermitProbeFile(path, _smallData);
+            fixture.PermitProbeFile(path, smallData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -939,7 +939,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
-            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -947,18 +947,18 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenRead())
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
-                var target = new byte[_largeData.Length];
+                var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
                 do
                 {
                     var readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
                     Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
-                } while (totalReadBytes < _largeData.Length);
+                } while (totalReadBytes < largeData.Length);
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, stream.Position, "Unexpected read count");
-                CollectionAssert.AreEqual(_largeData, target, "Unexpected result content");
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
 #endif
             }
 
@@ -976,8 +976,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: _largeData);
-            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: _largeData);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -985,7 +985,7 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenRead())
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
-                var target = new byte[_largeData.Length];
+                var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
 
                 do
@@ -993,11 +993,11 @@ namespace DokanNet.Tests
                     var readBytes = stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
                     Assert.AreEqual(Math.Min(FILE_BUFFER_SIZE, target.Length - totalReadBytes), readBytes, $"Unexpected empty read at origin {totalReadBytes}");
                     totalReadBytes += readBytes;
-                } while (totalReadBytes < _largeData.Length);
+                } while (totalReadBytes < largeData.Length);
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, stream.Position, "Unexpected read count");
-                CollectionAssert.AreEqual(_largeData, target, "Unexpected result content");
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
 #endif
             }
 
@@ -1017,7 +1017,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
-            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1025,12 +1025,12 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenRead())
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
-                var target = new byte[_largeData.Length];
+                var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
 
-                Parallel.For(0, _largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -1042,8 +1042,8 @@ namespace DokanNet.Tests
                 });
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, totalReadBytes, "Unexpected read count");
-                CollectionAssert.AreEqual(_largeData, target, "Unexpected result content");
+                Assert.AreEqual(largeData.Length, totalReadBytes, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
 #endif
             }
 
@@ -1062,8 +1062,8 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: _largeData);
-            fixture.ExpectReadFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: _largeData);
+            fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1071,12 +1071,12 @@ namespace DokanNet.Tests
             using (var stream = sut.OpenRead())
             {
                 Assert.IsTrue(stream.CanRead, "Stream should be readable");
-                var target = new byte[_largeData.Length];
+                var target = new byte[largeData.Length];
                 var totalReadBytes = 0;
 
-                Parallel.For(0, _largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
+                    var origin = i * FILE_BUFFER_SIZE;
                     var count = Math.Min(FILE_BUFFER_SIZE, target.Length - origin);
                     lock (stream)
                     {
@@ -1088,8 +1088,8 @@ namespace DokanNet.Tests
                 });
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, totalReadBytes, "Unexpected read count");
-                CollectionAssert.AreEqual(_largeData, target, "Unexpected result content");
+                Assert.AreEqual(largeData.Length, totalReadBytes, "Unexpected read count");
+                CollectionAssert.AreEqual(largeData, target, "Unexpected result content");
 #endif
             }
 
@@ -1242,9 +1242,9 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
 
-            fixture.PermitProbeFile(path, _largeData);
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1256,13 +1256,13 @@ namespace DokanNet.Tests
 
                 do
                 {
-                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - totalWrittenBytes);
-                    stream.Write(_largeData, totalWrittenBytes, writtenBytes);
+                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
                     totalWrittenBytes += writtenBytes;
-                } while (totalWrittenBytes < _largeData.Length);
+                } while (totalWrittenBytes < largeData.Length);
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, stream.Position, "Unexpected write count");
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
 #endif
             }
 
@@ -1280,10 +1280,10 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: _largeData);
-            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: _largeData);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 
-            fixture.PermitProbeFile(path, _largeData);
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1295,13 +1295,13 @@ namespace DokanNet.Tests
 
                 do
                 {
-                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - totalWrittenBytes);
-                    stream.Write(_largeData, totalWrittenBytes, writtenBytes);
+                    var writtenBytes = Math.Min(FILE_BUFFER_SIZE, largeData.Length - totalWrittenBytes);
+                    stream.Write(largeData, totalWrittenBytes, writtenBytes);
                     totalWrittenBytes += writtenBytes;
-                } while (totalWrittenBytes < _largeData.Length);
+                } while (totalWrittenBytes < largeData.Length);
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, stream.Position, "Unexpected write count");
+                Assert.AreEqual(largeData.Length, stream.Position, "Unexpected write count");
 #endif
             }
 
@@ -1321,9 +1321,9 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
-            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
 
-            fixture.PermitProbeFile(path, _largeData);
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1333,20 +1333,20 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 var totalWrittenBytes = 0;
 
-                Parallel.For(0, _largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
-                    var count = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - origin);
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
                         stream.Seek(origin, SeekOrigin.Begin);
-                        stream.Write(_largeData, origin, count);
+                        stream.Write(largeData, origin, count);
                         totalWrittenBytes += count;
                     }
                 });
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, totalWrittenBytes, "Unexpected write count");
+                Assert.AreEqual(largeData.Length, totalWrittenBytes, "Unexpected write count");
 #endif
             }
 
@@ -1365,10 +1365,10 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: _largeData);
-            fixture.ExpectWriteFileInChunks(path, _largeData, FILE_BUFFER_SIZE, context: _largeData);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
+            fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
 
-            fixture.PermitProbeFile(path, _largeData);
+            fixture.PermitProbeFile(path, largeData);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -1378,20 +1378,20 @@ namespace DokanNet.Tests
                 Assert.IsTrue(stream.CanWrite, "Stream should be writable");
                 var totalWrittenBytes = 0;
 
-                Parallel.For(0, _largeData.Length/FILE_BUFFER_SIZE + 1, i =>
+                Parallel.For(0, largeData.Length / FILE_BUFFER_SIZE + 1, i =>
                 {
-                    var origin = i*FILE_BUFFER_SIZE;
-                    var count = Math.Min(FILE_BUFFER_SIZE, _largeData.Length - origin);
+                    var origin = i * FILE_BUFFER_SIZE;
+                    var count = Math.Min(FILE_BUFFER_SIZE, largeData.Length - origin);
                     lock (stream)
                     {
                         stream.Seek(origin, SeekOrigin.Begin);
-                        stream.Write(_largeData, origin, count);
+                        stream.Write(largeData, origin, count);
                         totalWrittenBytes += count;
                     }
                 });
 
 #if !LOGONLY
-                Assert.AreEqual(_largeData.Length, totalWrittenBytes, "Unexpected write count");
+                Assert.AreEqual(largeData.Length, totalWrittenBytes, "Unexpected write count");
 #endif
             }
 

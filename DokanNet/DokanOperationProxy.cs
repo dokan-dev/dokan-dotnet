@@ -146,11 +146,11 @@ namespace DokanNet
 
         #endregion Delegates
 
-        private readonly IDokanOperations _operations;
+        private readonly IDokanOperations operations;
 
-        private readonly ILogger _logger;
+        private readonly ILogger logger;
 
-        private readonly uint _serialNumber;
+        private readonly uint serialNumber;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DokanOperationProxy"/> class.
@@ -163,9 +163,9 @@ namespace DokanNet
         /// </param>
         public DokanOperationProxy(IDokanOperations operations, ILogger logger)
         {
-            _operations = operations;
-            _logger = logger;
-            _serialNumber = (uint)_operations.GetHashCode();
+            operations = operations;
+            logger = logger;
+            serialNumber = (uint)operations.GetHashCode();
         }
 
         /// <summary>
@@ -188,37 +188,37 @@ namespace DokanNet
 
                 foreach (FileOptions fileOption in Enum.GetValues(typeof(FileOptions)))
                 {
-                    if (((FileOptions) (fileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
+                    if (((FileOptions)(fileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
                         fileOptions |= fileOption;
                 }
 
                 foreach (FileAttributes fileAttribute in Enum.GetValues(typeof(FileAttributes)))
                 {
-                    if (((FileAttributes) (fileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
+                    if (((FileAttributes)(fileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
                         fileAttributes |= fileAttribute;
                 }
 
-                _logger.Debug("CreateFileProxy : {0}", rawFileName);
-                _logger.Debug("\tCreationDisposition\t{0}", (FileMode) creationDisposition);
-                _logger.Debug("\tFileAccess\t{0}", (FileAccess) rawDesiredAccess);
-                _logger.Debug("\tFileShare\t{0}", (FileShare) rawShareAccess);
-                _logger.Debug("\tFileOptions\t{0}", fileOptions);
-                _logger.Debug("\tFileAttributes\t{0}", fileAttributes);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
-                var result = _operations.CreateFile(rawFileName,
-                    (FileAccess) rawDesiredAccess,
-                    (FileShare) rawShareAccess,
-                    (FileMode) creationDisposition,
+                logger.Debug("CreateFileProxy : {0}", rawFileName);
+                logger.Debug("\tCreationDisposition\t{0}", (FileMode)creationDisposition);
+                logger.Debug("\tFileAccess\t{0}", (FileAccess)rawDesiredAccess);
+                logger.Debug("\tFileShare\t{0}", (FileShare)rawShareAccess);
+                logger.Debug("\tFileOptions\t{0}", fileOptions);
+                logger.Debug("\tFileAttributes\t{0}", fileAttributes);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
+                var result = operations.CreateFile(rawFileName,
+                    (FileAccess)rawDesiredAccess,
+                    (FileShare)rawShareAccess,
+                    (FileMode)creationDisposition,
                     fileOptions,
                     fileAttributes,
                     rawFileInfo);
 
-                _logger.Debug("CreateFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("CreateFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("CreateFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("CreateFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.Unsuccessful;
             }
         }
@@ -230,16 +230,16 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("CleanupProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("CleanupProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                _operations.Cleanup(rawFileName, rawFileInfo);
+                operations.Cleanup(rawFileName, rawFileInfo);
 
-                _logger.Debug("CleanupProxy : {0}", rawFileName);
+                logger.Debug("CleanupProxy : {0}", rawFileName);
             }
             catch (Exception ex)
             {
-                _logger.Error("CleanupProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("CleanupProxy : {0} Throw : {1}", rawFileName, ex.Message);
             }
         }
 
@@ -250,16 +250,16 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("CloseFileProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("CloseFileProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                _operations.CloseFile(rawFileName, rawFileInfo);
+                operations.CloseFile(rawFileName, rawFileInfo);
 
-                _logger.Debug("CloseFileProxy : {0}", rawFileName);
+                logger.Debug("CloseFileProxy : {0}", rawFileName);
             }
             catch (Exception ex)
             {
-                _logger.Error("CloseFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("CloseFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
             }
         }
 
@@ -271,19 +271,19 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("ReadFileProxy : " + rawFileName);
-                _logger.Debug("\tBufferLength\t" + rawBufferLength);
-                _logger.Debug("\tOffset\t" + rawOffset);
-                _logger.Debug("\tContext\t" + rawFileInfo);
+                logger.Debug("ReadFileProxy : " + rawFileName);
+                logger.Debug("\tBufferLength\t" + rawBufferLength);
+                logger.Debug("\tOffset\t" + rawOffset);
+                logger.Debug("\tContext\t" + rawFileInfo);
 
-                var result = _operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset, rawFileInfo);
+                var result = operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset, rawFileInfo);
 
-                _logger.Debug("ReadFileProxy : " + rawFileName + " Return : " + result + " ReadLength : " + rawReadLength);
+                logger.Debug("ReadFileProxy : " + rawFileName + " Return : " + result + " ReadLength : " + rawReadLength);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("ReadFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("ReadFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -296,21 +296,21 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("WriteFileProxy : {0}", rawFileName);
-                _logger.Debug("\tNumberOfBytesToWrite\t{0}", rawNumberOfBytesToWrite);
-                _logger.Debug("\tOffset\t{0}", rawOffset);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("WriteFileProxy : {0}", rawFileName);
+                logger.Debug("\tNumberOfBytesToWrite\t{0}", rawNumberOfBytesToWrite);
+                logger.Debug("\tOffset\t{0}", rawOffset);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.WriteFile(rawFileName, rawBuffer, out rawNumberOfBytesWritten, rawOffset,
+                var result = operations.WriteFile(rawFileName, rawBuffer, out rawNumberOfBytesWritten, rawOffset,
                     rawFileInfo);
 
-                _logger.Debug("WriteFileProxy : {0} Return : {1} NumberOfBytesWritten : {2}", rawFileName, result,
+                logger.Debug("WriteFileProxy : {0} Return : {1} NumberOfBytesWritten : {2}", rawFileName, result,
                     rawNumberOfBytesWritten);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("WriteFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("WriteFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -322,17 +322,17 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("FlushFileBuffersProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("FlushFileBuffersProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.FlushFileBuffers(rawFileName, rawFileInfo);
+                var result = operations.FlushFileBuffers(rawFileName, rawFileInfo);
 
-                _logger.Debug("FlushFileBuffersProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("FlushFileBuffersProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("FlushFileBuffersProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("FlushFileBuffersProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -345,51 +345,51 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("GetFileInformationProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("GetFileInformationProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 FileInformation fi;
-                var result = _operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
+                var result = operations.GetFileInformation(rawFileName, out fi, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
                     Debug.Assert(fi.FileName != null);
-                    _logger.Debug("\tFileName\t{0}", fi.FileName);
-                    _logger.Debug("\tAttributes\t{0}", fi.Attributes);
-                    _logger.Debug("\tCreationTime\t{0}", fi.CreationTime);
-                    _logger.Debug("\tLastAccessTime\t{0}", fi.LastAccessTime);
-                    _logger.Debug("\tLastWriteTime\t{0}", fi.LastWriteTime);
-                    _logger.Debug("\tLength\t{0}", fi.Length);
+                    logger.Debug("\tFileName\t{0}", fi.FileName);
+                    logger.Debug("\tAttributes\t{0}", fi.Attributes);
+                    logger.Debug("\tCreationTime\t{0}", fi.CreationTime);
+                    logger.Debug("\tLastAccessTime\t{0}", fi.LastAccessTime);
+                    logger.Debug("\tLastWriteTime\t{0}", fi.LastWriteTime);
+                    logger.Debug("\tLength\t{0}", fi.Length);
 
-                    rawHandleFileInformation.dwFileAttributes = (uint) fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
+                    rawHandleFileInformation.dwFileAttributes = (uint)fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
 
                     var ctime = ToFileTime(fi.CreationTime);
                     var atime = ToFileTime(fi.LastAccessTime);
                     var mtime = ToFileTime(fi.LastWriteTime);
-                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int) (ctime >> 32);
-                    rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int) (ctime & 0xffffffff);
+                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int)(ctime >> 32);
+                    rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int)(ctime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime = (int) (atime >> 32);
-                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime = (int) (atime & 0xffffffff);
+                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime = (int)(atime >> 32);
+                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime = (int)(atime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime = (int) (mtime >> 32);
-                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime = (int) (mtime & 0xffffffff);
+                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime = (int)(mtime >> 32);
+                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime = (int)(mtime & 0xffffffff);
 
-                    rawHandleFileInformation.dwVolumeSerialNumber = _serialNumber;
+                    rawHandleFileInformation.dwVolumeSerialNumber = serialNumber;
 
-                    rawHandleFileInformation.nFileSizeLow = (uint) (fi.Length & 0xffffffff);
-                    rawHandleFileInformation.nFileSizeHigh = (uint) (fi.Length >> 32);
+                    rawHandleFileInformation.nFileSizeLow = (uint)(fi.Length & 0xffffffff);
+                    rawHandleFileInformation.nFileSizeHigh = (uint)(fi.Length >> 32);
                     rawHandleFileInformation.dwNumberOfLinks = 1;
                     rawHandleFileInformation.nFileIndexHigh = 0;
-                    rawHandleFileInformation.nFileIndexLow = (uint) fi.FileName.GetHashCode();
+                    rawHandleFileInformation.nFileIndexLow = (uint)fi.FileName.GetHashCode();
                 }
 
-                _logger.Debug("GetFileInformationProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("GetFileInformationProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("GetFileInformationProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("GetFileInformationProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -404,22 +404,22 @@ namespace DokanNet
             {
                 IList<FileInformation> files;
 
-                _logger.Debug("FindFilesProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("FindFilesProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.FindFiles(rawFileName, out files, rawFileInfo);
+                var result = operations.FindFiles(rawFileName, out files, rawFileInfo);
 
                 Debug.Assert(files != null);
                 if (result == DokanResult.Success && files.Count != 0)
                 {
                     foreach (var fi in files)
                     {
-                        _logger.Debug("\tFileName\t{0}", fi.FileName);
-                        _logger.Debug("\t\tAttributes\t{0}", fi.Attributes);
-                        _logger.Debug("\t\tCreationTime\t{0}", fi.CreationTime);
-                        _logger.Debug("\t\tLastAccessTime\t{0}", fi.LastAccessTime);
-                        _logger.Debug("\t\tLastWriteTime\t{0}", fi.LastWriteTime);
-                        _logger.Debug("\t\tLength\t{0}", fi.Length);
+                        logger.Debug("\tFileName\t{0}", fi.FileName);
+                        logger.Debug("\t\tAttributes\t{0}", fi.Attributes);
+                        logger.Debug("\t\tCreationTime\t{0}", fi.CreationTime);
+                        logger.Debug("\t\tLastAccessTime\t{0}", fi.LastAccessTime);
+                        logger.Debug("\t\tLastWriteTime\t{0}", fi.LastWriteTime);
+                        logger.Debug("\t\tLength\t{0}", fi.Length);
                     }
 
                     var fill =
@@ -432,12 +432,12 @@ namespace DokanNet
                     }
                 }
 
-                _logger.Debug("FindFilesProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("FindFilesProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("FindFilesProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("FindFilesProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -451,23 +451,23 @@ namespace DokanNet
             {
                 IList<FileInformation> files;
 
-                _logger.Debug("FindFilesWithPatternProxy : {0}", rawFileName);
-                _logger.Debug("\trawSearchPattern\t{0}", rawSearchPattern);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("FindFilesWithPatternProxy : {0}", rawFileName);
+                logger.Debug("\trawSearchPattern\t{0}", rawSearchPattern);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.FindFilesWithPattern(rawFileName, rawSearchPattern, out files, rawFileInfo);
+                var result = operations.FindFilesWithPattern(rawFileName, rawSearchPattern, out files, rawFileInfo);
 
                 Debug.Assert(files != null);
                 if (result == DokanResult.Success && files.Count != 0)
                 {
                     foreach (var fi in files)
                     {
-                        _logger.Debug("\tFileName\t{0}", fi.FileName);
-                        _logger.Debug("\t\tAttributes\t{0}", fi.Attributes);
-                        _logger.Debug("\t\tCreationTime\t{0}", fi.CreationTime);
-                        _logger.Debug("\t\tLastAccessTime\t{0}", fi.LastAccessTime);
-                        _logger.Debug("\t\tLastWriteTime\t{0}", fi.LastWriteTime);
-                        _logger.Debug("\t\tLength\t{0}", fi.Length);
+                        logger.Debug("\tFileName\t{0}", fi.FileName);
+                        logger.Debug("\t\tAttributes\t{0}", fi.Attributes);
+                        logger.Debug("\t\tCreationTime\t{0}", fi.CreationTime);
+                        logger.Debug("\t\tLastAccessTime\t{0}", fi.LastAccessTime);
+                        logger.Debug("\t\tLastWriteTime\t{0}", fi.LastWriteTime);
+                        logger.Debug("\t\tLength\t{0}", fi.Length);
                     }
 
                     var fill =
@@ -480,12 +480,12 @@ namespace DokanNet
                     }
                 }
 
-                _logger.Debug("FindFilesWithPatternProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("FindFilesWithPatternProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("FindFilesWithPatternProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("FindFilesWithPatternProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -514,8 +514,8 @@ namespace DokanNet
                     dwHighDateTime = (int) (mtime >> 32),
                     dwLowDateTime = (int) (mtime & 0xffffffff)
                 },
-                nFileSizeLow = (uint) (fi.Length & 0xffffffff),
-                nFileSizeHigh = (uint) (fi.Length >> 32),
+                nFileSizeLow = (uint)(fi.Length & 0xffffffff),
+                nFileSizeHigh = (uint)(fi.Length >> 32),
                 cFileName = fi.FileName
             };
             //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
@@ -531,18 +531,18 @@ namespace DokanNet
             {
                 IList<FileInformation> files;
 
-                _logger.Debug("FindStreamsProxy: {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("FindStreamsProxy: {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.FindStreams(rawFileName, out files, rawFileInfo);
+                var result = operations.FindStreams(rawFileName, out files, rawFileInfo);
 
                 Debug.Assert(!(result == DokanResult.NotImplemented && files == null));
                 if (result == DokanResult.Success && files.Count != 0)
                 {
                     foreach (var fi in files)
                     {
-                        _logger.Debug("\tFileName\t{0}", fi.FileName);
-                        _logger.Debug("\t\tLength\t{0}", fi.Length);
+                        logger.Debug("\tFileName\t{0}", fi.FileName);
+                        logger.Debug("\t\tLength\t{0}", fi.Length);
                     }
 
                     var fill =
@@ -555,12 +555,12 @@ namespace DokanNet
                     }
                 }
 
-                _logger.Debug("FindStreamsProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("FindStreamsProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("FindStreamsProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("FindStreamsProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -586,18 +586,18 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("SetEndOfFileProxy : {0}", rawFileName);
-                _logger.Debug("\tByteOffset\t{0}", rawByteOffset);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("SetEndOfFileProxy : {0}", rawFileName);
+                logger.Debug("\tByteOffset\t{0}", rawByteOffset);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
+                var result = operations.SetEndOfFile(rawFileName, rawByteOffset, rawFileInfo);
 
-                _logger.Debug("SetEndOfFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("SetEndOfFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("SetEndOfFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("SetEndOfFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -607,18 +607,18 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("SetAllocationSizeProxy : {0}", rawFileName);
-                _logger.Debug("\tLength\t{0}", rawLength);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("SetAllocationSizeProxy : {0}", rawFileName);
+                logger.Debug("\tLength\t{0}", rawLength);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
+                var result = operations.SetAllocationSize(rawFileName, rawLength, rawFileInfo);
 
-                _logger.Debug("SetAllocationSizeProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("SetAllocationSizeProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("SetAllocationSizeProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("SetAllocationSizeProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -631,18 +631,18 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("SetFileAttributesProxy : {0}", rawFileName);
-                _logger.Debug("\tAttributes\t{0}", (FileAttributes) rawAttributes);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("SetFileAttributesProxy : {0}", rawFileName);
+                logger.Debug("\tAttributes\t{0}", (FileAttributes)rawAttributes);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.SetFileAttributes(rawFileName, (FileAttributes) rawAttributes, rawFileInfo);
+                var result = operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
 
-                _logger.Debug("SetFileAttributesProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("SetFileAttributesProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("SetFileAttributesProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("SetFileAttributesProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -655,36 +655,36 @@ namespace DokanNet
         {
             var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) &&
                         (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawCreationTime.dwHighDateTime << 32) |
-                                        (uint) rawCreationTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) |
+                                        (uint)rawCreationTime.dwLowDateTime)
+                : (DateTime?)null;
             var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) &&
                         (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawLastAccessTime.dwHighDateTime << 32) |
-                                        (uint) rawLastAccessTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) |
+                                        (uint)rawLastAccessTime.dwLowDateTime)
+                : (DateTime?)null;
             var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) &&
                         (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawLastWriteTime.dwHighDateTime << 32) |
-                                        (uint) rawLastWriteTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) |
+                                        (uint)rawLastWriteTime.dwLowDateTime)
+                : (DateTime?)null;
 
             try
             {
-                _logger.Debug("SetFileTimeProxy : {0}", rawFileName);
-                _logger.Debug("\tCreateTime\t{0}", ctime);
-                _logger.Debug("\tAccessTime\t{0}", atime);
-                _logger.Debug("\tWriteTime\t{0}", mtime);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("SetFileTimeProxy : {0}", rawFileName);
+                logger.Debug("\tCreateTime\t{0}", ctime);
+                logger.Debug("\tAccessTime\t{0}", atime);
+                logger.Debug("\tWriteTime\t{0}", mtime);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.SetFileTime(rawFileName, ctime, atime, mtime, rawFileInfo);
+                var result = operations.SetFileTime(rawFileName, ctime, atime, mtime, rawFileInfo);
 
-                _logger.Debug("SetFileTimeProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("SetFileTimeProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("SetFileTimeProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("SetFileTimeProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -696,17 +696,17 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("DeleteFileProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("DeleteFileProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.DeleteFile(rawFileName, rawFileInfo);
+                var result = operations.DeleteFile(rawFileName, rawFileInfo);
 
-                _logger.Debug("DeleteFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("DeleteFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("DeleteFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("DeleteFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -718,17 +718,17 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("DeleteDirectoryProxy : {0}", rawFileName);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("DeleteDirectoryProxy : {0}", rawFileName);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.DeleteDirectory(rawFileName, rawFileInfo);
+                var result = operations.DeleteDirectory(rawFileName, rawFileInfo);
 
-                _logger.Debug("DeleteDirectoryProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("DeleteDirectoryProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("DeleteDirectoryProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("DeleteDirectoryProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -741,19 +741,19 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("MoveFileProxy : {0}", rawFileName);
-                _logger.Debug("\tNewFileName\t{0}", rawNewFileName);
-                _logger.Debug("\tReplaceIfExisting\t{0}", rawReplaceIfExisting);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("MoveFileProxy : {0}", rawFileName);
+                logger.Debug("\tNewFileName\t{0}", rawNewFileName);
+                logger.Debug("\tReplaceIfExisting\t{0}", rawReplaceIfExisting);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting, rawFileInfo);
+                var result = operations.MoveFile(rawFileName, rawNewFileName, rawReplaceIfExisting, rawFileInfo);
 
-                _logger.Debug("MoveFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("MoveFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("MoveFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("MoveFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -766,19 +766,19 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("LockFileProxy : {0}", rawFileName);
-                _logger.Debug("\tByteOffset\t{0}", rawByteOffset);
-                _logger.Debug("\tLength\t{0}", rawLength);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("LockFileProxy : {0}", rawFileName);
+                logger.Debug("\tByteOffset\t{0}", rawByteOffset);
+                logger.Debug("\tLength\t{0}", rawLength);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
+                var result = operations.LockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                _logger.Debug("LockFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("LockFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("LockFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("LockFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -791,19 +791,19 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("UnlockFileProxy : {0}", rawFileName);
-                _logger.Debug("\tByteOffset\t{0}", rawByteOffset);
-                _logger.Debug("\tLength\t{0}", rawLength);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("UnlockFileProxy : {0}", rawFileName);
+                logger.Debug("\tByteOffset\t{0}", rawByteOffset);
+                logger.Debug("\tLength\t{0}", rawLength);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
+                var result = operations.UnlockFile(rawFileName, rawByteOffset, rawLength, rawFileInfo);
 
-                _logger.Debug("UnlockFileProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("UnlockFileProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("UnlockFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("UnlockFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -816,21 +816,21 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("GetDiskFreeSpaceProxy:");
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("GetDiskFreeSpaceProxy:");
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
+                var result = operations.GetDiskFreeSpace(out rawFreeBytesAvailable, out rawTotalNumberOfBytes,
                     out rawTotalNumberOfFreeBytes, rawFileInfo);
 
-                _logger.Debug("\tFreeBytesAvailable\t{0}", rawFreeBytesAvailable);
-                _logger.Debug("\tTotalNumberOfBytes\t{0}", rawTotalNumberOfBytes);
-                _logger.Debug("\tTotalNumberOfFreeBytes\t{0}", rawTotalNumberOfFreeBytes);
-                _logger.Debug("GetDiskFreeSpaceProxy Return : {0}", result);
+                logger.Debug("\tFreeBytesAvailable\t{0}", rawFreeBytesAvailable);
+                logger.Debug("\tTotalNumberOfBytes\t{0}", rawTotalNumberOfBytes);
+                logger.Debug("\tTotalNumberOfFreeBytes\t{0}", rawTotalNumberOfFreeBytes);
+                logger.Debug("GetDiskFreeSpaceProxy Return : {0}", result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("GetDiskFreeSpaceProxy Throw : {0}", ex.Message);
+                logger.Error("GetDiskFreeSpaceProxy Throw : {0}", ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -842,14 +842,14 @@ namespace DokanNet
             DokanFileInfo rawFileInfo)
         {
             rawMaximumComponentLength = 256;
-            rawVolumeSerialNumber = _serialNumber;
+            rawVolumeSerialNumber = serialNumber;
             try
             {
-                _logger.Debug("GetVolumeInformationProxy:");
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("GetVolumeInformationProxy:");
+                logger.Debug("\tContext\t{0}", rawFileInfo);
                 string label;
                 string name;
-                var result = _operations.GetVolumeInformation(out label, out rawFileSystemFlags, out name, rawFileInfo);
+                var result = operations.GetVolumeInformation(out label, out rawFileSystemFlags, out name, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
@@ -858,18 +858,18 @@ namespace DokanNet
                     rawVolumeNameBuffer.Append(label);
                     rawFileSystemNameBuffer.Append(name);
 
-                    _logger.Debug("\tVolumeNameBuffer\t{0}", rawVolumeNameBuffer);
-                    _logger.Debug("\tFileSystemNameBuffer\t{0}", rawFileSystemNameBuffer);
-                    _logger.Debug("\tVolumeSerialNumber\t{0}", rawVolumeSerialNumber);
-                    _logger.Debug("\tFileSystemFlags\t{0}", rawFileSystemFlags);
+                    logger.Debug("\tVolumeNameBuffer\t{0}", rawVolumeNameBuffer);
+                    logger.Debug("\tFileSystemNameBuffer\t{0}", rawFileSystemNameBuffer);
+                    logger.Debug("\tVolumeSerialNumber\t{0}", rawVolumeSerialNumber);
+                    logger.Debug("\tFileSystemFlags\t{0}", rawFileSystemFlags);
                 }
 
-                _logger.Debug("GetVolumeInformationProxy Return : {0}", result);
+                logger.Debug("GetVolumeInformationProxy Return : {0}", result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("GetVolumeInformationProxy Throw : {0}", ex.Message);
+                logger.Error("GetVolumeInformationProxy Throw : {0}", ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -878,17 +878,17 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("MountedProxy:");
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("MountedProxy:");
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.Mounted(rawFileInfo);
+                var result = operations.Mounted(rawFileInfo);
 
-                _logger.Debug("MountedProxy Return : {0}", result);
+                logger.Debug("MountedProxy Return : {0}", result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("MountedProxy Throw : {0}", ex.Message);
+                logger.Error("MountedProxy Throw : {0}", ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -897,17 +897,17 @@ namespace DokanNet
         {
             try
             {
-                _logger.Debug("UnmountedProxy:");
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("UnmountedProxy:");
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.Unmounted(rawFileInfo);
+                var result = operations.Unmounted(rawFileInfo);
 
-                _logger.Debug("UnmountedProxy Return : {0}", result);
+                logger.Debug("UnmountedProxy Return : {0}", result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("UnmountedProxy Throw : {0}", ex.Message);
+                logger.Error("UnmountedProxy Throw : {0}", ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -941,30 +941,30 @@ namespace DokanNet
             }
             try
             {
-                _logger.Debug("GetFileSecurityProxy : {0}", rawFileName);
-                _logger.Debug("\tFileSystemSecurity\t{0}", sect);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("GetFileSecurityProxy : {0}", rawFileName);
+                logger.Debug("\tFileSystemSecurity\t{0}", sect);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
                 FileSystemSecurity sec;
-                var result = _operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
+                var result = operations.GetFileSecurity(rawFileName, out sec, sect, rawFileInfo);
                 if (result == DokanResult.Success /*&& sec != null*/)
                 {
                     Debug.Assert(sec != null);
-                    _logger.Debug("\tFileSystemSecurity Result : {0}", sec);
+                    logger.Debug("\tFileSystemSecurity Result : {0}", sec);
                     var buffer = sec.GetSecurityDescriptorBinaryForm();
-                    rawSecurityDescriptorLengthNeeded = (uint) buffer.Length;
+                    rawSecurityDescriptorLengthNeeded = (uint)buffer.Length;
                     if (buffer.Length > rawSecurityDescriptorLength)
                         return DokanResult.BufferOverflow;
 
                     Marshal.Copy(buffer, 0, rawSecurityDescriptor, buffer.Length);
                 }
 
-                _logger.Debug("GetFileSecurityProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("GetFileSecurityProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("GetFileSecurityProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("GetFileSecurityProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
@@ -998,23 +998,23 @@ namespace DokanNet
             var buffer = new byte[rawSecurityDescriptorLength];
             try
             {
-                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int) rawSecurityDescriptorLength);
-                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity) new DirectorySecurity() : new FileSecurity();
+                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int)rawSecurityDescriptorLength);
+                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity)new DirectorySecurity() : new FileSecurity();
                 sec.SetSecurityDescriptorBinaryForm(buffer);
 
-                _logger.Debug("SetFileSecurityProxy : {0}", rawFileName);
-                _logger.Debug("\tAccessControlSections\t{0}", sect);
-                _logger.Debug("\tFileSystemSecurity\t{0}", sec);
-                _logger.Debug("\tContext\t{0}", rawFileInfo);
+                logger.Debug("SetFileSecurityProxy : {0}", rawFileName);
+                logger.Debug("\tAccessControlSections\t{0}", sect);
+                logger.Debug("\tFileSystemSecurity\t{0}", sec);
+                logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = _operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
+                var result = operations.SetFileSecurity(rawFileName, sec, sect, rawFileInfo);
 
-                _logger.Debug("SetFileSecurityProxy : {0} Return : {1}", rawFileName, result);
+                logger.Debug("SetFileSecurityProxy : {0} Return : {1}", rawFileName, result);
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.Error("SetFileSecurityProxy : {0} Throw : {1}", rawFileName, ex.Message);
+                logger.Error("SetFileSecurityProxy : {0} Throw : {1}", rawFileName, ex.Message);
                 return DokanResult.InvalidParameter;
             }
         }
