@@ -3,9 +3,20 @@
 namespace DokanNet.Native
 {
     /// <summary>
-    /// Delegates that the kernel Dokan driver use to do callbacks to DokanNet.
-    /// Se <seealso cref="IDokanOperations"/> for more information about the fields.
+    /// Dokan API callbacks interface
+    /// 
+    /// A struct of callbacks that describe all Dokan API operation
+    /// that will be called when Windows access to the filesystem.
+    /// 
+    /// If an error occurs, return <see cref="NtStatus"/>.
+    /// 
+    /// All this callbacks can be set to <c>null</c> or return <see cref="NtStatus.NotImplemented"/>
+    /// if you dont want to support one of them. Be aware that returning such value to important callbacks
+    /// such <see cref="ZwCreateFile"/>/<see cref="ReadFile"/>/... would make the filesystem not working or unstable.
+    /// 
+    /// Se <see cref="IDokanOperations"/> for more information about the fields.
     /// </summary>
+    /// <remarks>This is the same struct as <c>_DOKAN_OPERATIONS</c> (dokan.h) in the C++ version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct DOKAN_OPERATIONS
     {
