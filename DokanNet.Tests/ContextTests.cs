@@ -63,8 +63,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None,
-                context: context);
+            fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
@@ -191,8 +190,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
-                context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
 
             fixture.PermitProbeFile(path, Encoding.UTF8.GetBytes(value));
@@ -220,8 +218,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
-                context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);
@@ -257,8 +254,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None,
-                context: context);
+            fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
 
             fixture.PermitProbeFile(path, largeData);

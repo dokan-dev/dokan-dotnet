@@ -10,12 +10,9 @@ namespace DokanNet.Tests
 
         public const FileAccess ReadAttributesPermissionsAccess = ReadAttributesAccess | ReadPermissionsAccess;
 
-        public const FileAccess ChangePermissionsAccess =
-            FileAccess.ReadAttributes | FileAccess.ReadPermissions | FileAccess.ChangePermissions;
+        public const FileAccess ChangePermissionsAccess = FileAccess.ReadAttributes | FileAccess.ReadPermissions | FileAccess.ChangePermissions;
 
-        public const FileAccess ReadAccess =
-            FileAccess.ReadData | FileAccess.ReadExtendedAttributes | FileAccess.ReadAttributes |
-            FileAccess.ReadPermissions | FileAccess.Synchronize;
+        public const FileAccess ReadAccess = FileAccess.ReadData | FileAccess.ReadExtendedAttributes | FileAccess.ReadAttributes | FileAccess.ReadPermissions | FileAccess.Synchronize;
 
         public const FileAccess WriteAccess =
             FileAccess.WriteData | FileAccess.AppendData | FileAccess.WriteExtendedAttributes |
@@ -23,13 +20,11 @@ namespace DokanNet.Tests
 
         public const FileAccess ReadWriteAccess = ReadAccess | WriteAccess;
 
-        public const FileAccess SetOwnershipAccess =
-            ReadAccess | WriteAccess | FileAccess.Delete | FileAccess.ChangePermissions | FileAccess.SetOwnership;
+        public const FileAccess SetOwnershipAccess = ReadAccess | WriteAccess | FileAccess.Delete | FileAccess.ChangePermissions | FileAccess.SetOwnership;
 
         public const FileAccess DeleteAccess = FileAccess.ReadAttributes | FileAccess.Delete;
 
-        public const FileAccess CopyToAccess =
-            ReadAccess | WriteAccess | FileAccess.Delete | FileAccess.ChangePermissions;
+        public const FileAccess CopyToAccess = ReadAccess | WriteAccess | FileAccess.Delete | FileAccess.ChangePermissions;
 
         public const FileAccess MoveFromAccess = FileAccess.ReadAttributes | FileAccess.Delete | FileAccess.Synchronize;
 
@@ -43,8 +38,7 @@ namespace DokanNet.Tests
 
         public const FileAccess AppendToDirectoryAccess = FileAccess.AppendData | FileAccess.Synchronize;
 
-        public const FileAccess DeleteFromDirectoryAccess =
-            FileAccess.Delete | FileAccess.ReadAttributes | FileAccess.Synchronize;
+        public const FileAccess DeleteFromDirectoryAccess = FileAccess.Delete | FileAccess.ReadAttributes | FileAccess.Synchronize;
 
         public const FileShare ReadOnlyShare = FileShare.Read;
 

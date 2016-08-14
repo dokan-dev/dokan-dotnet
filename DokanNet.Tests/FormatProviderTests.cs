@@ -7,11 +7,10 @@ namespace DokanNet.Tests
     public sealed class FormatProviderTests
     {
         [TestMethod, TestCategory(TestCategories.Success)]
-        public void NullValuesShouldBeVisibles()
+        public void NullValuesShouldBeVisible()
         {
             DateTime? obj = null;
-            Assert.AreEqual(FormatProviders.NullStringRapresentation,
-                string.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
+            Assert.AreEqual(FormatProviders.NullStringRepresentation, string.Format(FormatProviders.DefaultFormatProvider, "{0}", obj));
         }
     }
 }

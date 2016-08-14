@@ -32,6 +32,7 @@ Semantics and parameters are just like Dokan library. Details are described
 at 'README.md' file in Dokan library. See sample codes under 'sample'
 directory. Administrator privileges are required to run file system
 applications.
+Doxygen documentation is also available [here](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
 
 ## Unmounting
 Just run the bellow command or your file system application call Dokan.Unmount
