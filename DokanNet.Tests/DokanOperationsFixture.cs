@@ -632,15 +632,15 @@ namespace DokanNet.Tests
         }
 
 #if !SPECIFIC_NAMES
-        private static string Named(string name) => name;
+        private string Named(string name) => name;
 #else
-        private static string Named(string name) => $"{currentTestName}_{name}";
+        private string Named(string name) => $"{currentTestName}_{name}";
 #endif
 
         private static FileInformation[] Named(FileInformation[] infos)
             => infos.Aggregate(new List<FileInformation>(), (l, i) => { l.Add(Named(i)); return l; }, l => l.ToArray());
 
-        private static FileInformation Named(FileInformation info) => new FileInformation()
+        private FileInformation Named(FileInformation info) => new FileInformation()
         {
             FileName = Named(info.FileName), Attributes = info.Attributes,
             CreationTime = info.CreationTime, LastAccessTime = info.LastAccessTime, LastWriteTime = info.LastWriteTime,
