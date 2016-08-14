@@ -5,7 +5,7 @@ namespace DokanNet.Native
     /// <summary>
     /// Dokan mount options used to describe dokan device behaviour
     /// </summary>
-    /// \see NativeMethods.DokanMain
+    /// <see cref="NativeMethods.DokanMain"/>
     /// <remarks>This is the same structure as <c>PDOKAN_OPTIONS</c> (dokan.h) in the C++ version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
     internal struct DOKAN_OPTIONS

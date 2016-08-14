@@ -191,7 +191,7 @@ namespace DokanNet
         /// <param name="rawCreateOptions">Specifies the options to apply when the driver creates or opens the file.</param>
         /// <param name="rawFileInfo">>An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</a>
-        /// \see DokanNet.IDokanOperations.CreateFile
+        /// <see cref="DokanNet.IDokanOperations.CreateFile"/>
         /// \todo Update the second paragraph in this documentation. 
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr securityContext, uint rawDesiredAccess,
             uint rawFileAttributes,

@@ -6,7 +6,7 @@ namespace DokanNet
     /// <summary>
     /// Dokan mount options used to describe dokan device behavior. 
     /// </summary>
-    /// \see DOKAN_OPTIONS.Options
+    /// <seealso cref="DOKAN_OPTIONS.Options"/>
     [Flags]
     public enum DokanOptions : long
     {
