@@ -3,7 +3,7 @@
     /// <summary>
     /// A NT status value.
     /// </summary>
-    /// <seealso cref="http://msdn.microsoft.com/en-us/library/cc704588.aspx?f=255&MSPPError=-2147217396"/>
+    /// \see <a cref="http://msdn.microsoft.com/en-us/library/cc704588.aspx?f=255&MSPPError=-2147217396">NTSTATUS Values (MSDN)</a>
     public enum NtStatus : long
     {
         // ***********

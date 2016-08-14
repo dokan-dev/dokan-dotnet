@@ -156,10 +156,10 @@ namespace DokanNet
         /// Initializes a new instance of the <see cref="DokanOperationProxy"/> class.
         /// </summary>
         /// <param name="operations">
-        /// A <seealso cref="IDokanOperations"/> that contains the custom implementation of the driver.
+        /// A <see cref="IDokanOperations"/> that contains the custom implementation of the driver.
         /// </param>
         /// <param name="logger">
-        /// A <seealso cref="ILogger"/> that handle all logging.
+        /// A <see cref="ILogger"/> that handle all logging.
         /// </param>
         public DokanOperationProxy(IDokanOperations operations, ILogger logger)
         {
@@ -169,9 +169,30 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Called when a file is to be created
+        /// CreateFile is called each time a request is made on a file system object.
+        /// 
+        /// In case <see cref="FileMode.OpenOrCreate"/> and
+        /// <see cref="FileMode.Create"/> are opening successfully a already
+        /// existing file, you have to <c>SetLastError(ERROR_ALREADY_EXISTS)</c>.
+        /// 
+        /// If the file is a directory, CreateFile is also called.
+        /// In this case, CreateFile should return <see cref="NtStatus.Success"/> when that directory
+        /// can be opened and <see cref="DokanFileInfo.IsDirectory"/> has to be set to <c>true</c>.
+        /// 
+        /// <see cref="DokanFileInfo.Context"/> can be used to store data (like <see cref="FileStream"/>)
+        /// that can be retrieved in all other request related to the context.
         /// </summary>
-        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</seealso>
+        /// <param name="rawFileName">File path requested by the Kernel on the FileSystem.</param>
+        /// <param name="securityContext">SecurityContext, see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff550613(v=vs.85).aspx">IO_SECURITY_CONTEXT structure (MSDN)</a></param>
+        /// <param name="rawDesiredAccess">Specifies an <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff540466(v=vs.85).aspx">ACCESS_MASK</a> value that determines the requested access to the object.</param>
+        /// <param name="rawFileAttributes">Specifies one or more FILE_ATTRIBUTE_XXX flags, which represent the file attributes to set if you create or overwrite a file.</param>
+        /// <param name="rawShareAccess">Type of share access, which is specified as zero or any combination of <see cref="FileShare"/>.</param>
+        /// <param name="rawCreateDisposition">Specifies the action to perform if the file does or does not exist.</param>
+        /// <param name="rawCreateOptions">Specifies the options to apply when the driver creates or opens the file.</param>
+        /// <param name="rawFileInfo">>An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
+        /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</a>
+        /// \see DokanNet.IDokanOperations.CreateFile
+        /// \todo Update the second paragraph in this documentation. 
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr securityContext, uint rawDesiredAccess,
             uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
@@ -1030,7 +1051,7 @@ namespace DokanNet
         /// The value of <paramref name="dateTime"/> expressed as a Windows file time
         /// -or- it returns <c>0</c> if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or <c>null</c>.
         /// </returns>
-        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx">WIN32_FILE_ATTRIBUTE_DATA structure (MSDN)</seealso>
+        /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx">WIN32_FILE_ATTRIBUTE_DATA structure (MSDN)</a>
         [Pure]
         private static long ToFileTime(DateTime? dateTime)
         {
@@ -1041,6 +1062,13 @@ namespace DokanNet
 
         #region Nested type: FILL_FIND_FILE_DATA
 
+        /// <summary>
+        /// Used to add an entry in <see cref="DokanOperationProxy.FindFilesProxy"/> and <see cref="DokanOperationProxy.FindFilesWithPatternProxy"/>.
+        /// </summary>
+        /// <param name="rawFindData">A <see cref="WIN32_FIND_DATA"/>.</param>
+        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
+        /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
+        /// <remarks>This is the same delegate as <c>PFillFindData</c> (dokan.h) in the C++ version of Dokan.</remarks>
         private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
@@ -1048,6 +1076,13 @@ namespace DokanNet
 
         #region Nested type: FILL_FIND_STREAM_DATA
 
+        /// <summary>
+        /// Used to add an entry in <see cref="DokanOperationProxy.FindStreamsProxy"/>.
+        /// </summary>
+        /// <param name="rawFindData">A <see cref="WIN32_FIND_STREAM_DATA"/>.</param>
+        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
+        /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
+        /// <remarks>This is the same delegate as <c>PFillFindStreamData</c> (dokan.h) in the C++ version of Dokan.</remarks>
         private delegate long FILL_FIND_STREAM_DATA(
             ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 

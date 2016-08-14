@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using DokanNet.Native;
@@ -10,17 +9,24 @@ using static DokanNet.FormatProviders;
 namespace DokanNet
 {
     /// <summary>
-    /// Contains information about a specific file or directory.
+    /// Dokan file information on the current operation.
     /// </summary>
     /// <remarks>
     /// This class cannot be instantiated in C#, it is created by the kernel Dokan driver.
+    /// This is the same structure as <c>_DOKAN_FILE_INFO</c> (dokan.h) in the C++ version of Dokan.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public sealed class DokanFileInfo
     {
         private ulong _context;
+        /// <summary>
+        /// Used internally, never modify
+        /// </summary>
         private readonly ulong _dokanContext;
-        private readonly IntPtr _dokanOptions;
+        /// <summary>
+        /// A pointer to the <see cref="DOKAN_OPTIONS"/> which was passed to <see cref="DokanNet.Native.NativeMethods.DokanMain"/>.
+        /// </summary>
+        private readonly IntPtr _dokanOptions;  //
         private readonly uint _processId;
 
         [MarshalAs(UnmanagedType.U1)] private bool _isDirectory;
@@ -37,7 +43,7 @@ namespace DokanNet
 
         /// <summary>
         /// Context that can be used to carry information between operation.
-        /// The Context can carry whatever type like <see cref="FileStream"/>, <c>struct</c>, <c>int</c>,
+        /// The Context can carry whatever type like <see cref="System.IO.FileStream"/>, <c>struct</c>, <c>int</c>,
         /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
         public object Context
@@ -58,15 +64,13 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Process id for the thread that originally requested a 
-        /// given I/O operation
+        /// Process id for the thread that originally requested a given I/O operation.
         /// </summary>
         public int ProcessId => (int) _processId;
 
         /// <summary>
-        /// Requesting a directory file
-        /// <c>IsDirectory</c> has to be set in <seealso cref="IDokanOperations.CreateFile"/> 
-        /// if the file appear to be a folder.
+        /// Requesting a directory file.
+        /// Must be set in <see cref="IDokanOperations.CreateFile"/> if the file appear to be a folder.
         /// </summary>
         public bool IsDirectory
         {
@@ -75,7 +79,7 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Indicate if the file has to be delete during the <see cref="IDokanOperations.Cleanup"/> event.
+        /// Flag if the file has to be delete during <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
         public bool DeleteOnClose
         {
@@ -105,7 +109,7 @@ namespace DokanNet
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
         /// <summary>
-        /// This method needs to be called in the <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
+        /// This method needs to be called in <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
         /// callback.
         /// </summary>
         /// <returns>An <see cref="WindowsIdentity"/> with the access token, 

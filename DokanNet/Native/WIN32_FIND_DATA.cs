@@ -9,18 +9,18 @@ namespace DokanNet.Native
     /// </summary>
     /// <remarks>
     /// If a file has a long file name, the complete name appears in the cFileName member, and the 8.3 format truncated version
-    /// of the name appears in the <see cref="cAlternateFileName"/>member. Otherwise,<see cref="cAlternateFileName"/>is empty. If the FindFirstFileEx function
-    /// was called with a value of FindExInfoBasic in the fInfoLevelId parameter, the<see cref="cAlternateFileName"/>member will always contain
+    /// of the name appears in the <see cref="cAlternateFileName"/>member. Otherwise,<see cref="cAlternateFileName"/> is empty. If the FindFirstFileEx function
+    /// was called with a value of FindExInfoBasic in the fInfoLevelId parameter, the <see cref="cAlternateFileName"/> member will always contain
     /// a NULL string value. This remains true for all subsequent calls to the FindNextFile function. As an alternative method of
     /// retrieving the 8.3 format version of a file name, you can use the GetShortPathName function. For more information about
-    /// file names, see <see href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx">Naming Files, Paths, and Namespaces (MSDN)</see>.
+    /// file names, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx">Naming Files, Paths, and Namespaces (MSDN)</a>.
     /// 
     /// Not all file systems can record creation and last access times, and not all file systems record them in the same manner.
     /// For example, on the FAT file system, create time has a resolution of 10 milliseconds, write time has a resolution of
     /// 2 seconds, and access time has a resolution of 1 day. The NTFS file system delays updates to the last access time for
-    /// a file by up to 1 hour after the last access.For more information, see <see href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times (MSDN)</see>.
+    /// a file by up to 1 hour after the last access.For more information, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times (MSDN)</a>.
     /// </remarks>
-    /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">WIN32_FIND_DATA structure (MSDN)</seealso>
+    /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">WIN32_FIND_DATA structure (MSDN)</a>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
     internal struct WIN32_FIND_DATA
     {
@@ -71,7 +71,7 @@ namespace DokanNet.Native
         /// 
         /// This value is zero unless the file size is greater than MAXDWORD.
         /// 
-        /// The size of the file is equal to(nFileSizeHigh* (MAXDWORD+1)) + nFileSizeLow.
+        /// The size of the file is equal to (nFileSizeHigh* (MAXDWORD+1)) + nFileSizeLow.
         /// </summary>
         public uint nFileSizeHigh;
 
@@ -85,7 +85,7 @@ namespace DokanNet.Native
         /// this member specifies the reparse point tag. 
         /// Otherwise, this value is undefined and should not be used.
         /// </summary>
-        /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx">Reparse Point Tags (MSDN)</seealso>
+        /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365511(v=vs.85).aspx">Reparse Point Tags (MSDN)</a>
         private readonly uint dwReserved0;
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace DokanNet.Native
     /// 10 milliseconds, write time has a resolution of 2 seconds, and access time has a resolution of
     /// 1 day (the access date). On the NTFS file system, access time has a resolution of 1 hour.
     /// </remarks>
-    /// <seealso href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363788%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">BY_HANDLE_FILE_INFORMATION structure (MSDN)</seealso>
+    /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363788%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">BY_HANDLE_FILE_INFORMATION structure (MSDN)</a>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct BY_HANDLE_FILE_INFORMATION
     {
