@@ -3,14 +3,39 @@
     /// <summary>
     /// A NT status value.
     /// </summary>
+    /// \see <a cref="http://msdn.microsoft.com/en-us/library/cc704588.aspx?f=255&MSPPError=-2147217396">NTSTATUS Values (MSDN)</a>
     public enum NtStatus : long
     {
-        // Success
+        // ***********
+        // * Success *
+        // ***********
+        /// <summary>
+        /// The operation completed successfully.
+        /// </summary>
         Success = 0x00000000,
+        /// <summary>
+        /// The caller specified WaitAny for WaitType and one of the dispatcher objects in 
+        /// the Object array has been set to the signaled state.
+        /// </summary>
         Wait1 = 0x00000001,
+        /// <summary>
+        /// The caller specified WaitAny for WaitType and one of the dispatcher objects in 
+        /// the Object array has been set to the signaled state.
+        /// </summary>
         Wait2 = 0x00000002,
+        /// <summary>
+        /// The caller specified WaitAny for WaitType and one of the dispatcher objects in 
+        /// the Object array has been set to the signaled state.
+        /// </summary>
         Wait3 = 0x00000003,
+        /// <summary>
+        /// The caller specified WaitAny for WaitType and one of the dispatcher objects in 
+        /// the Object array has been set to the signaled state.
+        /// </summary>
         Wait63 = 0x0000003f,
+        /// <summary>
+        /// The caller attempted to wait for a mutex that has been abandoned.
+        /// </summary>
         Abandoned = 0x00000080,
         AbandonedWait0 = 0x00000080,
         AbandonedWait1 = 0x00000081,
@@ -47,35 +72,129 @@
         FileLockedWithOnlyReaders = 0x0000012a,
         FileLockedWithWriters = 0x0000012b,
 
-        // Informational
+        // *****************
+        // * Informational *
+        // *****************
+        /// <summary>
+        /// General information
+        /// </summary>
         Informational = 0x40000000,
+        /// <summary>
+        /// {Object Exists} An attempt was made to create an object but 
+        /// the object name already exists.
+        /// </summary>
         ObjectNameExists = 0x40000000,
+        /// <summary>
+        /// {Thread Suspended} A thread termination occurred while 
+        /// the thread was suspended. The thread resumed, and termination proceeded.
+        /// </summary>
         ThreadWasSuspended = 0x40000001,
+        /// <summary>
+        /// {Working Set Range Error} An attempt was made to set the working set 
+        /// minimum or maximum to values that are outside the allowable range.
+        /// </summary>
         WorkingSetLimitRange = 0x40000002,
+        /// <summary>
+        /// {Image Relocated} An image file could not be mapped at the address 
+        /// that is specified in the image file. Local fixes must be performed on this image.
+        /// </summary>
         ImageNotAtBase = 0x40000003,
+        /// <summary>
+        /// {Registry Recovery} One of the files that contains the system 
+        /// registry data had to be recovered by using a log or alternate copy. 
+        /// The recovery was successful.
+        /// </summary>
         RegistryRecovered = 0x40000009,
 
-        // Warning
+        // ***********
+        // * Warning *
+        // ***********
+        /// <summary>
+        /// General warning
+        /// </summary>
         Warning = 0x80000000,
+        /// <summary>
+        /// {EXCEPTION} Guard Page Exception A page of memory that marks 
+        /// the end of a data structure, such as a stack or an array, 
+        /// has been accessed.
+        /// </summary>
         GuardPageViolation = 0x80000001,
+        /// <summary>
+        /// {EXCEPTION} Alignment Fault A data type misalignment was detected 
+        /// in a load or store instruction.
+        /// </summary>
         DatatypeMisalignment = 0x80000002,
+        /// <summary>
+        /// {EXCEPTION} Breakpoint A breakpoint has been reached.
+        /// </summary>
         Breakpoint = 0x80000003,
+        /// <summary>
+        /// {EXCEPTION} Single Step A single step or trace operation has just been completed.
+        /// </summary>
         SingleStep = 0x80000004,
+        /// <summary>
+        /// {Buffer Overflow} The data was too large to fit into the specified buffer.
+        /// </summary>
         BufferOverflow = 0x80000005,
+        /// <summary>
+        /// {No More Files} No more files were found which match the file specification.
+        /// </summary>
         NoMoreFiles = 0x80000006,
+        /// <summary>
+        /// {Handles Closed} Handles to objects have been automatically closed 
+        /// because of the requested operation.
+        /// </summary>
         HandlesClosed = 0x8000000a,
+        /// <summary>
+        /// Because of protection conflicts, not all the requested bytes could be copied.
+        /// </summary>
         PartialCopy = 0x8000000d,
+        /// <summary>
+        /// {Device Busy} The device is currently busy.
+        /// </summary>
         DeviceBusy = 0x80000011,
+        /// <summary>
+        /// {Illegal EA} The specified extended attribute (EA) name contains at least one illegal character.
+        /// </summary>
         InvalidEaName = 0x80000013,
+        /// <summary>
+        /// {Inconsistent EA List} The extended attribute (EA) list is inconsistent.
+        /// </summary>
         EaListInconsistent = 0x80000014,
+        /// <summary>
+        /// {No More Entries} No more entries are available from an enumeration operation.
+        /// </summary>
         NoMoreEntries = 0x8000001a,
+        /// <summary>
+        /// A long jump has been executed.
+        /// </summary>
         LongJump = 0x80000026,
+        /// <summary>
+        /// The application is attempting to run executable code from the module %hs. 
+        /// This may be insecure. An alternative, %hs, is available. Should 
+        /// the application use the secure module %hs?
+        /// </summary>
         DllMightBeInsecure = 0x8000002b,
 
-        // Error
+        // *********
+        // * Error *
+        // *********
+        /// <summary>
+        /// General error
+        /// </summary>
         Error = 0xc0000000,
+        /// <summary>
+        /// {Operation Failed} The requested operation was unsuccessful.
+        /// </summary>
         Unsuccessful = 0xc0000001,
+        /// <summary>
+        /// {Not Implemented} The requested operation is not implemented.
+        /// </summary>
         NotImplemented = 0xc0000002,
+        /// <summary>
+        /// {Invalid Parameter} The specified information class is not a 
+        /// valid information class for the specified object.
+        /// </summary>
         InvalidInfoClass = 0xc0000003,
         InfoLengthMismatch = 0xc0000004,
         AccessViolation = 0xc0000005,
@@ -345,171 +464,4 @@
 
         MaximumNtStatus = 0xffffffff
     }
-
-    /*
-    case ERROR_SUCCESS:
-        return STATUS_SUCCESS;
- 
-    case ERROR_ACCESS_DENIED:
-        return STATUS_ACCESS_DENIED;
-        
-    case ERROR_NOACCESS:
-        return STATUS_ACCESS_VIOLATION;
- 
-    case ERROR_NOT_SUPPORTED:
-        return STATUS_NOT_SUPPORTED;
- 
-    case ERROR_INVALID_PARAMETER:
-        return STATUS_INVALID_PARAMETER;
- 
-    case ERROR_INVALID_HANDLE:
-        return STATUS_INVALID_HANDLE;
- 
-    case ERROR_NOT_LOCKED:
-        return STATUS_NOT_LOCKED;
- 
-    case ERROR_NO_SYSTEM_RESOURCES:
-        return STATUS_INSUFFICIENT_RESOURCES;
- 
-    case ERROR_NOT_ENOUGH_MEMORY:
-        return STATUS_NO_MEMORY;                        
- 
-    case ERROR_MORE_DATA:
-        return STATUS_BUFFER_OVERFLOW;
- 
-    case ERROR_INSUFFICIENT_BUFFER:
-        return STATUS_BUFFER_TOO_SMALL;
-        
-    case ERROR_NO_MORE_FILES:
-        return STATUS_NO_MORE_FILES;
- 
-    case ERROR_FILE_NOT_FOUND:    
-        return STATUS_NO_SUCH_FILE;
- 
-    case ERROR_INVALID_FUNCTION:
-        return STATUS_NOT_SUPPORTED;
- 
-    case ERROR_CALL_NOT_IMPLEMENTED:
-        return STATUS_NOT_IMPLEMENTED;
- 
-    case ERROR_HANDLE_EOF:
-        return STATUS_END_OF_FILE;
- 
-    case ERROR_INVALID_NAME:
-        return STATUS_OBJECT_NAME_INVALID;
- 
-    case ERROR_DISK_FULL:
-        return STATUS_DISK_FULL;
- 
-    case ERROR_DISK_CORRUPT:
-        return STATUS_DISK_CORRUPT_ERROR;
- 
-    case ERROR_BAD_COMMAND:
-        return STATUS_INVALID_DEVICE_STATE;
- 
-    case ERROR_FILE_EXISTS:
-        return STATUS_OBJECT_NAME_COLLISION;
- 
-    case ERROR_ALREADY_EXISTS:
-        return STATUS_OBJECT_NAME_COLLISION;
- 
-    case ERROR_CANNOT_MAKE:
-        return STATUS_CANNOT_MAKE;
- 
-    case ERROR_PROC_NOT_FOUND:
-        return STATUS_PROCEDURE_NOT_FOUND;
- 
-    case ERROR_OPERATION_ABORTED:
-        return STATUS_CANCELLED;
- 
-    case ERROR_IO_DEVICE:
-    case TYPE_E_IOERROR:
-        return STATUS_IO_DEVICE_ERROR;
- 
-    case ERROR_BAD_UNIT:
-        return STATUS_NO_SUCH_DEVICE;
- 
-    case ERROR_BAD_ARGUMENTS:
-        return STATUS_INVALID_PARAMETER;
- 
-    case ERROR_BAD_EXE_FORMAT:
-        return STATUS_INVALID_IMAGE_FORMAT;
- 
-    case ERROR_WAIT_NO_CHILDREN:
-        return STATUS_NOT_FOUND;
- 
-    case ERROR_RETRY:
-        return STATUS_RETRY;
- 
-    case ERROR_INVALID_ADDRESS:
-        return STATUS_CONFLICTING_ADDRESSES;
- 
-    case ERROR_BUSY:
-        return STATUS_DEVICE_BUSY;
- 
-    case ERROR_DIRECTORY:
-        return STATUS_NOT_A_DIRECTORY;
- 
-    case ERROR_TOO_MANY_OPEN_FILES:
-        return STATUS_TOO_MANY_OPENED_FILES;
- 
-    case ERROR_EA_TABLE_FULL:
-        return STATUS_EA_TOO_LARGE;
- 
-    case ERROR_FILE_INVALID:
-        return STATUS_FILE_INVALID;
- 
-    case ERROR_CONNECTION_UNAVAIL:
-        return STATUS_CONNECTION_DISCONNECTED;              
- 
-    case ERROR_TOO_MANY_LINKS:
-        return STATUS_TOO_MANY_LINKS;
- 
-    case ERROR_BROKEN_PIPE:
-        return STATUS_PIPE_BROKEN;
- 
-    case ERROR_ARITHMETIC_OVERFLOW:
-        return STATUS_INTEGER_OVERFLOW;
- 
-    case ERROR_POSSIBLE_DEADLOCK:
-        return STATUS_POSSIBLE_DEADLOCK;
- 
-    case ERROR_BUFFER_OVERFLOW:
-        return STATUS_NAME_TOO_LONG;
- 
-    case ERROR_TOO_MANY_SEMAPHORES:
-        return STATUS_INSUFFICIENT_RESOURCES;
- 
-    case ERROR_DIR_NOT_EMPTY:
-        return STATUS_DIRECTORY_NOT_EMPTY;
- 
-    case ERROR_PATH_NOT_FOUND:
-        return STATUS_OBJECT_PATH_NOT_FOUND;
- 
-    case ERROR_ARENA_TRASHED:
-        return STATUS_DISK_CORRUPT_ERROR;
- 
-    case ERROR_INVALID_BLOCK:
-        return STATUS_INVALID_ADDRESS;
- 
-    case ERROR_BAD_ENVIRONMENT:
-        return STATUS_VARIABLE_NOT_FOUND;
- 
-    case ERROR_SHARING_VIOLATION:
-        return STATUS_SHARING_VIOLATION;
- 
-    case ERROR_FILENAME_EXCED_RANGE:
-        return STATUS_NAME_TOO_LONG;
- 
-    case WSAEINTR:
-        return STATUS_CANCELLED;
- 
-    case WSAEBADF:
-        return STATUS_INVALID_HANDLE;
- 
-    case WSATRY_AGAIN:
-        return STATUS_RETRY;
- 
-    default:
-        return STATUS_UNSUCCESSFUL;*/
 }

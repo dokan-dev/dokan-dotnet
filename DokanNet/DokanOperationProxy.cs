@@ -12,6 +12,9 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace DokanNet
 {
+    /// <summary>
+    /// The dokan operation proxy.
+    /// </summary>
     internal sealed class DokanOperationProxy
     {
         #region Delegates
@@ -149,17 +152,47 @@ namespace DokanNet
 
         private readonly uint serialNumber;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DokanOperationProxy"/> class.
+        /// </summary>
+        /// <param name="operations">
+        /// A <see cref="IDokanOperations"/> that contains the custom implementation of the driver.
+        /// </param>
+        /// <param name="logger">
+        /// A <see cref="ILogger"/> that handle all logging.
+        /// </param>
         public DokanOperationProxy(IDokanOperations operations, ILogger logger)
         {
             this.operations = operations;
             this.logger = logger;
-            serialNumber = (uint) this.operations.GetHashCode();
+            serialNumber = (uint)operations.GetHashCode();
         }
 
         /// <summary>
-        /// Called when a file is to be created
-        /// See https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx
+        /// CreateFile is called each time a request is made on a file system object.
+        /// 
+        /// In case <see cref="FileMode.OpenOrCreate"/> and
+        /// <see cref="FileMode.Create"/> are opening successfully a already
+        /// existing file, you have to <c>SetLastError(ERROR_ALREADY_EXISTS)</c>.
+        /// 
+        /// If the file is a directory, CreateFile is also called.
+        /// In this case, CreateFile should return <see cref="NtStatus.Success"/> when that directory
+        /// can be opened and <see cref="DokanFileInfo.IsDirectory"/> has to be set to <c>true</c>.
+        /// 
+        /// <see cref="DokanFileInfo.Context"/> can be used to store data (like <see cref="FileStream"/>)
+        /// that can be retrieved in all other request related to the context.
         /// </summary>
+        /// <param name="rawFileName">File path requested by the Kernel on the FileSystem.</param>
+        /// <param name="securityContext">SecurityContext, see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff550613(v=vs.85).aspx">IO_SECURITY_CONTEXT structure (MSDN)</a></param>
+        /// <param name="rawDesiredAccess">Specifies an <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff540466(v=vs.85).aspx">ACCESS_MASK</a> value that determines the requested access to the object.</param>
+        /// <param name="rawFileAttributes">Specifies one or more FILE_ATTRIBUTE_XXX flags, which represent the file attributes to set if you create or overwrite a file.</param>
+        /// <param name="rawShareAccess">Type of share access, which is specified as zero or any combination of <see cref="FileShare"/>.</param>
+        /// <param name="rawCreateDisposition">Specifies the action to perform if the file does or does not exist.</param>
+        /// <param name="rawCreateOptions">Specifies the options to apply when the driver creates or opens the file.</param>
+        /// <param name="rawFileInfo">>An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
+        /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</a>
+        /// <see cref="DokanNet.IDokanOperations.CreateFile"/>
+        /// \todo Update the second paragraph in this documentation. 
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr securityContext, uint rawDesiredAccess,
             uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
@@ -176,27 +209,27 @@ namespace DokanNet
 
                 foreach (FileOptions fileOption in Enum.GetValues(typeof(FileOptions)))
                 {
-                    if (((FileOptions) (fileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
+                    if (((FileOptions)(fileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
                         fileOptions |= fileOption;
                 }
 
                 foreach (FileAttributes fileAttribute in Enum.GetValues(typeof(FileAttributes)))
                 {
-                    if (((FileAttributes) (fileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
+                    if (((FileAttributes)(fileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
                         fileAttributes |= fileAttribute;
                 }
 
                 logger.Debug("CreateFileProxy : {0}", rawFileName);
-                logger.Debug("\tCreationDisposition\t{0}", (FileMode) creationDisposition);
-                logger.Debug("\tFileAccess\t{0}", (FileAccess) rawDesiredAccess);
-                logger.Debug("\tFileShare\t{0}", (FileShare) rawShareAccess);
+                logger.Debug("\tCreationDisposition\t{0}", (FileMode)creationDisposition);
+                logger.Debug("\tFileAccess\t{0}", (FileAccess)rawDesiredAccess);
+                logger.Debug("\tFileShare\t{0}", (FileShare)rawShareAccess);
                 logger.Debug("\tFileOptions\t{0}", fileOptions);
                 logger.Debug("\tFileAttributes\t{0}", fileAttributes);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
                 var result = operations.CreateFile(rawFileName,
-                    (FileAccess) rawDesiredAccess,
-                    (FileShare) rawShareAccess,
-                    (FileMode) creationDisposition,
+                    (FileAccess)rawDesiredAccess,
+                    (FileShare)rawShareAccess,
+                    (FileMode)creationDisposition,
                     fileOptions,
                     fileAttributes,
                     rawFileInfo);
@@ -349,27 +382,27 @@ namespace DokanNet
                     logger.Debug("\tLastWriteTime\t{0}", fi.LastWriteTime);
                     logger.Debug("\tLength\t{0}", fi.Length);
 
-                    rawHandleFileInformation.dwFileAttributes = (uint) fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
+                    rawHandleFileInformation.dwFileAttributes = (uint)fi.Attributes /* + FILE_ATTRIBUTE_VIRTUAL*/;
 
                     var ctime = ToFileTime(fi.CreationTime);
                     var atime = ToFileTime(fi.LastAccessTime);
                     var mtime = ToFileTime(fi.LastWriteTime);
-                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int) (ctime >> 32);
-                    rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int) (ctime & 0xffffffff);
+                    rawHandleFileInformation.ftCreationTime.dwHighDateTime = (int)(ctime >> 32);
+                    rawHandleFileInformation.ftCreationTime.dwLowDateTime = (int)(ctime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime = (int) (atime >> 32);
-                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime = (int) (atime & 0xffffffff);
+                    rawHandleFileInformation.ftLastAccessTime.dwHighDateTime = (int)(atime >> 32);
+                    rawHandleFileInformation.ftLastAccessTime.dwLowDateTime = (int)(atime & 0xffffffff);
 
-                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime = (int) (mtime >> 32);
-                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime = (int) (mtime & 0xffffffff);
+                    rawHandleFileInformation.ftLastWriteTime.dwHighDateTime = (int)(mtime >> 32);
+                    rawHandleFileInformation.ftLastWriteTime.dwLowDateTime = (int)(mtime & 0xffffffff);
 
                     rawHandleFileInformation.dwVolumeSerialNumber = serialNumber;
 
-                    rawHandleFileInformation.nFileSizeLow = (uint) (fi.Length & 0xffffffff);
-                    rawHandleFileInformation.nFileSizeHigh = (uint) (fi.Length >> 32);
+                    rawHandleFileInformation.nFileSizeLow = (uint)(fi.Length & 0xffffffff);
+                    rawHandleFileInformation.nFileSizeHigh = (uint)(fi.Length >> 32);
                     rawHandleFileInformation.dwNumberOfLinks = 1;
                     rawHandleFileInformation.nFileIndexHigh = 0;
-                    rawHandleFileInformation.nFileIndexLow = (uint) fi.FileName.GetHashCode();
+                    rawHandleFileInformation.nFileIndexLow = (uint)fi.FileName.GetHashCode();
                 }
 
                 logger.Debug("GetFileInformationProxy : {0} Return : {1}", rawFileName, result);
@@ -416,7 +449,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -464,7 +497,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -478,7 +511,7 @@ namespace DokanNet
             }
         }
 
-        private static void Addto(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void AddTo(FILL_FIND_FILE_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!string.IsNullOrEmpty(fi.FileName));
             var ctime = ToFileTime(fi.CreationTime);
@@ -502,8 +535,8 @@ namespace DokanNet
                     dwHighDateTime = (int) (mtime >> 32),
                     dwLowDateTime = (int) (mtime & 0xffffffff)
                 },
-                nFileSizeLow = (uint) (fi.Length & 0xffffffff),
-                nFileSizeHigh = (uint) (fi.Length >> 32),
+                nFileSizeLow = (uint)(fi.Length & 0xffffffff),
+                nFileSizeHigh = (uint)(fi.Length >> 32),
                 cFileName = fi.FileName
             };
             //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
@@ -539,7 +572,7 @@ namespace DokanNet
                     // used a single entry call to speed up the "enumeration" of the list
                     foreach (var t in files)
                     {
-                        Addto(fill, rawFileInfo, t);
+                        AddTo(fill, rawFileInfo, t);
                     }
                 }
 
@@ -553,7 +586,7 @@ namespace DokanNet
             }
         }
 
-        private static void Addto(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        private static void AddTo(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
         {
             Debug.Assert(!string.IsNullOrEmpty(fi.FileName));
             var data = new WIN32_FIND_STREAM_DATA
@@ -620,10 +653,10 @@ namespace DokanNet
             try
             {
                 logger.Debug("SetFileAttributesProxy : {0}", rawFileName);
-                logger.Debug("\tAttributes\t{0}", (FileAttributes) rawAttributes);
+                logger.Debug("\tAttributes\t{0}", (FileAttributes)rawAttributes);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.SetFileAttributes(rawFileName, (FileAttributes) rawAttributes, rawFileInfo);
+                var result = operations.SetFileAttributes(rawFileName, (FileAttributes)rawAttributes, rawFileInfo);
 
                 logger.Debug("SetFileAttributesProxy : {0} Return : {1}", rawFileName, result);
                 return result;
@@ -643,19 +676,19 @@ namespace DokanNet
         {
             var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) &&
                         (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawCreationTime.dwHighDateTime << 32) |
-                                        (uint) rawCreationTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) |
+                                        (uint)rawCreationTime.dwLowDateTime)
+                : (DateTime?)null;
             var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) &&
                         (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawLastAccessTime.dwHighDateTime << 32) |
-                                        (uint) rawLastAccessTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) |
+                                        (uint)rawLastAccessTime.dwLowDateTime)
+                : (DateTime?)null;
             var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) &&
                         (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long) rawLastWriteTime.dwHighDateTime << 32) |
-                                        (uint) rawLastWriteTime.dwLowDateTime)
-                : (DateTime?) null;
+                ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) |
+                                        (uint)rawLastWriteTime.dwLowDateTime)
+                : (DateTime?)null;
 
             try
             {
@@ -940,7 +973,7 @@ namespace DokanNet
                     Debug.Assert(sec != null);
                     logger.Debug("\tFileSystemSecurity Result : {0}", sec);
                     var buffer = sec.GetSecurityDescriptorBinaryForm();
-                    rawSecurityDescriptorLengthNeeded = (uint) buffer.Length;
+                    rawSecurityDescriptorLengthNeeded = (uint)buffer.Length;
                     if (buffer.Length > rawSecurityDescriptorLength)
                         return DokanResult.BufferOverflow;
 
@@ -986,8 +1019,8 @@ namespace DokanNet
             var buffer = new byte[rawSecurityDescriptorLength];
             try
             {
-                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int) rawSecurityDescriptorLength);
-                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity) new DirectorySecurity() : new FileSecurity();
+                Marshal.Copy(rawSecurityDescriptor, buffer, 0, (int)rawSecurityDescriptorLength);
+                var sec = rawFileInfo.IsDirectory ? (FileSystemSecurity)new DirectorySecurity() : new FileSecurity();
                 sec.SetSecurityDescriptorBinaryForm(buffer);
 
                 logger.Debug("SetFileSecurityProxy : {0}", rawFileName);
@@ -1009,14 +1042,19 @@ namespace DokanNet
 
         /// <summary>
         /// Converts the value of <paramref name="dateTime"/> to a Windows file time.
-        /// If <paramref name="dateTime"/> is null or before 12:00 midnight January 1, 1601 C.E. UTC, it returns 0
+        /// If <paramref name="dateTime"/> is <c>null</c> or before 12:00 midnight January 1, 1601 C.E. UTC, it returns <c>0</c>.
         /// </summary>
-        /// <returns>The value of <paramref name="dateTime"/> expressed as a Windows file time
-        ///  -or- it returns 0 if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or null.</returns>
+        /// <param name="dateTime">
+        /// The date Time.
+        /// </param>
+        /// <returns>
+        /// The value of <paramref name="dateTime"/> expressed as a Windows file time
+        /// -or- it returns <c>0</c> if <paramref name="dateTime"/> is before 12:00 midnight January 1, 1601 C.E. UTC or <c>null</c>.
+        /// </returns>
+        /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx">WIN32_FILE_ATTRIBUTE_DATA structure (MSDN)</a>
         [Pure]
         private static long ToFileTime(DateTime? dateTime)
         {
-            //See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365739(v=vs.85).aspx
             return dateTime.HasValue && (dateTime.Value >= DateTime.FromFileTime(0))
                 ? dateTime.Value.ToFileTime()
                 : 0;
@@ -1024,6 +1062,13 @@ namespace DokanNet
 
         #region Nested type: FILL_FIND_FILE_DATA
 
+        /// <summary>
+        /// Used to add an entry in <see cref="DokanOperationProxy.FindFilesProxy"/> and <see cref="DokanOperationProxy.FindFilesWithPatternProxy"/>.
+        /// </summary>
+        /// <param name="rawFindData">A <see cref="WIN32_FIND_DATA"/>.</param>
+        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
+        /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
+        /// <remarks>This is the same delegate as <c>PFillFindData</c> (dokan.h) in the C++ version of Dokan.</remarks>
         private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
@@ -1031,6 +1076,13 @@ namespace DokanNet
 
         #region Nested type: FILL_FIND_STREAM_DATA
 
+        /// <summary>
+        /// Used to add an entry in <see cref="DokanOperationProxy.FindStreamsProxy"/>.
+        /// </summary>
+        /// <param name="rawFindData">A <see cref="WIN32_FIND_STREAM_DATA"/>.</param>
+        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
+        /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
+        /// <remarks>This is the same delegate as <c>PFillFindStreamData</c> (dokan.h) in the C++ version of Dokan.</remarks>
         private delegate long FILL_FIND_STREAM_DATA(
             ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
