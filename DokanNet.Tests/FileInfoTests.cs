@@ -626,6 +626,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
+            fixture.ExpectCloseFile(path);
             fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
 #endif
 
