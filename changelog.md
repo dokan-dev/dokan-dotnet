@@ -6,8 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - XML comments in code.
 - A website with the [documentation](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
-- Posibiles to redirect log output.
-- Localizated error messages for DE and FR.
+- Possibility to redirect log output.
+- Localized error messages for DE and FR.
 - Support to specify UNC name used for network volume.
 - Support to specify allocation Unit Size of the volume.
 - Support to specify sector Size of the volume.
@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Enum ``DokanOptions`` get following new values: ``WriteProtection``, ``MountManager``, ``CurrentSession`` and ``UserModeLock``.
 - Enum value ``NtStatus.NotADirectory``.
 ### Changed
-- ``DokanResult.AlreadyExists`` should be returnerd insted of using ``SetLastError(ERROR_ALREADY_EXISTS)`` in ``CreateFile``.
+- ``DokanResult.AlreadyExists`` should be returned instead of using ``SetLastError(ERROR_ALREADY_EXISTS)`` in ``CreateFile``.
 - Updated ``DokanFileInfo`` to support for unknown creation, access and modification time.
  
 ## [1.0.8] - 2015-12-09
