@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Support for ``IDokanOperations.FindFilesWithPattern``.
 - Enum ``DokanOptions`` get following new values: ``WriteProtection``, ``MountManager``, ``CurrentSession`` and ``UserModeLock``.
 - Enum value ``NtStatus.NotADirectory``.
+
 ### Changed
 - ``DokanResult.AlreadyExists`` should be returned instead of using ``SetLastError(ERROR_ALREADY_EXISTS)`` in ``CreateFile``.
 - Updated ``DokanFileInfo`` to support for unknown creation, access and modification time.
@@ -27,18 +28,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Enum value ``FileAccess.Reserved``.
 - Support for ``DokanMapKernelToUserCreateFileFlags``.
 - Enum ``NtStatus``.
+
 ### Changed
 - Renamed ``IDokanOperations.Unmount`` to ``Unmounted``.
 - ``IDokanOperations.CreateFile`` get responsible for Directory to.
+
 ### Removed
 - Removed enum ``DokanError`` that are replaced with class ``DokanResult``.
 - Removed ``IDokanOperations.OpenDirectory`` that are replaced with ``IDokanOperations.CreateFile``.
 - Removed ``IDokanOperations.OpenDirectory`` that are replaced with ``IDokanOperations.CreateFile``.
 
 ## [1.0.6] - 2015-05-23
-### Added
-- Enum value ``DokanError.Undefined``.
-- Enum value ``FileSystemFeatures.None``.
+Dokan-dotnet is added to GitHub the same time as this release, and unfortunately do we do not have any 
+history of what changed before this time.
+
 
 [Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...HEAD
 [1.0.8]: https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
