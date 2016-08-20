@@ -47,7 +47,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                 }
@@ -65,7 +65,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -84,7 +84,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -103,7 +103,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -122,7 +122,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -141,7 +141,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {arg3}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {arg3}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -163,7 +163,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -186,7 +186,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -209,7 +209,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -232,7 +232,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn1}, {argIn2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn1}, {argIn2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -257,7 +257,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut1 = default(TOut1);
@@ -1035,7 +1035,7 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Callback((string fileName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{/*Interlocked.Decrement(ref */pendingFiles/*)*/}] (\"{fileName}\", {info.Log()})"))
+                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
                 .Verifiable();
         }
 
