@@ -47,7 +47,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                 }
