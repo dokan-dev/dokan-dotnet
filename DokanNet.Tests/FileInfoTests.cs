@@ -392,7 +392,6 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists);
-            fixture.ExpectCloseFile(destinationPath);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -626,7 +625,6 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformationToFail(destinationPath, DokanResult.FileNotFound);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
-            fixture.ExpectCloseFile(path);
             fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
 #endif
 
