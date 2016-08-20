@@ -1015,7 +1015,7 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Callback((string fileName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
+                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{/*Interlocked.Decrement(ref */pendingFiles/*)*/}] (\"{fileName}\", {info.Log()})"))
                 .Verifiable();
         }
 
@@ -1101,7 +1101,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info)
                     =>
                     {
-                        Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                        Trace($"{nameof(IDokanOperations.CloseFile)}[{(isDirectory ? Interlocked.Read(ref pendingFiles) : Interlocked.Decrement(ref pendingFiles))}] (\"{fileName}\", {info.Log()})");
                         info.Context = null;
                     })
                 .Verifiable();
