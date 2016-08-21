@@ -21,7 +21,7 @@ To install DokanNet, run the following command in the Package Manager Console
 Dokan.NET Binding is distributed under a version of the "MIT License",
 which is a BSD-like license. See the 'license.mit.txt' file for details.
 
-##Environment
+## Environment
 Microsoft .NET Framework 4.0 and Dokan library
 
 ## How to write a file system

@@ -1,13 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/).
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/) 
+and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- This CHANGELOG.md.
 - XML comments in code.
 - A website with the [documentation](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
 - Possibility to redirect log output.
-- Localized error messages for DE and FR.
+- Localized error messages for German and French.
 - Support to specify UNC name used for network volume.
 - Support to specify allocation Unit Size of the volume.
 - Support to specify sector Size of the volume.
@@ -38,11 +41,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Removed ``IDokanOperations.OpenDirectory`` that are replaced with ``IDokanOperations.CreateFile``.
 - Removed ``IDokanOperations.OpenDirectory`` that are replaced with ``IDokanOperations.CreateFile``.
 
-## [1.0.6] - 2015-05-23
-Dokan-dotnet is added to GitHub the same time as this release, and unfortunately do we do not have any 
-history of what changed before this time.
+## [1.0.6] - 2011-01-12
+Latest Dokan version from Hiroki Asakawa.
+See the [release note](http://web.archive.org/web/20150416102451/http://dokan-dev.net/en/2011/01/12/dokan-net-library-0-6-0-released/) and [source code](https://code.google.com/archive/p/dokan/source/default/source).
 
+### Added
+- ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
+- ``DokanRemoveMountPoint``
 
 [Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...HEAD
 [1.0.8]: https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
-[1.0.6]: https://github.com/dokan-dev/dokan-dotnet/compare/19fb1d6cdad87fa6185626677fc5f44733af9896...1.0.6.0
+[1.0.6]: http://web.archive.org/web/20150416102451/http://dokan-dev.net/en/2011/01/12/dokan-net-library-0-6-0-released/
