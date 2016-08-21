@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - XML comments in code.
 - A website with the [documentation](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
 - Possibility to redirect log output.
-- Localized error messages for German and French.
+- Localized error messages for German, French and Swedish.
 - Support to specify UNC name used for network volume.
 - Support to specify allocation Unit Size of the volume.
 - Support to specify sector Size of the volume.

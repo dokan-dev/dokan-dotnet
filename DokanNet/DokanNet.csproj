@@ -141,6 +141,7 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resource.fr.resx" />
+    <EmbeddedResource Include="Properties\Resource.sv.resx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dokan.snk" />
