@@ -16,7 +16,8 @@
     </metadata>
     <files>
         <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
-		<file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
-		<file src="bin\Release\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
+		    <file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
+		    <file src="bin\Release\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
+        <file src="bin\Release\sv\DokanNet.resources.dll" target="lib\net40\sv\DokanNet.resources.dll" />
     </files>
 </package>
