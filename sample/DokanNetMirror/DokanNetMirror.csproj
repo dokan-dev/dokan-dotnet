@@ -55,8 +55,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, PublicKeyToken=761dcf67ba0bf74d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\StringInterpolationBridgeStrong.0.9.1\lib\net40\StringInterpolationBridge.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -101,9 +101,10 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\DokanNet\DokanNet.csproj">
+    <ProjectReference Include="..\..\DokanNet\DokanNet.net4.0.csproj">
       <Project>{a09b408a-26a0-4ff8-83d5-6e1b1da5f63c}</Project>
       <Name>DokanNet</Name>
     </ProjectReference>
