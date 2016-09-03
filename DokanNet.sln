@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet", "DokanNet\DokanNet.csproj", "{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}"
 EndProject
@@ -16,7 +16,22 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D685023A-6DCE-4CC5-8468-8A0E672E2ACC}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		DokanNet.runsettings = DokanNet.runsettings
+		CHANGELOG.md = CHANGELOG.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documentations", "documentations", "{CD7C8139-B069-4C41-86EE-8D0F8BD24191}"
+	ProjectSection(SolutionItems) = preProject
+		DokanNet\documentations\Doxyfile = DokanNet\documentations\Doxyfile
+		DokanNet\documentations\mainpage.md = DokanNet\documentations\mainpage.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{F4BC71C8-E83F-499B-8E6F-4FB9B2F5972A}"
+	ProjectSection(SolutionItems) = preProject
+		DokanNet\documentations\resources\customdoxygen.css = DokanNet\documentations\resources\customdoxygen.css
+		DokanNet\documentations\resources\doxy-boot.js = DokanNet\documentations\resources\doxy-boot.js
+		DokanNet\documentations\resources\footer.html = DokanNet\documentations\resources\footer.html
+		DokanNet\documentations\resources\header.html = DokanNet\documentations\resources\header.html
 	EndProjectSection
 EndProject
 Global
@@ -48,5 +63,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
+		{F4BC71C8-E83F-499B-8E6F-4FB9B2F5972A} = {CD7C8139-B069-4C41-86EE-8D0F8BD24191}
 	EndGlobalSection
 EndGlobal

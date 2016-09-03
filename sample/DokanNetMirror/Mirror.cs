@@ -71,6 +71,7 @@ namespace DokanNetMirror
         public NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
             FileOptions options, FileAttributes attributes, DokanFileInfo info)
         {
+            NtStatus result = NtStatus.Success;
             var filePath = GetPath(fileName);
 
             if (info.IsDirectory)
@@ -191,6 +192,10 @@ namespace DokanNetMirror
                     info.Context = new FileStream(filePath, mode,
                         readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
 
+                    if (pathExists && (mode == FileMode.OpenOrCreate
+                        || mode == FileMode.Create))
+                        result = DokanResult.AlreadyExists;
+
                     if (mode == FileMode.CreateNew || mode == FileMode.Create) //Files are always created as Archive
                         attributes |= FileAttributes.Archive;
                     File.SetAttributes(filePath, attributes);
@@ -219,7 +224,7 @@ namespace DokanNetMirror
                 }
             }
             return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
-                DokanResult.Success);
+                result);
         }
 
         public void Cleanup(string fileName, DokanFileInfo info)

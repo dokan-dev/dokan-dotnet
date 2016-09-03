@@ -1064,6 +1064,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Directory);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
+            fixture.ExpectCloseFile(path);
 #endif
 
             var sut = new DirectoryInfo(fixture.DirectoryName.AsDriveBasedPath());
