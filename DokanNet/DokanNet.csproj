@@ -141,9 +141,11 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resource.fr.resx" />
+    <EmbeddedResource Include="Properties\Resource.sv.resx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Dokan.snk" />
+    <None Include="DokanNet.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
