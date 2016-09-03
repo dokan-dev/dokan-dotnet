@@ -26,7 +26,7 @@ namespace DokanNet
         /// 
         /// In case <paramref name="mode"/> is <see cref="FileMode.OpenOrCreate"/> and
         /// <see cref="FileMode.Create"/> are opening successfully a already
-        /// existing file, you have to <c>SetLastError(ERROR_ALREADY_EXISTS)</c>.
+        /// existing file, you have to return <see cref="DokanResult.AlreadyExists"/> instead of <see cref="NtStatus.Success"/>.
         /// 
         /// If the file is a directory, CreateFile is also called.
         /// In this case, CreateFile should return <see cref="NtStatus.Success"/> when that directory

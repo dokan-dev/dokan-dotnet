@@ -173,7 +173,7 @@ namespace DokanNet
         /// 
         /// In case <see cref="FileMode.OpenOrCreate"/> and
         /// <see cref="FileMode.Create"/> are opening successfully a already
-        /// existing file, you have to <c>SetLastError(ERROR_ALREADY_EXISTS)</c>.
+        /// existing file, you have to return <see cref="DokanResult.AlreadyExists"/> instead of <see cref="NtStatus.Success"/>.
         /// 
         /// If the file is a directory, CreateFile is also called.
         /// In this case, CreateFile should return <see cref="NtStatus.Success"/> when that directory
@@ -200,24 +200,13 @@ namespace DokanNet
         {
             try
             {
-                FileOptions fileOptions = 0;
-                FileAttributes fileAttributes = 0;
                 var fileAttributesAndFlags = 0;
                 var creationDisposition = 0;
                 NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions,
                     rawCreateDisposition, ref fileAttributesAndFlags, ref creationDisposition);
 
-                foreach (FileOptions fileOption in Enum.GetValues(typeof(FileOptions)))
-                {
-                    if (((FileOptions)(fileAttributesAndFlags & 0xffffc000) & fileOption) == fileOption)
-                        fileOptions |= fileOption;
-                }
-
-                foreach (FileAttributes fileAttribute in Enum.GetValues(typeof(FileAttributes)))
-                {
-                    if (((FileAttributes)(fileAttributesAndFlags & 0x3fff) & fileAttribute) == fileAttribute)
-                        fileAttributes |= fileAttribute;
-                }
+                var fileAttributes = (FileAttributes)(fileAttributesAndFlags & 0x00003ff7);
+                var fileOptions = (FileOptions)(fileAttributesAndFlags & 0xdc004000);
 
                 logger.Debug("CreateFileProxy : {0}", rawFileName);
                 logger.Debug("\tCreationDisposition\t{0}", (FileMode)creationDisposition);
