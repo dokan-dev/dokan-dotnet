@@ -1070,7 +1070,7 @@ namespace DokanNet.Tests
                 .Verifiable();
         }
 
-        internal void ExpectCreateFileToFail(string path, NtStatus result)
+        internal void ExpectCreateFileToFail(string path, NtStatus result, bool closeFile = false)
         {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
@@ -1079,8 +1079,11 @@ namespace DokanNet.Tests
                 .Setup(d => d.CreateFile(path, It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<DokanFileInfo>()))
                 .Returns(result)
                 .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"))
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{(closeFile ? Interlocked.Increment(ref pendingFiles) : Interlocked.Read(ref pendingFiles))}] **{result}** (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"))
                 .Verifiable();
+
+            if (closeFile)
+                ExpectCloseFile(path);
         }
 
         internal void ExpectCleanupFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
