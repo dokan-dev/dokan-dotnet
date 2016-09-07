@@ -464,7 +464,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        private void GetDirectories_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
+        private static void GetDirectories_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
             var fixture = DokanOperationsFixture.Instance;
 
@@ -747,7 +747,7 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectOpenDirectory(path);
             //Remove all dates
-            var files = fixture.RemoveDatesFromFileInformations(fixture.DirectoryItems);
+            var files = DokanOperationsFixture.RemoveDatesFromFileInformations(fixture.DirectoryItems);
 
             if (supportsPatternSearch)
             {
@@ -983,7 +983,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectCreateFile(destinationPath, AppendToDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
             fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, AppendToDirectoryAccess, FileShare.ReadWrite);
-            fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Normal, DokanResult.FileNotFound);
+            fixture.PermitGetFileInformationToFail(destinationPath, DokanResult.FileNotFound);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
 #endif
@@ -1014,7 +1014,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Directory);
             fixture.ExpectOpenDirectoryWithoutCleanup(fixture.DestinationDirectoryName.AsRootedPath(), AppendToDirectoryAccess, FileShare.ReadWrite);
             fixture.ExpectCreateFile(destinationPath, AppendToDirectoryAccess, FileShare.ReadWrite, FileMode.Open);
-            fixture.PermitGetFileInformationToFail(destinationPath, FileAttributes.Directory, DokanResult.PathNotFound);
+            fixture.PermitGetFileInformationToFail(destinationPath, DokanResult.PathNotFound);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), attributes: FileAttributes.Normal);
             fixture.ExpectMoveFile(path, destinationPath, false);
 #endif
