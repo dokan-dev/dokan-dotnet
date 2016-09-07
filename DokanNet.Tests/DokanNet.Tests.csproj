@@ -80,7 +80,7 @@
     <Compile Include="TestCategories.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DokanNet\DokanNet.csproj">
+    <ProjectReference Include="..\DokanNet\DokanNet.net4.0.csproj">
       <Project>{a09b408a-26a0-4ff8-83d5-6e1b1da5f63c}</Project>
       <Name>DokanNet</Name>
     </ProjectReference>

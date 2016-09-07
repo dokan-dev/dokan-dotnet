@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - This CHANGELOG.md.
+- Support for .NET Framework 4.6
 - XML comments in code.
 - A website with the [documentation](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
 - Possibility to redirect log output.

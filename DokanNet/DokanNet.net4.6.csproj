@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DokanNet</RootNamespace>
+    <AssemblyName>DokanNet</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\NET$(TargetFrameworkVersion)\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\NET$(TargetFrameworkVersion)\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Adding a custom constant will auto-magically append a comma and space to the pre-built constants.    -->
+    <!-- Move the comma delimiter to the end of each constant and remove the trailing comma when we're done.  -->
+    <DefineConstants Condition=" !$(DefineConstants.Contains(', NET')) ">$(DefineConstants)$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", "")); </DefineConstants>
+    <DefineConstants Condition=" $(DefineConstants.Contains(', NET')) ">$(DefineConstants.Remove($(DefineConstants.LastIndexOf("; NET"))))$(TargetFrameworkVersion.Replace("v", "NET").Replace(".", "")); </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 2.0 ">$(DefineConstants)NET20_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 3.0 ">$(DefineConstants)NET30_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 3.5 ">$(DefineConstants)NET35_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 4.0 ">$(DefineConstants)NET40_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 4.5 ">$(DefineConstants)NET45_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= 4.6 ">$(DefineConstants)NET46_OR_GREATER; </DefineConstants>
+    <DefineConstants Condition=" $(DefineConstants.EndsWith(', ')) ">$(DefineConstants.Remove($(DefineConstants.LastIndexOf("; "))))</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="DokanOptions.cs" />
+    <Compile Include="DokanResult.cs" />
+    <Compile Include="FileSystemFeatures.cs" />
+    <Compile Include="DokanException.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\DebugViewLogger.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LoggerExtensions.cs" />
+    <Compile Include="Logging\NullLogger.cs" />
+    <Compile Include="Logging\TraceLogger.cs" />
+    <Compile Include="Native\BY_HANDLE_FILE_INFORMATION.cs" />
+    <Compile Include="DokanFileInfo.cs" />
+    <Compile Include="Native\SECURITY_INFORMATION.cs" />
+    <Compile Include="Native\DOKAN_OPERATIONS.cs" />
+    <Compile Include="Native\DOKAN_OPTIONS.cs" />
+    <Compile Include="FileAccess.cs" />
+    <Compile Include="FileInformation.cs" />
+    <Compile Include="Native\NativeMethods.cs" />
+    <Compile Include="Dokan.cs" />
+    <Compile Include="IDokanOperations.cs" />
+    <Compile Include="Native\WIN32_FIND_STREAM_DATA.cs" />
+    <Compile Include="NtStatus.cs" />
+    <Compile Include="NullFormatProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DokanOperationProxy.cs" />
+    <Compile Include="Native\WIN32_FIND_DATA.cs" />
+    <Compile Include="Properties\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resource.de.resx" />
+    <EmbeddedResource Include="Properties\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resource.fr.resx" />
+    <EmbeddedResource Include="Properties\Resource.sv.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Dokan.snk" />
+    <None Include="DokanNet.net4.6.project.json" />
+    <None Include="DokanNet.nuspec" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
