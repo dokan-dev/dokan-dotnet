@@ -11,13 +11,21 @@
         <description>DotNet Wrapper for Dokan, user mode file system for windows</description>
         <copyright>Copyright (C) 2016</copyright>
         <dependencies>
+          <group targetFramework="net40">
             <dependency id="StringInterpolationBridgeStrong" version="0.9.1" />
-		</dependencies>
+          </group>
+          <group targetFramework="net46"/>
+        </dependencies>
     </metadata>
     <files>
-        <file src="bin\Release\DokanNet.dll" target="lib\net40\DokanNet.dll" />
-        <file src="bin\Release\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
-        <file src="bin\Release\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
-        <file src="bin\Release\sv\DokanNet.resources.dll" target="lib\net40\sv\DokanNet.resources.dll" />
+        <file src="bin\Release\NETv4.0\DokanNet.dll" target="lib\net40\DokanNet.dll" />
+        <file src="bin\Release\NETv4.0\de\DokanNet.resources.dll" target="lib\net40\de\DokanNet.resources.dll" />
+        <file src="bin\Release\NETv4.0\fr\DokanNet.resources.dll" target="lib\net40\fr\DokanNet.resources.dll" />
+        <file src="bin\Release\NETv4.0\sv\DokanNet.resources.dll" target="lib\net40\sv\DokanNet.resources.dll" />
+
+        <file src="bin\Release\NETv4.6\DokanNet.dll" target="lib\net46\DokanNet.dll" />
+        <file src="bin\Release\NETv4.6\de\DokanNet.resources.dll" target="lib\net46\de\DokanNet.resources.dll" />
+        <file src="bin\Release\NETv4.6\fr\DokanNet.resources.dll" target="lib\net46\fr\DokanNet.resources.dll" />
+        <file src="bin\Release\NETv4.6\sv\DokanNet.resources.dll" target="lib\net46\sv\DokanNet.resources.dll" />
     </files>
 </package>

@@ -153,6 +153,29 @@ namespace DokanNet
         private readonly uint serialNumber;
 
         /// <summary>
+        /// To be used to mask out the <see cref="FileOptions"/> flags from what is returned from <see cref="Native.NativeMethods.DokanMapKernelToUserCreateFileFlags"/>.
+        /// </summary>
+        private const int FileOptionsMask =
+            (int)
+            (FileOptions.Asynchronous | FileOptions.DeleteOnClose | FileOptions.Encrypted | FileOptions.None
+             | FileOptions.RandomAccess | FileOptions.SequentialScan | FileOptions.WriteThrough);
+
+        /// <summary>
+        /// To be used to mask out the <see cref="FileAttributes"/> flags from what is returned from <see cref="Native.NativeMethods.DokanMapKernelToUserCreateFileFlags"/>.
+        /// Note that some flags where introduces in .NET Framework 4.5, and is not supported in .NET Framework 4. 
+        /// </summary>
+        private const int FileAttributeMask =
+            (int)
+            (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System | FileAttributes.Directory
+             | FileAttributes.Archive | FileAttributes.Device | FileAttributes.Normal | FileAttributes.Temporary
+             | FileAttributes.SparseFile | FileAttributes.ReparsePoint | FileAttributes.Compressed
+             | FileAttributes.Offline | FileAttributes.NotContentIndexed | FileAttributes.Encrypted
+#if NET45_OR_GREATER
+             | FileAttributes.IntegrityStream | FileAttributes.NoScrubData
+#endif
+            );
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DokanOperationProxy"/> class.
         /// </summary>
         /// <param name="operations">
@@ -192,7 +215,6 @@ namespace DokanNet
         /// <param name="rawFileInfo">>An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff566424(v=vs.85).aspx">ZwCreateFile routine (MSDN)</a>
         /// <see cref="DokanNet.IDokanOperations.CreateFile"/>
-        /// \todo Update the second paragraph in this documentation. 
         public NtStatus ZwCreateFileProxy(string rawFileName, IntPtr securityContext, uint rawDesiredAccess,
             uint rawFileAttributes,
             uint rawShareAccess, uint rawCreateDisposition, uint rawCreateOptions,
@@ -205,8 +227,8 @@ namespace DokanNet
                 NativeMethods.DokanMapKernelToUserCreateFileFlags(rawFileAttributes, rawCreateOptions,
                     rawCreateDisposition, ref fileAttributesAndFlags, ref creationDisposition);
 
-                var fileAttributes = (FileAttributes)(fileAttributesAndFlags & 0x00003ff7);
-                var fileOptions = (FileOptions)(fileAttributesAndFlags & 0xdc004000);
+                var fileAttributes = (FileAttributes)(fileAttributesAndFlags & FileAttributeMask);
+                var fileOptions = (FileOptions)(fileAttributesAndFlags & FileOptionsMask);
 
                 logger.Debug("CreateFileProxy : {0}", rawFileName);
                 logger.Debug("\tCreationDisposition\t{0}", (FileMode)creationDisposition);

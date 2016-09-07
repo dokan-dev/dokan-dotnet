@@ -1,0 +1,11 @@
+﻿{
+    "dependencies": {
+        "StringInterpolationBridgeStrong": "0.9.1"
+    },
+    "frameworks": {
+        "net40": { }
+    },
+    "runtimes": {
+        "win": { }
+    }
+}

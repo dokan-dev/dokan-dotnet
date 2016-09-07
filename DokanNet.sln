@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet", "DokanNet\DokanNet.csproj", "{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.net4.0", "DokanNet\DokanNet.net4.0.csproj", "{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.net4.6", "DokanNet\DokanNet.net4.6.csproj", "{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C} = {A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.Tests", "DokanNet.Tests\DokanNet.Tests.csproj", "{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}"
 EndProject
@@ -44,6 +49,10 @@ Global
 		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
