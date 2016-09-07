@@ -1098,7 +1098,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Manual)]
+#if USER_MODE_LOCK
+        [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1435,7 +1437,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Manual)]
+#if USER_MODE_LOCK
+        [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
