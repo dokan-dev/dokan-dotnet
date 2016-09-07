@@ -1012,11 +1012,9 @@ namespace DokanNet.Tests
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] **{result}** (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"))
                 .Verifiable();
-            operations
-                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
-                .Callback((string fileName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
-                .Verifiable();
+
+            ExpectCloseFile(path, isDirectory: true);
+            ExpectCloseFile(path);
         }
 
         internal void ExpectDeleteDirectory(string path)

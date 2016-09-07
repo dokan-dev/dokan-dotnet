@@ -392,6 +392,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists, true);
+            fixture.ExpectCloseFile(path);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
