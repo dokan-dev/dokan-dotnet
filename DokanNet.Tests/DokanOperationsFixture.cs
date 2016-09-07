@@ -545,9 +545,6 @@ namespace DokanNet.Tests
 
         internal static void InitInstance(string currentTestName)
         {
-            // For single-core environments, allow other threads to process
-            Thread.Yield();
-
             Instance = new DokanOperationsFixture(currentTestName);
             proxy.Target = Instance.operations.Object;
             proxy.HasUnmatchedInvocations = false;
@@ -555,6 +552,9 @@ namespace DokanNet.Tests
 
         internal static void ClearInstance(out bool hasUnmatchedInvocations)
         {
+            // Allow pending calls to process
+            Thread.Sleep(2);
+
             hasUnmatchedInvocations = proxy.HasUnmatchedInvocations;
             proxy.Target = null;
             Instance = null;
