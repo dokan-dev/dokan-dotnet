@@ -36,14 +36,14 @@ namespace DokanNet.Tests
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
 
             [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
-            private void TryExecute(string filename, DokanFileInfo info, Action<string, DokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
+            private void TryExecute(string fileName, DokanFileInfo info, Action<string, DokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
             {
                 if (restrictCallingProcessId && info.ProcessId != Process.GetCurrentProcess().Id)
                     return;
 
                 try
                 {
-                    func(filename, info);
+                    func(fileName, info);
                 }
                 catch (Exception ex)
                 {
