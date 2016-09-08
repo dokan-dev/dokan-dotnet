@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.25123.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.net4.0", "DokanNet\DokanNet.net4.0.csproj", "{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}"
 EndProject
@@ -41,28 +41,46 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug (.NET 4.0)|Any CPU = Debug (.NET 4.0)|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Release  (.NET 4.0)|Any CPU = Release  (.NET 4.0)|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug (.NET 4.0)|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug (.NET 4.0)|Any CPU.Build.0 = Debug (.NET 4.0)|Any CPU
 		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release  (.NET 4.0)|Any CPU.ActiveCfg = Release  (.NET 4.0)|Any CPU
+		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release  (.NET 4.0)|Any CPU.Build.0 = Release  (.NET 4.0)|Any CPU
 		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A09B408A-26A0-4FF8-83D5-6E1B1DA5F63C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug (.NET 4.0)|Any CPU
 		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Release  (.NET 4.0)|Any CPU.ActiveCfg = Release  (.NET 4.0)|Any CPU
 		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug (.NET 4.0)|Any CPU
+		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug (.NET 4.0)|Any CPU.Build.0 = Debug (.NET 4.0)|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Release  (.NET 4.0)|Any CPU.ActiveCfg = Release  (.NET 4.0)|Any CPU
+		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Release  (.NET 4.0)|Any CPU.Build.0 = Release  (.NET 4.0)|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug (.NET 4.0)|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug (.NET 4.0)|Any CPU.Build.0 = Debug (.NET 4.0)|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release  (.NET 4.0)|Any CPU.ActiveCfg = Release  (.NET 4.0)|Any CPU
+		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release  (.NET 4.0)|Any CPU.Build.0 = Release  (.NET 4.0)|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug (.NET 4.0)|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug (.NET 4.0)|Any CPU.Build.0 = Debug (.NET 4.0)|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release  (.NET 4.0)|Any CPU.ActiveCfg = Release  (.NET 4.0)|Any CPU
+		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release  (.NET 4.0)|Any CPU.Build.0 = Release  (.NET 4.0)|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

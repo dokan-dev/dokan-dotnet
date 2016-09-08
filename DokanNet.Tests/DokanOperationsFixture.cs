@@ -637,7 +637,7 @@ namespace DokanNet.Tests
         private string Named(string name) => $"{currentTestName}_{name}";
 #endif
 
-        private static FileInformation[] Named(FileInformation[] infos)
+        private FileInformation[] Named(FileInformation[] infos)
             => infos.Aggregate(new List<FileInformation>(), (l, i) => { l.Add(Named(i)); return l; }, l => l.ToArray());
 
         private FileInformation Named(FileInformation info) => new FileInformation()
