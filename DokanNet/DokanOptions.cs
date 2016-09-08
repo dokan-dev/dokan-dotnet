@@ -10,7 +10,7 @@ namespace DokanNet
     [Flags]
     public enum DokanOptions : long
     {
-        /// <summary>Fixed Drive</summary>
+        /// <summary>Fixed Drive.</summary>
         FixedDrive = 0,
 
         /// <summary>Enable ouput debug message</summary>
