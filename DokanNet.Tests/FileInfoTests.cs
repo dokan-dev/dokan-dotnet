@@ -296,8 +296,8 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectSetEndOfFile(destinationPath, value.Length);
 #if NETWORK_DRIVE
-            fixture.SetupReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
-            fixture.SetupWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+            fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
+            fixture.ExpectWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length, synchronousIo: false);
 #else
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
             fixture.ExpectWriteFile(destinationPath, Encoding.UTF8.GetBytes(value), value.Length);
@@ -336,8 +336,8 @@ namespace DokanNet.Tests
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectSetEndOfFile(destinationPath, largeData.Length);
 #if NETWORK_DRIVE
-            fixture.SetupReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
-            fixture.SetupWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+            fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
+            fixture.ExpectWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE, synchronousIo: false);
 #else
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
             fixture.ExpectWriteFileInChunks(destinationPath, largeData, FILE_BUFFER_SIZE);
@@ -391,8 +391,8 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
-            fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists);
-            fixture.ExpectCloseFile(destinationPath);
+            fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists, true);
+            fixture.ExpectCloseFile(path);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -626,7 +626,6 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformationToFail(destinationPath, DokanResult.FileNotFound);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, attributes: FileAttributes.Normal);
             fixture.ExpectMoveFileToFail(path, destinationPath, false, DokanResult.FileExists);
-            fixture.ExpectCloseFile(path);
             fixture.ExpectOpenDirectoryWithoutCleanup(DokanOperationsFixture.RootName, WriteDirectoryAccess, FileShare.ReadWrite);
 #endif
 
@@ -1100,7 +1099,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Manual)]
+#if USER_MODE_LOCK
+        [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenRead_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1437,7 +1438,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Manual)]
+#if USER_MODE_LOCK
+        [TestMethod, TestCategory(TestCategories.Success)]
+#endif
         public void OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
