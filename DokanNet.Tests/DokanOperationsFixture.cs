@@ -36,18 +36,18 @@ namespace DokanNet.Tests
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
 
             [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
-            private void TryExecute(string filename, DokanFileInfo info, Action<string, DokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
+            private void TryExecute(string fileName, DokanFileInfo info, Action<string, DokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
             {
                 if (restrictCallingProcessId && info.ProcessId != Process.GetCurrentProcess().Id)
                     return;
 
                 try
                 {
-                    func(filename, info);
+                    func(fileName, info);
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                 }
@@ -65,7 +65,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -84,7 +84,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -103,7 +103,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -122,7 +122,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -141,7 +141,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {arg3}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {arg3}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     return DokanResult.InvalidParameter;
@@ -163,7 +163,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -186,7 +186,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -209,7 +209,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -232,7 +232,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} (\"{fileName}\", {argIn1}, {argIn2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} (\"{fileName}\", {argIn1}, {argIn2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut = default(TOut);
@@ -257,7 +257,7 @@ namespace DokanNet.Tests
                 }
                 catch (Exception ex)
                 {
-                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}");
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
                         HasUnmatchedInvocations = true;
                     argOut1 = default(TOut1);
@@ -559,9 +559,6 @@ namespace DokanNet.Tests
 
         internal static void InitInstance(string currentTestName)
         {
-            // For single-core environments, allow other threads to process
-            Thread.Yield();
-
             Instance = new DokanOperationsFixture(currentTestName);
             proxy.Target = Instance.operations.Object;
             proxy.HasUnmatchedInvocations = false;
@@ -569,6 +566,9 @@ namespace DokanNet.Tests
 
         internal static void ClearInstance(out bool hasUnmatchedInvocations)
         {
+            // Allow pending calls to process
+            Thread.Sleep(2);
+
             hasUnmatchedInvocations = proxy.HasUnmatchedInvocations;
             proxy.Target = null;
             Instance = null;
@@ -632,15 +632,15 @@ namespace DokanNet.Tests
         }
 
 #if !SPECIFIC_NAMES
-        private static string Named(string name) => name;
+        private string Named(string name) => name;
 #else
-        private static string Named(string name) => $"{currentTestName}_{name}";
+        private string Named(string name) => $"{currentTestName}_{name}";
 #endif
 
         private static FileInformation[] Named(FileInformation[] infos)
             => infos.Aggregate(new List<FileInformation>(), (l, i) => { l.Add(Named(i)); return l; }, l => l.ToArray());
 
-        private static FileInformation Named(FileInformation info) => new FileInformation()
+        private FileInformation Named(FileInformation info) => new FileInformation()
         {
             FileName = Named(info.FileName), Attributes = info.Attributes,
             CreationTime = info.CreationTime, LastAccessTime = info.LastAccessTime, LastWriteTime = info.LastWriteTime,
@@ -1027,11 +1027,9 @@ namespace DokanNet.Tests
                 .Callback((string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] **{result}** (\"{fileName}\", [{access}], [{share}], {mode}, [{options}], [{attributes}], {info.Log()})"))
                 .Verifiable();
-            operations
-                .Setup(d => d.CloseFile(path, It.Is<DokanFileInfo>(i => i.IsDirectory)))
-                .Callback((string fileName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
-                .Verifiable();
+
+            ExpectCloseFile(path, isDirectory: true);
+            ExpectCloseFile(path);
         }
 
         internal void ExpectDeleteDirectory(string path)
@@ -1085,7 +1083,7 @@ namespace DokanNet.Tests
                 .Verifiable();
         }
 
-        internal void ExpectCreateFileToFail(string path, NtStatus result)
+        internal void ExpectCreateFileToFail(string path, NtStatus result, bool closeFile = false)
         {
             if (result == DokanResult.Success)
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
@@ -1094,8 +1092,11 @@ namespace DokanNet.Tests
                 .Setup(d => d.CreateFile(path, It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<DokanFileInfo>()))
                 .Returns(result)
                 .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Read(ref pendingFiles)}] **{result}** (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"))
+                    => Trace($"{nameof(IDokanOperations.CreateFile)}[{(closeFile ? Interlocked.Increment(ref pendingFiles) : Interlocked.Read(ref pendingFiles))}] **{result}** (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{options}], [{_attributes}], {info.Log()})"))
                 .Verifiable();
+
+            if (closeFile)
+                ExpectCloseFile(path);
         }
 
         internal void ExpectCleanupFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
@@ -1116,7 +1117,7 @@ namespace DokanNet.Tests
                 .Callback((string fileName, DokanFileInfo info)
                     =>
                     {
-                        Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                        Trace($"{nameof(IDokanOperations.CloseFile)}[{(isDirectory ? Interlocked.Read(ref pendingFiles) : Interlocked.Decrement(ref pendingFiles))}] (\"{fileName}\", {info.Log()})");
                         info.Context = null;
                     })
                 .Verifiable();
@@ -1286,11 +1287,12 @@ namespace DokanNet.Tests
                 .Setup(d => d.MoveFile(path, destinationPath, replace, It.IsAny<DokanFileInfo>()))
                 .Returns(result)
                 .Callback((string oldName, string newName, bool _replace, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Increment(ref pendingFiles)}] **{result}** (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"))
+                    => Trace($"{nameof(IDokanOperations.MoveFile)}[{Interlocked.Add(ref pendingFiles, 2)}] **{result}** (\"{oldName}\", \"{newName}\", {_replace}, {info.Log()})"))
                 .Verifiable();
 
             ExpectCleanupFile(destinationPath, isDirectory: true);
             ExpectCleanupFile(destinationPath);
+            ExpectCloseFile(path);
         }
 
         internal void ExpectSetAllocationSize(string path, long length)
