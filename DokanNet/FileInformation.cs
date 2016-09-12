@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 namespace DokanNet
 {
     /// <summary>
-    /// Use to provide file information to Dokan during operations
+    /// Used to provide file information to Dokan during operations
     /// <see cref="IDokanOperations.GetFileInformation"/>, <see cref="IDokanOperations.FindFiles"/>,
-    /// <see cref="IDokanOperations.FindStreams"/> or <see cref="IDokanOperations.FindFilesWithPattern"/>
+    /// <see cref="IDokanOperations.FindStreams"/> or <see cref="IDokanOperations.FindFilesWithPattern"/>.
     /// </summary>
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay("{FileName}, {Length}, {CreationTime}, {LastWriteTime}, {LastAccessTime}, {Attributes}")]
@@ -20,7 +20,7 @@ namespace DokanNet
         public string FileName { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="FileAttributes"/> for the file or directory.
+        /// Gets or sets the <c><see cref="FileAttributes"/></c> for the file or directory.
         /// </summary>
         public FileAttributes Attributes { get; set; }
 
@@ -32,7 +32,7 @@ namespace DokanNet
 
         /// <summary>
         /// Gets or sets the last access time of the file or directory.
-        /// If equal to <c>null</c>, the value will not be set or the file has no creation time.
+        /// If equal to <c>null</c>, the value will not be set or the file has no last access time.
         /// </summary>
         public DateTime? LastAccessTime { get; set; }
 

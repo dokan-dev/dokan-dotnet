@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+/// <summary>
+/// Namespace for structures and classes related to native API.
+/// </summary>
 namespace DokanNet.Native
 {
     /// <summary>
@@ -67,7 +70,7 @@ namespace DokanNet.Native
         /// <summary>
         /// Get the handle to Access Token.
         /// This method needs be called in <see cref="IDokanOperations.CreateFile"/> callback.
-        /// The caller must call <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx">CloseHandle</a> for the returned handle.
+        /// The caller must call <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724211(v=vs.85).aspx">CloseHandle (MSDN)</a> for the returned handle.
         /// </summary>
         /// <param name="rawFileInfo">
         /// A <see cref="DokanFileInfo"/> of the operation to extend.
@@ -84,8 +87,8 @@ namespace DokanNet.Native
         /// <param name="fileAttributes">FileAttributes from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
         /// <param name="createOptions">CreateOptions from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
         /// <param name="createDisposition">CreateDisposition from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
-        /// <param name="outFileAttributesAndFlags">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile</a> dwFlagsAndAttributes.</param>
-        /// <param name="outCreationDisposition">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile</a> dwCreationDisposition.</param>
+        /// <param name="outFileAttributesAndFlags">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile (MSDN)</a> dwFlagsAndAttributes.</param>
+        /// <param name="outCreationDisposition">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile (MSDN)</a> dwCreationDisposition.</param>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile function (MSDN)</a>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern void DokanMapKernelToUserCreateFileFlags(

@@ -1,10 +1,6 @@
-﻿/*! \dir 
- * Classes related to logging.
- */
-
-/*! \namespace DokanNet.Logging
- * Classes related to logging.
- */
+/// <summary>
+/// Namespace for interface and classes related to logging.
+/// </summary>
 namespace DokanNet.Logging
 {
    /// <summary>

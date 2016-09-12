@@ -19,14 +19,17 @@ namespace DokanNet
     public sealed class DokanFileInfo
     {
         private ulong _context;
+
         /// <summary>
-        /// Used internally, never modify
+        /// Used internally, never modify.
         /// </summary>
         private readonly ulong _dokanContext;
+
         /// <summary>
         /// A pointer to the <see cref="DOKAN_OPTIONS"/> which was passed to <see cref="DokanNet.Native.NativeMethods.DokanMain"/>.
         /// </summary>
-        private readonly IntPtr _dokanOptions;  //
+        private readonly IntPtr _dokanOptions;  
+
         private readonly uint _processId;
 
         [MarshalAs(UnmanagedType.U1)] private bool _isDirectory;
@@ -37,40 +40,56 @@ namespace DokanNet
 
         [MarshalAs(UnmanagedType.U1)] private bool _synchronousIo;
 
-        [MarshalAs(UnmanagedType.U1)] private bool _nocache;
+        [MarshalAs(UnmanagedType.U1)] private bool _noCache;
 
         [MarshalAs(UnmanagedType.U1)] private bool _writeToEndOfFile;
 
         /// <summary>
-        /// Context that can be used to carry information between operation.
-        /// The Context can carry whatever type like <see cref="System.IO.FileStream"/>, <c>struct</c>, <c>int</c>,
+        /// Prevents a default instance of the <see cref="DokanFileInfo"/> class from being created. 
+        /// The class is created by the Dokan kernel driver.
+        /// </summary>
+        private DokanFileInfo()
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets context that can be used to carry information between operation.
+        /// The Context can carry whatever type like <c><see cref="System.IO.FileStream"/></c>, <c>struct</c>, <c>int</c>,
         /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
         public object Context
         {
-            get { return _context != 0 ? ((GCHandle) (IntPtr) _context).Target : null; }
+            get
+            {
+                return _context != 0 
+                    ? ((GCHandle)(IntPtr)_context).Target 
+                    : null;
+            }
             set
             {
                 if (_context != 0)
                 {
-                    ((GCHandle) (IntPtr) _context).Free();
+                    ((GCHandle)(IntPtr)_context).Free();
                     _context = 0;
                 }
+
                 if (value != null)
                 {
-                    _context = (ulong) (IntPtr) GCHandle.Alloc(value);
+                    _context = (ulong)(IntPtr)GCHandle.Alloc(value);
                 }
             }
         }
 
         /// <summary>
-        /// Process id for the thread that originally requested a given I/O operation.
+        /// Process id for the thread that originally requested a given I/O
+        /// operation.
         /// </summary>
-        public int ProcessId => (int) _processId;
+        public int ProcessId => (int)_processId;
 
         /// <summary>
-        /// Requesting a directory file.
-        /// Must be set in <see cref="IDokanOperations.CreateFile"/> if the file appear to be a folder.
+        /// Gets or sets a value indicating whether it requesting a directory
+        /// file. Must be set in <see cref="IDokanOperations.CreateFile"/> if
+        /// the file appear to be a folder.
         /// </summary>
         public bool IsDirectory
         {
@@ -79,7 +98,8 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Flag if the file has to be delete during <see cref="IDokanOperations.Cleanup"/> event.
+        /// Gets or sets a value indicating whether the file has to be delete
+        /// during the <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
         public bool DeleteOnClose
         {
@@ -100,20 +120,19 @@ namespace DokanNet
         /// <summary>
         /// Read or write directly from data source without cache.
         /// </summary>
-        public bool NoCache => _nocache;
+        public bool NoCache => _noCache;
 
         /// <summary>
         /// If <c>true</c>, write to the current end of file instead 
-        /// of using the Offset parameter.
+        /// of using the <c>Offset</c> parameter.
         /// </summary>
         public bool WriteToEndOfFile => _writeToEndOfFile;
 
         /// <summary>
-        /// This method needs to be called in <see cref="IDokanOperations.CreateFile"/>, OpenDirectory or CreateDirectly
-        /// callback.
+        /// This method needs to be called in <see cref="IDokanOperations.CreateFile"/>.
         /// </summary>
-        /// <returns>An <see cref="WindowsIdentity"/> with the access token, 
-        /// -or- <c>null</c> if the operation was not successful</returns>
+        /// <returns>An <c><see cref="WindowsIdentity"/></c> with the access token, 
+        /// -or- <c>null</c> if the operation was not successful.</returns>
         public WindowsIdentity GetRequestor()
         {
             try
@@ -129,19 +148,11 @@ namespace DokanNet
         /// <summary>
         /// Extends the time out of the current IO operation in driver.
         /// </summary>
-        /// <param name="milliseconds">Number of milliseconds to extend with</param>
-        /// <returns>If the operation was successful</returns>
+        /// <param name="milliseconds">Number of milliseconds to extend with.</param>
+        /// <returns>If the operation was successful.</returns>
         public bool TryResetTimeout(int milliseconds)
         {
-            return NativeMethods.DokanResetTimeout((uint) milliseconds, this);
-        }
-
-        /// <summary>
-        /// Prevent instantiation of the class.
-        /// The class is created by the Dokan kernel driver.
-        /// </summary>
-        private DokanFileInfo()
-        {
+            return NativeMethods.DokanResetTimeout((uint)milliseconds, this);
         }
 
         /// <summary>Returns a string that represents the current object.</summary>
