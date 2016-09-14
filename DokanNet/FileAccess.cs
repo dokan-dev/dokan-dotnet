@@ -7,18 +7,18 @@ namespace DokanNet
     /// These rights are used in access control entries (ACEs) and are the primary means of 
     /// specifying the requested or granted access to an object. 
     /// </summary>
-    /// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa374896(v=vs.85).aspx">Access Mask Format (MSDN)</a>
-    /// <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa374892(v=vs.85).aspx">ACCESS_MASK (MSDN)</a>
+    /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa374896(v=vs.85).aspx">Access Mask Format (MSDN)</a>
+    /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa374892(v=vs.85).aspx">ACCESS_MASK (MSDN)</a>
     [Flags]
     public enum FileAccess : long
     {
         /// <summary>
-        /// Read access right to an object
+        /// Read access right to an object.
         /// </summary>
         ReadData = 0x00000001,
 
         /// <summary>
-        /// Write access right to an object
+        /// Write access right to an object.
         /// </summary>
         WriteData = 0x00000002,
 
@@ -96,18 +96,18 @@ namespace DokanNet
         //GenericAll            = 0x10000000,
 
         /// <summary>
-        /// Generic execute access
+        /// Generic execute access.
         /// </summary>
         GenericExecute = 0x20000000,
 
         /// <summary>
-        /// Generic write access
+        /// Generic write access.
         /// </summary>
         GenericWrite = 0x40000000,
 
         /// <summary>
-        /// Generic read access
+        /// Generic read access.
         /// </summary>
-        GenericRead = 0x80000000,
+        GenericRead = 0x80000000
     }
 }
