@@ -7,7 +7,7 @@ namespace DokanNet.Logging
     /// </summary>
     /// <remarks>
     /// To see the output in visual studio 
-    /// Project + Properties, Debug tab, check "Enable unmanaged code debugging".
+    /// Project + %Properties, Debug tab, check "Enable unmanaged code debugging".
     /// </remarks> 
     public class DebugViewLogger : ILogger
     {

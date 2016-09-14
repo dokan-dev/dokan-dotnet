@@ -4,14 +4,14 @@ using System.IO;
 using System.Security.AccessControl;
 
 /// <summary>
-/// Base namespace for Dokan.
+/// Base namespace for %Dokan.
 /// </summary>
 namespace DokanNet
 {
     /// <summary>
-    /// Dokan API callbacks interface.
+    /// %Dokan API callbacks interface.
     /// 
-    /// A interface of callbacks that describe all Dokan API operation
+    /// A interface of callbacks that describe all %Dokan API operation
     /// that will be called when Windows access to the file system.
     /// 
     /// All this callbacks can return <see cref="NtStatus.NotImplemented"/>
@@ -315,7 +315,7 @@ namespace DokanNet
         /// <see cref="FileSystemFeatures.ReadOnlyVolume"/> is automatically added to the <paramref name="features"/> if <see cref="DokanOptions.WriteProtection"/> was
         /// specified when the volume was mounted.
         /// 
-        /// If <see cref="NtStatus.NotImplemented"/> is returned, the Dokan kernel driver use following settings by default:
+        /// If <see cref="NtStatus.NotImplemented"/> is returned, the %Dokan kernel driver use following settings by default:
         /// | Parameter                    | Default value                                                                                    |
         /// |------------------------------|--------------------------------------------------------------------------------------------------|
         /// | \a rawVolumeNameBuffer       | <c>"DOKAN"</c>                                                                                   |
@@ -373,7 +373,7 @@ namespace DokanNet
             DokanFileInfo info);
 
         /// <summary>
-        /// Is called when Dokan succeed to mount the volume.
+        /// Is called when %Dokan succeed to mount the volume.
         /// </summary>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
@@ -381,7 +381,7 @@ namespace DokanNet
         NtStatus Mounted(DokanFileInfo info);
 
         /// <summary>
-        /// Is called when Dokan is unmounting the volume.
+        /// Is called when %Dokan is unmounting the volume.
         /// </summary>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
