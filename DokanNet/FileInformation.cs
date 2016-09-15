@@ -6,9 +6,11 @@ using System.Runtime.InteropServices;
 namespace DokanNet
 {
     /// <summary>
-    /// Used to provide file information to Dokan during operations
-    /// <see cref="IDokanOperations.GetFileInformation"/>, <see cref="IDokanOperations.FindFiles"/>,
-    /// <see cref="IDokanOperations.FindStreams"/> or <see cref="IDokanOperations.FindFilesWithPattern"/>.
+    /// Used to provide file information to %Dokan during operations by
+    ///  - <see cref="IDokanOperations.GetFileInformation"/>
+    ///  - <see cref="IDokanOperations.FindFiles"/>
+    ///  - <see cref="IDokanOperations.FindStreams"/> 
+    ///  - <see cref="IDokanOperations.FindFilesWithPattern"/>.
     /// </summary>
     [StructLayout(LayoutKind.Auto)]
     [DebuggerDisplay("{FileName}, {Length}, {CreationTime}, {LastWriteTime}, {LastAccessTime}, {Attributes}")]

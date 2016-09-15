@@ -9,10 +9,10 @@ using static DokanNet.FormatProviders;
 namespace DokanNet
 {
     /// <summary>
-    /// Dokan file information on the current operation.
+    /// %Dokan file information on the current operation.
     /// </summary>
     /// <remarks>
-    /// This class cannot be instantiated in C#, it is created by the kernel Dokan driver.
+    /// This class cannot be instantiated in C#, it is created by the kernel %Dokan driver.
     /// This is the same structure as <c>_DOKAN_FILE_INFO</c> (dokan.h) in the C++ version of Dokan.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -46,7 +46,7 @@ namespace DokanNet
 
         /// <summary>
         /// Prevents a default instance of the <see cref="DokanFileInfo"/> class from being created. 
-        /// The class is created by the Dokan kernel driver.
+        /// The class is created by the %Dokan kernel driver.
         /// </summary>
         private DokanFileInfo()
         {

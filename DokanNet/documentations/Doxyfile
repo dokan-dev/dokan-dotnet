@@ -238,7 +238,26 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                = 
+#        Create a generel table. A class must be defined, 
+#        or else Doxygen do its own formating of it.
+ALIASES                += table="<table class=\"customTable\">"
+ALIASES                += endtable="</table> "
+
+#        Add a row to a table started with \table.
+#        \tablerow{2} fills two cels, and let the third be empty.
+#        \tablerow{3} fills all three cels.
+ALIASES                += tablerow{2}="<tr> <td>\1</td> <td>\2</td> <td>&nbsp;</td> </tr>"
+ALIASES                += tablerow{3}="<tr> <td>\1</td> <td>\2</td> <td>\3    </td> </tr>"
+
+#        Create a headline for generel native information
+ALIASES                += native="\par %Native information"
+ALIASES                += endnative=" "
+
+#        Add a row with information about a native constant to a \table
+#        nativeconst{2} creats a row as following "SOME_CONSTANT | 0x12345678 | &nbsp;"
+#        nativeconst{3} creats a row as following "SOME_CONSTANT | 0x12345678 | Some information"
+ALIASES                += nativeconst{2}="\tablerow{\c \1,\c \2}"
+ALIASES                += nativeconst{3}="\tablerow{\c \1,\c \2,\3}"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"

@@ -7,3 +7,5 @@ packages
 TestResults
 /DokanNet/documentations/doc
 *.lock.json
+*.db
+*.opendb

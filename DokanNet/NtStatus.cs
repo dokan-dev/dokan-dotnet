@@ -499,7 +499,7 @@
         /// <summary>
         /// Error - {Wrong Volume} The wrong volume is in the drive. Insert
         /// volume into drive.
-        /// </summary>e.
+        /// </summary>
         WrongVolume = 0xc0000012,
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿namespace DokanNet
 {
     /// <summary>
-    /// Defines common result status codes in <see cref="NtStatus"/> for Dokan
+    /// Defines common result status codes in <see cref="NtStatus"/> for %Dokan
     /// operations.
     /// </summary>
     public static class DokanResult
