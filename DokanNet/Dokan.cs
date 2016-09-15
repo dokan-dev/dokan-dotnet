@@ -282,7 +282,7 @@ namespace DokanNet
         /// <summary>
         /// Unmount a dokan device from a mount point.
         /// </summary>
-        /// <param name="mountPoint">Mount point to unmount (<c>Z</c>, <c>Z:</c>, <c>Z:\</c>, <c>Z:\MyMountPoint</c>).</param>
+        /// <param name="mountPoint">Mount point to unmount (<c>Z</c>, <c>Z:</c>, <c>Z:\\</c>, <c>Z:\\MyMountPoint</c>).</param>
         /// <returns><c>true</c> if device was unmount 
         /// -or- <c>false</c> in case of failure or device not found.</returns>
         public static bool RemoveMountPoint(string mountPoint)
