@@ -52,8 +52,8 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release  %28.NET 4.0%29|AnyCPU'">
-    <OutputPath>bin\Release  %28.NET 4.0%29\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28.NET 4.0%29|AnyCPU'">
+    <OutputPath>bin\Release %28.NET 4.0%29\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>

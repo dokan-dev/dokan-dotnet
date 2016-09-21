@@ -62,7 +62,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release  %28.NET 4.0%29|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28.NET 4.0%29|AnyCPU'">
     <OutputPath>bin\Release\NETv4.6\</OutputPath>
     <DefineConstants>NET46; NET20_OR_GREATER; NET30_OR_GREATER; NET35_OR_GREATER; NET40_OR_GREATER; NET45_OR_GREATER; NET46_OR_GREATER; </DefineConstants>
     <Optimize>true</Optimize>
