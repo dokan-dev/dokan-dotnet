@@ -5,7 +5,9 @@ environment:
 version: 1.0.0-{build}
 configuration:
 - Release
+- Release (.NET 4.0)
 - Debug
+- Debug (.NET 4.0)
 os: Visual Studio 2015
 branches:
   only:
@@ -15,7 +17,7 @@ install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v1.0.0-RC4/DokanSetup.exe',
+              'https://github.com/dokan-dev/dokany/releases/download/v1.0.0/DokanSetup_redist-1.0.0.5000.exe',
               'C:\projects\dokan-dotnet\DokanSetup.exe'
             )
             

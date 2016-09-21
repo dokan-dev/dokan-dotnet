@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.0] - 2016-09-21
 ### Added
 - This CHANGELOG.md.
 - Support for .NET Framework 4.6
