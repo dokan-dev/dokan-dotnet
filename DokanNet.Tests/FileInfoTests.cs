@@ -1488,7 +1488,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
+            fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.AccessSystemSecurity, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
@@ -1531,7 +1531,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.Reserved, ReadWriteShare, FileMode.Open);
+            fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.AccessSystemSecurity, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(path, SetOwnershipAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
