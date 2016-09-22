@@ -760,24 +760,24 @@ namespace DokanNet
             ref FILETIME rawLastWriteTime,
             DokanFileInfo rawFileInfo)
         {
-            var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) &&
-                        (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long)rawCreationTime.dwHighDateTime << 32) |
-                                        (uint)rawCreationTime.dwLowDateTime)
-                : (DateTime?)null;
-            var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) &&
-                        (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long)rawLastAccessTime.dwHighDateTime << 32) |
-                                        (uint)rawLastAccessTime.dwLowDateTime)
-                : (DateTime?)null;
-            var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) &&
-                        (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
-                ? DateTime.FromFileTime(((long)rawLastWriteTime.dwHighDateTime << 32) |
-                                        (uint)rawLastWriteTime.dwLowDateTime)
-                : (DateTime?)null;
-
             try
             {
+                var ctime = (rawCreationTime.dwLowDateTime != 0 || rawCreationTime.dwHighDateTime != 0) &&
+                            (rawCreationTime.dwLowDateTime != -1 || rawCreationTime.dwHighDateTime != -1)
+                    ? DateTime.FromFileTime(((long) rawCreationTime.dwHighDateTime << 32) |
+                                            (uint) rawCreationTime.dwLowDateTime)
+                    : (DateTime?) null;
+                var atime = (rawLastAccessTime.dwLowDateTime != 0 || rawLastAccessTime.dwHighDateTime != 0) &&
+                            (rawLastAccessTime.dwLowDateTime != -1 || rawLastAccessTime.dwHighDateTime != -1)
+                    ? DateTime.FromFileTime(((long) rawLastAccessTime.dwHighDateTime << 32) |
+                                            (uint) rawLastAccessTime.dwLowDateTime)
+                    : (DateTime?) null;
+                var mtime = (rawLastWriteTime.dwLowDateTime != 0 || rawLastWriteTime.dwHighDateTime != 0) &&
+                            (rawLastWriteTime.dwLowDateTime != -1 || rawLastWriteTime.dwHighDateTime != -1)
+                    ? DateTime.FromFileTime(((long) rawLastWriteTime.dwHighDateTime << 32) |
+                                            (uint) rawLastWriteTime.dwLowDateTime)
+                    : (DateTime?) null;
+
                 logger.Debug("SetFileTimeProxy : {0}", rawFileName);
                 logger.Debug("\tCreateTime\t{0}", ctime);
                 logger.Debug("\tAccessTime\t{0}", atime);
