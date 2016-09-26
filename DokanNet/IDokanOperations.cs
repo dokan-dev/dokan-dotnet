@@ -200,6 +200,9 @@ namespace DokanNet
         /// you must only check whether you can delete the file or not,
         /// and return <see cref="NtStatus.Success"/> (when you can delete it) or appropriate error
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectNameNotFound"/>.
+        ///
+        /// DeleteFile will also be called with <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>false</c>
+        /// to notify the driver when the file is no longer requested to be deleted.
         /// 
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
         /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
@@ -221,6 +224,10 @@ namespace DokanNet
         /// and return <see cref="NtStatus.Success"/> (when you can delete it) or appropriate error
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectPathNotFound"/>,
         /// <see cref="NtStatus.ObjectNameNotFound"/>.
+        ///
+        /// DeleteFile will also be called with <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>false</c>
+        /// to notify the driver when the file is no longer requested to be deleted.
+        ///
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
         /// <see cref="DokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
         /// delete the file being closed.
