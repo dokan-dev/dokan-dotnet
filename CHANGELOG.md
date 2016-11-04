@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 - 
 
-## [1.1.0] - 2016-09-21
+## [1.1.0.1] - 2016-11-01
+### Added
+- Update documentation for Delete functions according to Dokany changes.
+
+### Fixed
+- SetFileTimeProxy could throw without return a proper error.
+
+## [1.1.0.0] - 2016-09-21
 ### Added
 - This CHANGELOG.md.
 - Support for .NET Framework 4.6
@@ -79,7 +86,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...HEAD
-[1.1.0]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...HEAD
+[1.1.0.1]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...v1.1.0.1
+[1.1.0.0]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0
 [1.0.8]: https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
 [1.0.6]: http://web.archive.org/web/20150416102451/http://dokan-dev.net/en/2011/01/12/dokan-net-library-0-6-0-released/
