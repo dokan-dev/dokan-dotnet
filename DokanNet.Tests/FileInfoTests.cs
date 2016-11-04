@@ -512,9 +512,10 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, ReadAttributesPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectGetFileSecurity(path, DokanOperationsFixture.DefaultFileSecurity);
-            fixture.ExpectCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
-            fixture.ExpectGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
-            fixture.ExpectGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity);
+            //No folder rights requested currently
+            //fixture.ExpectCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
+            //fixture.ExpectGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);
+            //fixture.ExpectGetFileSecurity(DokanOperationsFixture.RootName, DokanOperationsFixture.DefaultDirectorySecurity);
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
