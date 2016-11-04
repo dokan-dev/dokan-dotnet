@@ -581,18 +581,16 @@ namespace DokanNet.Tests
 
         internal static void InitSecurity()
         {
-            var sid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+            var sid = WindowsIdentity.GetCurrent();
+            
+            string sidRights = "O:" + sid.User + "G:" + sid.Groups[0];
 
             DefaultDirectorySecurity = new DirectorySecurity();
-            DefaultDirectorySecurity.AddAccessRule(new FileSystemAccessRule(sid,
-                FileSystemRights.Read | FileSystemRights.Traverse, AccessControlType.Allow));
-            DefaultDirectorySecurity.AddAccessRule(new FileSystemAccessRule(sid,
-                FileSystemRights.Write | FileSystemRights.Delete, AccessControlType.Deny));
+            DefaultDirectorySecurity.SetSecurityDescriptorSddlForm(sidRights + "D:PAI(A;OICI;FA;;;AU)");
 
             DefaultFileSecurity = new FileSecurity();
-            DefaultFileSecurity.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.Read | FileSystemRights.ExecuteFile, AccessControlType.Allow));
-            DefaultFileSecurity.AddAccessRule(new FileSystemAccessRule(sid, FileSystemRights.Write | FileSystemRights.Delete, AccessControlType.Deny));
-        }
+            DefaultFileSecurity.SetSecurityDescriptorSddlForm(sidRights + "D:AI(A;ID;FA;;;AU)");
+         }
 
         internal static IList<FileInformation> GetEmptyDirectoryDefaultFiles()
             => new[]
