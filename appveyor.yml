@@ -46,7 +46,7 @@ after_build:
       
       New-Item C:\TMP -type directory
       & $buildCmd $buildArgs
-      & .\winfstest\TestSuite\run-winfstest.bat t N:\TMP
+      & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP
       Start-Sleep -s 5
       Stop-Process $app.Id
 test:
