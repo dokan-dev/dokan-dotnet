@@ -537,15 +537,15 @@ namespace DokanNetMirror
             }
         }
 
-        public NtStatus GetDiskFreeSpace(out long free, out long total, out long used, DokanFileInfo info)
+        public NtStatus GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes, DokanFileInfo info)
         {
             var dinfo = DriveInfo.GetDrives().Single(di => string.Equals(di.RootDirectory.Name, Path.GetPathRoot(path + "\\"), StringComparison.OrdinalIgnoreCase));
 
-            used = dinfo.AvailableFreeSpace;
-            total = dinfo.TotalSize;
-            free = dinfo.TotalFreeSpace;
-            return Trace(nameof(GetDiskFreeSpace), null, info, DokanResult.Success, "out " + free.ToString(),
-                "out " + total.ToString(), "out " + used.ToString());
+            freeBytesAvailable = dinfo.TotalFreeSpace;
+            totalNumberOfBytes = dinfo.TotalSize;
+            totalNumberOfFreeBytes = dinfo.AvailableFreeSpace;
+            return Trace(nameof(GetDiskFreeSpace), null, info, DokanResult.Success, "out " + freeBytesAvailable.ToString(),
+                "out " + totalNumberOfBytes.ToString(), "out " + totalNumberOfFreeBytes.ToString());
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
