@@ -31,6 +31,8 @@ namespace DokanNet
         /// If the file is a directory, CreateFile is also called.
         /// In this case, CreateFile should return <see cref="NtStatus.Success"/> when that directory
         /// can be opened and <see cref="DokanFileInfo.IsDirectory"/> has to be set to <c>true</c>.
+        /// In the other hande, if <see cref="DokanFileInfo.IsDirectory"/> is set to <c>true</c>
+        /// but the path target a file, you need to return <see cref="NtStatus.NotADirectory"/>
         /// 
         /// <see cref="DokanFileInfo.Context"/> can be used to store data (like <c><see cref="FileStream"/></c>)
         /// that can be retrieved in all other request related to the context.
