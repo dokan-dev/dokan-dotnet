@@ -343,7 +343,29 @@ namespace DokanNet.Tests
                 => TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, DokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
         }
 
-        public const string MOUNT_POINT = "Z:";
+        private static String _mount_point;
+
+        public static String MOUNT_POINT
+        {
+            get
+            {
+                if (String.IsNullOrWhiteSpace(_mount_point))
+                {
+                    var drives = Environment.GetLogicalDrives()
+                        .Select(x => x[0])
+                        .ToArray();
+                    var alphabet = new Stack<Char>("ABCDEFGHILMNOPQRSTUVZ");
+
+                    while (alphabet.Any() && String.IsNullOrWhiteSpace(_mount_point))
+                    {
+                        var letter = alphabet.Pop();
+                        if (!drives.Contains(letter))
+                            _mount_point = $@"{letter}:";
+                    }
+                }
+                return _mount_point;
+            }
+        }
 
         public const string VOLUME_LABEL = "Dokan Volume";
 
