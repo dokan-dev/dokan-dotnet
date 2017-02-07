@@ -11,6 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.net4.6", "DokanNet
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNet.Tests", "DokanNet.Tests\DokanNet.Tests.csproj", "{65806CB3-BC11-4E5B-8DCB-58826A49FBBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7EAF58F3-ECB0-4B08-B457-C1FD87CCE459} = {7EAF58F3-ECB0-4B08-B457-C1FD87CCE459}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{6AF2183D-1D93-414C-8FAC-C97E60078F4C}"
 EndProject

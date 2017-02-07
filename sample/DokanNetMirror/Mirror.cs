@@ -12,7 +12,7 @@ using FileAccess = DokanNet.FileAccess;
 
 namespace DokanNetMirror
 {
-    internal class Mirror : IDokanOperations
+    public class Mirror : IDokanOperations
     {
         private readonly string path;
 
@@ -99,7 +99,7 @@ namespace DokanNetMirror
                             }
 
                             new DirectoryInfo(filePath).EnumerateFileSystemInfos().Any();
-                                // you can't list the directory
+                            // you can't list the directory
                             break;
 
                         case FileMode.CreateNew:
@@ -151,7 +151,7 @@ namespace DokanNetMirror
                         if (pathExists)
                         {
                             if (readWriteAttributes || pathIsDirectory)
-                                // check if driver only wants to read attributes, security info, or open directory
+                            // check if driver only wants to read attributes, security info, or open directory
                             {
                                 if (pathIsDirectory && (access & FileAccess.Delete) == FileAccess.Delete
                                     && (access & FileAccess.Synchronize) != FileAccess.Synchronize)
@@ -212,7 +212,7 @@ namespace DokanNetMirror
                 }
                 catch (Exception ex)
                 {
-                    var hr = (uint) Marshal.GetHRForException(ex);
+                    var hr = (uint)Marshal.GetHRForException(ex);
                     switch (hr)
                     {
                         case 0x80070020: //Sharing violation
@@ -261,7 +261,7 @@ namespace DokanNetMirror
             (info.Context as FileStream)?.Dispose();
             info.Context = null;
             Trace(nameof(CloseFile), fileName, info, DokanResult.Success);
-                // could recreate cleanup code here but this is not called sometimes
+            // could recreate cleanup code here but this is not called sometimes
         }
 
         public NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, DokanFileInfo info)
@@ -316,7 +316,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).Flush();
+                ((FileStream)(info.Context)).Flush();
                 return Trace(nameof(FlushFileBuffers), fileName, info, DokanResult.Success);
             }
             catch (IOException)
@@ -481,7 +481,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).SetLength(length);
+                ((FileStream)(info.Context)).SetLength(length);
                 return Trace(nameof(SetEndOfFile), fileName, info, DokanResult.Success,
                     length.ToString(CultureInfo.InvariantCulture));
             }
@@ -496,7 +496,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).SetLength(length);
+                ((FileStream)(info.Context)).SetLength(length);
                 return Trace(nameof(SetAllocationSize), fileName, info, DokanResult.Success,
                     length.ToString(CultureInfo.InvariantCulture));
             }
@@ -511,7 +511,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).Lock(offset, length);
+                ((FileStream)(info.Context)).Lock(offset, length);
                 return Trace(nameof(LockFile), fileName, info, DokanResult.Success,
                     offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
@@ -526,7 +526,7 @@ namespace DokanNetMirror
         {
             try
             {
-                ((FileStream) (info.Context)).Unlock(offset, length);
+                ((FileStream)(info.Context)).Unlock(offset, length);
                 return Trace(nameof(UnlockFile), fileName, info, DokanResult.Success,
                     offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
@@ -568,7 +568,7 @@ namespace DokanNetMirror
             try
             {
                 security = info.IsDirectory
-                    ? (FileSystemSecurity) Directory.GetAccessControl(GetPath(fileName))
+                    ? (FileSystemSecurity)Directory.GetAccessControl(GetPath(fileName))
                     : File.GetAccessControl(GetPath(fileName));
                 return Trace(nameof(GetFileSecurity), fileName, info, DokanResult.Success, sections.ToString());
             }
@@ -586,11 +586,11 @@ namespace DokanNetMirror
             {
                 if (info.IsDirectory)
                 {
-                    Directory.SetAccessControl(GetPath(fileName), (DirectorySecurity) security);
+                    Directory.SetAccessControl(GetPath(fileName), (DirectorySecurity)security);
                 }
                 else
                 {
-                    File.SetAccessControl(GetPath(fileName), (FileSecurity) security);
+                    File.SetAccessControl(GetPath(fileName), (FileSecurity)security);
                 }
                 return Trace(nameof(SetFileSecurity), fileName, info, DokanResult.Success, sections.ToString());
             }
@@ -628,7 +628,8 @@ namespace DokanNetMirror
         public IList<FileInformation> FindFilesHelper(string fileName, string searchPattern)
         {
             IList<FileInformation> files = new DirectoryInfo(GetPath(fileName))
-                .GetFileSystemInfos(searchPattern)
+                .EnumerateFileSystemInfos()
+                .Where(finfo => DokanHelper.DokanIsNameInExpression(searchPattern, finfo.Name, true))
                 .Select(finfo => new FileInformation
                 {
                     Attributes = finfo.Attributes,
