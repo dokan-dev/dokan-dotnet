@@ -12,7 +12,7 @@ using FileAccess = DokanNet.FileAccess;
 
 namespace DokanNetMirror
 {
-    internal class Mirror : IDokanOperations
+    public class Mirror : IDokanOperations
     {
         private readonly string path;
 
@@ -664,7 +664,7 @@ namespace DokanNetMirror
         /// <param name="Name">file name</param>
         /// <param name="IgnoreCase">banana</param>
         /// <returns></returns>
-        Boolean DokanIsNameInExpression(String Expression, String Name, Boolean IgnoreCase)
+        public static Boolean DokanIsNameInExpression(String Expression, String Name, Boolean IgnoreCase)
         {
             const char DOS_STAR = '<';
             const char DOS_QM = '>';
@@ -732,7 +732,7 @@ namespace DokanNetMirror
                             p++;
                         }
 
-                        if (Name[p] == '.')
+                        if (p < Name.Length && Name[p] == '.')
                             ni++;
                     }
                 }

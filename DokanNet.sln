@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{
 		DokanNet\documentations\resources\header.html = DokanNet\documentations\resources\header.html
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DokanNetMirror.Tests", "DokanNetMirror.Tests\DokanNetMirror.Tests.csproj", "{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug (.NET 4.0)|Any CPU = Debug (.NET 4.0)|Any CPU
@@ -84,6 +86,14 @@ Global
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release (.NET 4.0)|Any CPU.Build.0 = Release (.NET 4.0)|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Debug (.NET 4.0)|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Debug (.NET 4.0)|Any CPU.Build.0 = Debug|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Release (.NET 4.0)|Any CPU.ActiveCfg = Release|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Release (.NET 4.0)|Any CPU.Build.0 = Release|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,5 +102,6 @@ Global
 		{01247A47-387C-4BB4-8068-31CB3F16BD9F} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
 		{70607B9C-A662-4BEC-89B1-57ABD4E25B2B} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
 		{F4BC71C8-E83F-499B-8E6F-4FB9B2F5972A} = {CD7C8139-B069-4C41-86EE-8D0F8BD24191}
+		{A3F7FB06-1981-4DF4-ABF4-616A04E3CCA8} = {6AF2183D-1D93-414C-8FAC-C97E60078F4C}
 	EndGlobalSection
 EndGlobal
