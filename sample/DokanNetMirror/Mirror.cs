@@ -643,9 +643,6 @@ namespace DokanNetMirror
             return files;
         }
 
-
-       
-
         public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
             DokanFileInfo info)
         {

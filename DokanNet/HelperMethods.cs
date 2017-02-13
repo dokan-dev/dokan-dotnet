@@ -11,36 +11,43 @@ namespace DokanNet
         /// Matches zero or more characters until encountering and matching the final . in the name.
         /// </summary>
         const Char DOS_STAR = '<';
+
         /// <summary>
         /// Matches any single character or, upon encountering a period or end
         /// of name string, advances the expression to the end of the set of
         /// contiguous DOS_QMs.
         /// </summary>
         const Char DOS_QM = '>';
+
         /// <summary>
         /// Matches either a period or zero characters beyond the name string.
         /// </summary>
         const Char DOS_DOT = '"';
+
         /// <summary>
         /// Matches zero or more characters.
         /// </summary>
         const Char ASTERISK = '*';
+
         /// <summary>
         /// Matches a single character.
         /// </summary>
         const Char QUESTION_MARK = '?';
 
         private static Char[] CharsThatMatchEmptyStringsAtEnd = new Char[] { DOS_DOT, DOS_STAR, ASTERISK };
+
         /// <summary>
-        /// check whether Name matches Expression
-        /// Expression can contain "?"(any one character) and "*" (any string)
-        /// when IgnoreCase is true, do case insenstive matching
+        /// Check whether <paramref name="Name">Name</paramref> matches <paramref name="Expression">Expression</paramref>.
         /// </summary>
-        /// <seealso cref="http://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx"/>
-        /// <param name="Expression">Matching pattern</param>
-        /// <param name="Name">Name to test</param>
-        /// <param name="IgnoreCase">Ignore case</param>
-        /// <returns></returns>
+        /// <remarks>
+        /// This method is mainly used in <see cref="IDokanOperations.FindFilesWithPattern"/> to filter a list of possible files.
+        /// <seealso cref="http://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx"/> 
+        /// </remarks>
+        /// <param name="Expression">The matching pattern. Can contain: ?, *, &lt;, &quot;, &gt;.</param>
+        /// <param name="Name">The string that will be tested.</param>
+        /// <param name="IgnoreCase">When set to true a case insensitive match will be performed.</param>
+        /// <returns>Returns true if Expression match Name, false otherwise.</returns>
+        /// <example>"F0_&lt;&quot;*" match "f0_001.txt"</example>
         public static Boolean DokanIsNameInExpression(String Expression, String Name, Boolean IgnoreCase)
         {
             var ei = 0;
