@@ -76,6 +76,7 @@
     <Compile Include="DokanResult.cs" />
     <Compile Include="FileSystemFeatures.cs" />
     <Compile Include="DokanException.cs" />
+    <Compile Include="HelperMethods.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />
     <Compile Include="Logging\DebugViewLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />

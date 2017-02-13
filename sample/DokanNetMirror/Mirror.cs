@@ -629,7 +629,7 @@ namespace DokanNetMirror
         {
             IList<FileInformation> files = new DirectoryInfo(GetPath(fileName))
                 .EnumerateFileSystemInfos()
-                .Where(finfo => DokanIsNameInExpression(searchPattern, finfo.Name, true))
+                .Where(finfo => HelperMethods.DokanIsNameInExpression(searchPattern, finfo.Name, true))
                 .Select(finfo => new FileInformation
                 {
                     Attributes = finfo.Attributes,
@@ -644,134 +644,7 @@ namespace DokanNetMirror
         }
 
 
-        /// <summary>
-        /// check whether Name matches Expression
-        /// Expression can contain "?"(any one character) and "*" (any string)
-        /// when IgnoreCase is true, do case insenstive matching
-        /// </summary>
-        /// <remarks>
-        /// http://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx
-        /// * (asterisk) Matches zero or more characters.
-        /// ? (question mark) Matches a single character.
-        /// DOS_DOT Matches either a period or zero characters beyond the name string.
-        /// DOS_QM Matches any single character or, upon encountering a period or end
-        ///         of name string, advances the expression to the end of the set of
-        ///         contiguous DOS_QMs.
-        /// DOS_STAR Matches zero or more characters until encountering and matching 
-        ///         the final . in the name.
-        /// </remarks>
-        /// <param name="Expression">matching pattern</param>
-        /// <param name="Name">file name</param>
-        /// <param name="IgnoreCase">banana</param>
-        /// <returns></returns>
-        public static Boolean DokanIsNameInExpression(String Expression, String Name, Boolean IgnoreCase)
-        {
-            const char DOS_STAR = '<';
-            const char DOS_QM = '>';
-            const char DOS_DOT = '"';
-
-            var ei = 0;
-            var ni = 0;
-
-            while (ei < Expression.Length && ni < Name.Length)
-            {
-                if (Expression[ei] == '*')
-                {
-                    ei++;
-                    if (ei > Expression.Length)
-                        return true;
-
-                    while (ni < Name.Length)
-                    {
-                        if (DokanIsNameInExpression(Expression.Substring(ei), Name.Substring(ni), IgnoreCase))
-                            return true;
-                        ni++;
-                    }
-
-                }
-                else if (Expression[ei] == DOS_STAR)
-                {
-                    var p = ni;
-                    var lastDot = 0;
-                    ei++;
-
-                    while (p < Name.Length)
-                    {
-                        if (Name[p] == '.')
-                            lastDot = p;
-                        p++;
-                    }
-
-                    var endReached = false;
-                    while (!endReached)
-                    {
-                        endReached = (ni >= Name.Length || ni == lastDot);
-
-                        if (!endReached)
-                        {
-                            if (DokanIsNameInExpression(Expression.Substring(ei), Name.Substring(ni), IgnoreCase))
-                                return true;
-                            ni++;
-                        }
-                    }
-                }
-                else if (Expression[ei] == DOS_QM)
-                {
-                    ei++;
-                    if (Name[ni] != '.')
-                    {
-                        ni++;
-                    }
-                    else
-                    {
-                        var p = ni + 1;
-                        while (p < Name.Length)
-                        {
-                            if (Name[p] == '.')
-                                break;
-                            p++;
-                        }
-
-                        if (p < Name.Length && Name[p] == '.')
-                            ni++;
-                    }
-                }
-                else if (Expression[ei] == DOS_DOT)
-                {
-                    ei++;
-
-                    if (Name[ni] == '.')
-                        ni++;
-                }
-                else
-                {
-                    if (Expression[ei] == '?')
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else if (IgnoreCase && char.ToUpperInvariant(Expression[ei]) == char.ToUpperInvariant(Name[ni]))
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else if (!IgnoreCase && Expression[ei] == Name[ni])
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            if (ei == Expression.Length && ni == Name.Length)
-                return true;
-
-            return false;
-        }
+       
 
         public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
             DokanFileInfo info)
