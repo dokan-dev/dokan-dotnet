@@ -629,7 +629,7 @@ namespace DokanNetMirror
         {
             IList<FileInformation> files = new DirectoryInfo(GetPath(fileName))
                 .EnumerateFileSystemInfos()
-                .Where(finfo => HelperMethods.DokanIsNameInExpression(searchPattern, finfo.Name, true))
+                .Where(finfo => DokanHelper.DokanIsNameInExpression(searchPattern, finfo.Name, true))
                 .Select(finfo => new FileInformation
                 {
                     Attributes = finfo.Attributes,

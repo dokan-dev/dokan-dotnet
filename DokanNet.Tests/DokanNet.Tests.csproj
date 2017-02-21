@@ -118,7 +118,7 @@
   <ItemGroup>
     <Compile Include="ContextTests.cs" />
     <Compile Include="FormatProviderTests.cs" />
-    <Compile Include="HelperMethodsTest.cs" />
+    <Compile Include="DokanNetTest.cs" />
     <Compile Include="OverlappedTests.cs" />
     <Compile Include="FileInfoTests.cs" />
     <Compile Include="DirectoryInfoTest.cs" />

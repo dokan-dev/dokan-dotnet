@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace DokanNet.Tests
 {
     [TestClass]
-    public class HelperMethodsTest
+    public class DokanNetTest
     {
         struct MatchTest
         {
@@ -180,8 +180,8 @@ namespace DokanNet.Tests
 
             foreach (var test in tests)
             {
-                var testResult = HelperMethods.DokanIsNameInExpression(test.Expression, test.Name, test.IgnoreCase);
-                Assert.AreEqual(test.Expected, testResult, $"{nameof(HelperMethods.DokanIsNameInExpression)}(\"{test.Expression}\",\"{test.Name}\",{test.IgnoreCase}): Expected {test.Expected}, got {testResult}");
+                var testResult = DokanHelper.DokanIsNameInExpression(test.Expression, test.Name, test.IgnoreCase);
+                Assert.AreEqual(test.Expected, testResult, $"{nameof(DokanHelper.DokanIsNameInExpression)}(\"{test.Expression}\",\"{test.Name}\",{test.IgnoreCase}): Expected {test.Expected}, got {testResult}");
             }
         }
     }

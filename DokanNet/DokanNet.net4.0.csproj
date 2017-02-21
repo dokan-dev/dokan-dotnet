@@ -71,7 +71,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HelperMethods.cs" />
+    <Compile Include="DokanHelper.cs" />
     <Compile Include="DokanOptions.cs" />
     <Compile Include="DokanResult.cs" />
     <Compile Include="FileSystemFeatures.cs" />

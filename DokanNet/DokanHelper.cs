@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DokanNet
 {
-    public class HelperMethods
+    public class DokanHelper
     {
         /// <summary>
         /// Matches zero or more characters until encountering and matching the final . in the name.
