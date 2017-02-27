@@ -21,7 +21,7 @@ namespace DokanNet.Native
     /// a file by up to 1 hour after the last access.For more information, see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724290(v=vs.85).aspx">File Times (MSDN)</a>.
     /// </remarks>
     /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365740%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">WIN32_FIND_DATA structure (MSDN)</a>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 4)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 4)]
     internal struct WIN32_FIND_DATA
     {
         /// <summary>

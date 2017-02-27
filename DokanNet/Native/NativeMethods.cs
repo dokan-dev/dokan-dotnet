@@ -29,7 +29,7 @@ namespace DokanNet.Native
         /// </summary>
         /// <param name="driveLetter">Dokan driver letter to unmount.</param>
         /// <returns><c>True</c> if device was unmount or <c>false</c> in case of failure or device not found.</returns>
-        [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Auto)]
+        [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Unicode)]
         public static extern bool DokanUnmount(char driveLetter);
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace DokanNet.Native
         /// <param name="mountPoint">MountPoint Mount point to unmount ("<c>Z</c>", 
         /// "<c>Z:</c>", "<c>Z:\\</c>", "<c>Z:\MyMountPoint</c>").</param>
         /// <returns><c>True</c> if device was unmount or <c>false</c> in case of failure or device not found.</returns>
-        [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Auto)]
+        [DllImport(DOKAN_DLL, ExactSpelling = true, CharSet = CharSet.Unicode)]
         public static extern bool DokanRemoveMountPoint([MarshalAs(UnmanagedType.LPWStr)] string mountPoint);
 
         /// <summary>

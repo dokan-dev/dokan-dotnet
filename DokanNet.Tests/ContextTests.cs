@@ -47,8 +47,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            var hasUnmatchedInvocations = false;
-            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            DokanOperationsFixture.ClearInstance(out bool hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
@@ -58,7 +57,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
+            var value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
             fixture.SetupAny();
@@ -87,7 +86,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
+            var value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
             fixture.SetupAny();
@@ -185,7 +184,7 @@ namespace DokanNet.Tests
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.FileName.AsRootedPath();
-            string value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
+            var value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
             fixture.SetupAny();

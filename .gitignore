@@ -9,3 +9,5 @@ TestResults
 *.lock.json
 *.db
 *.opendb
+.vs
+*.DotSettings

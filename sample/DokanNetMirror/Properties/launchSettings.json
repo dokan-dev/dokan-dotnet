@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DokanNetMirror (net4.6)": {
+      "commandName": "Project"
+    },
+    "DokanNetMirror (net4.0)": {
+      "commandName": "Executable",
+      "executablePath": "$(ProjectDir)\\bin\\$(Configuration)\\net4.0\\win\\DokanNetMirror.exe"
+    }
+  }
+}

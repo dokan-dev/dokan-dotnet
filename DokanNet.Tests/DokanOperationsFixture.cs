@@ -354,7 +354,7 @@ namespace DokanNet.Tests
                     var drives = Environment.GetLogicalDrives()
                         .Select(x => x[0])
                         .ToArray();
-                    var alphabet = new Stack<Char>("ABCDEFGHILMNOPQRSTUVZ");
+                    var alphabet = new Stack<char>("ABCDEFGHILMNOPQRSTUVZ");
 
                     while (alphabet.Any() && string.IsNullOrWhiteSpace(_mount_point))
                     {
@@ -568,8 +568,7 @@ namespace DokanNet.Tests
 
         internal static int NumberOfChunks(long bufferSize, long fileSize)
         {
-            var remainder = default(long);
-            var quotient = Math.DivRem(fileSize, bufferSize, out remainder);
+            var quotient = Math.DivRem(fileSize, bufferSize, out long remainder);
             return (int) quotient + (remainder > 0 ? 1 : 0);
         }
 
@@ -577,7 +576,7 @@ namespace DokanNet.Tests
             => DriveName + RootedPath(fileName);
 
         internal static string RootedPath(string fileName)
-            => Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture) + fileName.TrimStart(Path.DirectorySeparatorChar);
+            => Path.DirectorySeparatorChar + fileName.TrimStart(Path.DirectorySeparatorChar);
 
         internal static void InitInstance(string currentTestName)
         {
@@ -605,7 +604,7 @@ namespace DokanNet.Tests
         {
             var sid = WindowsIdentity.GetCurrent();
             
-            string sidRights = "O:" + sid.User + "G:" + sid.Groups[0];
+            var sidRights = "O:" + sid.User + "G:" + sid.Groups[0];
 
             DefaultDirectorySecurity = new DirectorySecurity();
             DefaultDirectorySecurity.SetSecurityDescriptorSddlForm(sidRights + "D:PAI(A;OICI;FA;;;AU)");

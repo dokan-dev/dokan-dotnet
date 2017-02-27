@@ -348,7 +348,7 @@ namespace DokanNet
         /// <summary>
         /// Get specified information about the security of a file or directory. 
         /// </summary>
-        /// \since Supported since version 0.6.0. You must specify the version in <see cref="Dokan.Mount"/> .
+        /// \since Supported since version 0.6.0. You must specify the version in <see cref="Dokan.Mount(IDokanOperations, string, DokanOptions,int, int, TimeSpan, string, int,int, Logging.ILogger)"/>.
         /// 
         /// <param name="fileName">File or directory name.</param>
         /// <param name="security">A <see cref="FileSystemSecurity"/> with security information to return.</param>
@@ -366,7 +366,7 @@ namespace DokanNet
         /// <summary>
         /// Sets the security of a file or directory object.
         /// </summary>
-        /// \since Supported since version 0.6.0. You must specify the version in <see cref="Dokan.Mount"/> .
+        /// \since Supported since version 0.6.0. You must specify the version in <see cref="Dokan.Mount(IDokanOperations, string, DokanOptions,int, int, TimeSpan, string, int,int, Logging.ILogger)"/>.
         /// 
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
         /// <param name="security">A <see cref="FileSystemSecurity"/> with security information to set.</param>
@@ -403,7 +403,7 @@ namespace DokanNet
         /// </summary>
         /// <remarks>For files, the first item in <paramref name="streams"/> is information about the 
         /// default data stream <c>"::$DATA"</c>.</remarks>
-        /// \since Supported since version 0.8.0. You must specify the version in <see cref="Dokan.Mount"/> .
+        /// \since Supported since version 0.8.0. You must specify the version in <see cref="Dokan.Mount(IDokanOperations, string, DokanOptions,int, int, TimeSpan, string, int,int, Logging.ILogger)"/>.
         /// 
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
         /// <param name="streams">List of <see cref="FileInformation"/> for each streams present on the file.</param>

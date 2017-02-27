@@ -24,8 +24,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            var hasUnmatchedInvocations = false;
-            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            DokanOperationsFixture.ClearInstance(out bool hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 
@@ -1099,12 +1098,12 @@ namespace DokanNet.Tests
             fixture.ExpectOpenDirectory(path.AsRootedPath(), share: FileShare.ReadWrite);
             if (supportsPatternSearch)
             {
-                fixture.ExpectFindFilesWithPattern(path.AsRootedPath(), "*", Array.Empty<FileInformation>());
+                fixture.ExpectFindFilesWithPattern(path.AsRootedPath(), "*", new FileInformation[0]);
             }
             else
             {
                 fixture.ExpectFindFilesWithPatternToFail(path.AsRootedPath(), "*", DokanResult.NotImplemented);
-                fixture.ExpectFindFiles(path.AsRootedPath(), Array.Empty<FileInformation>());
+                fixture.ExpectFindFiles(path.AsRootedPath(), new FileInformation[0]);
             }
             fixture.ExpectSetFileSecurity(path.AsRootedPath(), security);
             fixture.ExpectCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);

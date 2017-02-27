@@ -5,18 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Support for .NET Standard 1.3
 
 ## [1.1.0.3] - 2017-03-29
 
 ### Added
-- Add `SearchFilesWithPattern` takes care of special chars DOS_STAR, DOS_QM and DOS_DOT
+- [``DokanHelper.DokanIsNameInExpression``][1.1.0.3-DokanIsNameInExpression] to help [``IDokanOperations.FindFilesWithPatter``][1.1.0.3-FindFilesWithPatter] filter the list of possible files.
+
+[1.1.0.3-DokanIsNameInExpression]: https://github.com/dokan-dev/dokan-dotnet/blob/master/DokanNet/DokanHelper.cs#L48
+[1.1.0.3-FindFilesWithPatter]:     https://github.com/dokan-dev/dokan-dotnet/blob/master/DokanNet/IDokanOperations.cs#L163
 
 ## [1.1.0.1] - 2016-11-01
 ### Added
 - Update documentation for Delete functions according to Dokany changes.
 
 ### Fixed
-- SetFileTimeProxy could throw without return a proper error.
+- ``SetFileTimeProxy`` could throw without return a proper error.
 
 ## [1.1.0.0] - 2016-09-21
 ### Added
@@ -72,15 +77,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed ``IDokanOperations.CreateDirectory`` that are replaced with [``IDokanOperations.CreateFile``][1.0.8-CreateFile].
 - Removed ``IDokanOperations.OpenDirectory`` that are replaced with [``IDokanOperations.CreateFile``][1.0.8-CreateFile].
 
-[1.0.8-Mount]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/Dokan.cs#L46
+[1.0.8-Mount]:       https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/Dokan.cs#L46
 [1.0.8-FindStreams]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L64
-[1.0.8-Mounted]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L60
+[1.0.8-Mounted]:     https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L60
 [1.0.8-DokanResult]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/DokanResult.cs
-[1.0.8-Reserved]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/FileAccess.cs#L24
-[1.0.8-MapKernel]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/Native/NativeMethods.cs#L31
-[1.0.8-NtStatus]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/NtStatus.cs
-[1.0.8-Unmounted]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L62
-[1.0.8-CreateFile]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L10
+[1.0.8-Reserved]:    https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/FileAccess.cs#L24
+[1.0.8-MapKernel]:   https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/Native/NativeMethods.cs#L31
+[1.0.8-NtStatus]:    https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/NtStatus.cs
+[1.0.8-Unmounted]:   https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L62
+[1.0.8-CreateFile]:  https://github.com/dokan-dev/dokan-dotnet/blob/v1.0.8.0/DokanNet/IDokanOperations.cs#L10
 
 ## [1.0.6] - 2011-01-12
 Latest Dokan version from Hiroki Asakawa.
@@ -91,8 +96,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanRemoveMountPoint``
 
 [Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.3...HEAD
-[1.1.0.3]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...v1.1.0.3
-[1.1.0.1]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...v1.1.0.1
-[1.1.0.0]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0
-[1.0.8]: https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
-[1.0.6]: http://web.archive.org/web/20150416102451/http://dokan-dev.net/en/2011/01/12/dokan-net-library-0-6-0-released/
+[1.1.0.3]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...v1.1.0.3
+[1.1.0.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...v1.1.0.1
+[1.1.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0
+[1.0.8]:      https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
+[1.0.6]:      http://web.archive.org/web/20150416102451/http://dokan-dev.net/en/2011/01/12/dokan-net-library-0-6-0-released/
