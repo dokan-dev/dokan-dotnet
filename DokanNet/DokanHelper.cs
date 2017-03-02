@@ -1,142 +1,139 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace DokanNet
 {
-    public class DokanHelper
+    public static class DokanHelper
     {
         /// <summary>
         /// Matches zero or more characters until encountering and matching the final . in the name.
         /// </summary>
-        const Char DOS_STAR = '<';
+        const char DOS_STAR = '<';
 
         /// <summary>
         /// Matches any single character or, upon encountering a period or end
         /// of name string, advances the expression to the end of the set of
         /// contiguous DOS_QMs.
         /// </summary>
-        const Char DOS_QM = '>';
+        const char DOS_QM = '>';
 
         /// <summary>
         /// Matches either a period or zero characters beyond the name string.
         /// </summary>
-        const Char DOS_DOT = '"';
+        const char DOS_DOT = '"';
 
         /// <summary>
         /// Matches zero or more characters.
         /// </summary>
-        const Char ASTERISK = '*';
+        const char ASTERISK = '*';
 
         /// <summary>
         /// Matches a single character.
         /// </summary>
-        const Char QUESTION_MARK = '?';
+        const char QUESTION_MARK = '?';
 
-        private static Char[] CharsThatMatchEmptyStringsAtEnd = new Char[] { DOS_DOT, DOS_STAR, ASTERISK };
+        private readonly static char[] CharsThatMatchEmptyStringsAtEnd = new char[] { DOS_DOT, DOS_STAR, ASTERISK };
 
         /// <summary>
-        /// Check whether <paramref name="Name">Name</paramref> matches <paramref name="Expression">Expression</paramref>.
+        /// Check whether <paramref name="name">Name</paramref> matches <paramref name="expression">Expression</paramref>.
         /// </summary>
         /// <remarks>
         /// This method is mainly used in <see cref="IDokanOperations.FindFilesWithPattern"/> to filter a list of possible files.
-        /// <seealso cref="http://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx"/> 
+        /// For example "F0_&lt;&quot;*" match "f0_001.txt"
+        /// \see <a href="http://msdn.microsoft.com/en-us/library/ff546850(v=VS.85).aspx">See FsRtlIsNameInExpression routine (MSDN)</a>
         /// </remarks>
-        /// <param name="Expression">The matching pattern. Can contain: ?, *, &lt;, &quot;, &gt;.</param>
-        /// <param name="Name">The string that will be tested.</param>
-        /// <param name="IgnoreCase">When set to true a case insensitive match will be performed.</param>
+        /// <param name="expression">The matching pattern. Can contain: ?, *, &lt;, &quot;, &gt;.</param>
+        /// <param name="name">The string that will be tested.</param>
+        /// <param name="ignoreCase">When set to true a case insensitive match will be performed.</param>
         /// <returns>Returns true if Expression match Name, false otherwise.</returns>
-        /// <example>"F0_&lt;&quot;*" match "f0_001.txt"</example>
-        public static Boolean DokanIsNameInExpression(String Expression, String Name, Boolean IgnoreCase)
+        public static bool DokanIsNameInExpression(string expression, string name, bool ignoreCase)
         {
             var ei = 0;
             var ni = 0;
 
-            while (ei < Expression.Length && ni < Name.Length)
+            while (ei < expression.Length && ni < name.Length)
             {
-                if (Expression[ei] == ASTERISK)
+                if (expression[ei] == ASTERISK)
                 {
                     ei++;
-                    if (ei > Expression.Length)
+                    if (ei > expression.Length)
                         return true;
 
-                    while (ni < Name.Length)
+                    while (ni < name.Length)
                     {
-                        if (DokanIsNameInExpression(Expression.Substring(ei), Name.Substring(ni), IgnoreCase))
+                        if (DokanIsNameInExpression(expression.Substring(ei), name.Substring(ni), ignoreCase))
                             return true;
                         ni++;
                     }
 
                 }
-                else if (Expression[ei] == DOS_STAR)
+                else if (expression[ei] == DOS_STAR)
                 {
-                    var lastDotIndex = Name.LastIndexOf('.');
+                    var lastDotIndex = name.LastIndexOf('.');
                     ei++;
 
                     var endReached = false;
                     while (!endReached)
                     {
-                        endReached = (ni >= Name.Length || lastDotIndex > -1 && ni > lastDotIndex);
+                        endReached = (ni >= name.Length || lastDotIndex > -1 && ni > lastDotIndex);
 
                         if (!endReached)
                         {
-                            if (DokanIsNameInExpression(Expression.Substring(ei), Name.Substring(ni), IgnoreCase))
+                            if (DokanIsNameInExpression(expression.Substring(ei), name.Substring(ni), ignoreCase))
                                 return true;
                             ni++;
                         }
                     }
                 }
-                else if (Expression[ei] == DOS_QM)
+                else if (expression[ei] == DOS_QM)
                 {
                     ei++;
-                    if (Name[ni] != '.')
+                    if (name[ni] != '.')
                     {
                         ni++;
                     }
                     else
                     {
                         var p = ni + 1;
-                        while (p < Name.Length)
+                        while (p < name.Length)
                         {
-                            if (Name[p] == '.')
+                            if (name[p] == '.')
                                 break;
                             p++;
                         }
 
-                        if (p < Name.Length && Name[p] == '.')
+                        if (p < name.Length && name[p] == '.')
                             ni++;
                     }
                 }
-                else if (Expression[ei] == DOS_DOT)
+                else if (expression[ei] == DOS_DOT)
                 {
-                    if (ei < Expression.Length)
+                    if (ei < expression.Length)
                     {
-                        if (Name[ni] != '.')
+                        if (name[ni] != '.')
                             return false;
                         else
                             ni++;
                     }
                     else
                     {
-                        if (Name[ni] == '.')
+                        if (name[ni] == '.')
                             ni++;
                     }
                     ei++;
                 }
                 else
                 {
-                    if (Expression[ei] == QUESTION_MARK)
+                    if (expression[ei] == QUESTION_MARK)
                     {
                         ei++;
                         ni++;
                     }
-                    else if (IgnoreCase && char.ToUpperInvariant(Expression[ei]) == char.ToUpperInvariant(Name[ni]))
+                    else if (ignoreCase && char.ToUpperInvariant(expression[ei]) == char.ToUpperInvariant(name[ni]))
                     {
                         ei++;
                         ni++;
                     }
-                    else if (!IgnoreCase && Expression[ei] == Name[ni])
+                    else if (!ignoreCase && expression[ei] == name[ni])
                     {
                         ei++;
                         ni++;
@@ -148,10 +145,10 @@ namespace DokanNet
                 }
             }
 
-            var nextExpressionChars = Expression.Substring(ei);
-            var AreNextExpressionCharsAllNullMatchers = Expression.Any() && !String.IsNullOrEmpty(nextExpressionChars) && nextExpressionChars.All(x => CharsThatMatchEmptyStringsAtEnd.Contains(x));
-            var IsNameCurrentCharTheLast = ni == Name.Length;
-            if (ei == Expression.Length && IsNameCurrentCharTheLast || IsNameCurrentCharTheLast && AreNextExpressionCharsAllNullMatchers)
+            var nextExpressionChars = expression.Substring(ei);
+            var areNextExpressionCharsAllNullMatchers = expression.Any() && !string.IsNullOrEmpty(nextExpressionChars) && nextExpressionChars.All(x => CharsThatMatchEmptyStringsAtEnd.Contains(x));
+            var isNameCurrentCharTheLast = ni == name.Length;
+            if (ei == expression.Length && isNameCurrentCharTheLast || isNameCurrentCharTheLast && areNextExpressionCharsAllNullMatchers)
                 return true;
 
             return false;
