@@ -12,7 +12,7 @@ using FileAccess = DokanNet.FileAccess;
 
 namespace DokanNetMirror
 {
-    public class Mirror : IDokanOperations
+    internal class Mirror : IDokanOperations
     {
         private readonly string path;
 
