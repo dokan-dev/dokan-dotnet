@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- 
+
+## [1.1.0.3] - 2017-03-29
+
+### Added
+- Add `SearchFilesWithPattern` takes care of special chars DOS_STAR, DOS_QM and DOS_DOT
 
 ## [1.1.0.1] - 2016-11-01
 ### Added
@@ -86,7 +90,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.3...HEAD
+[1.1.0.3]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...v1.1.0.3
 [1.1.0.1]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...v1.1.0.1
 [1.1.0.0]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0
 [1.0.8]: https://github.com/dokan-dev/dokan-dotnet/compare/1.0.6.0...v1.0.8.0
