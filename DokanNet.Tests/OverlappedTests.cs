@@ -132,8 +132,7 @@ namespace DokanNet.Tests
 
             internal static int NumberOfChunks(long bufferSize, long fileSize)
             {
-                var remainder = default(long);
-                var quotient = Math.DivRem(fileSize, bufferSize, out remainder);
+                var quotient = Math.DivRem(fileSize, bufferSize, out long remainder);
                 return (int) quotient + (remainder > 0 ? 1 : 0);
             }
 
@@ -261,8 +260,7 @@ namespace DokanNet.Tests
         [TestCleanup]
         public void Cleanup()
         {
-            var hasUnmatchedInvocations = false;
-            DokanOperationsFixture.ClearInstance(out hasUnmatchedInvocations);
+            DokanOperationsFixture.ClearInstance(out bool hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
         }
 

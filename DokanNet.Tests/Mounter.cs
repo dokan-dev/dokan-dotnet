@@ -23,7 +23,7 @@ namespace DokanNet.Tests
             dokanOptions |= DokanOptions.UserModeLock;
 #endif
 
-            (mounterThread = new Thread(new ThreadStart(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT, dokanOptions, 5)))).Start();
+            (mounterThread = new Thread(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.MOUNT_POINT, dokanOptions, 5))).Start();
             var drive = new DriveInfo(DokanOperationsFixture.MOUNT_POINT);
             while (!drive.IsReady)
                 Thread.Sleep(50);
@@ -34,7 +34,7 @@ namespace DokanNet.Tests
         {
             mounterThread.Abort();
             Dokan.Unmount(DokanOperationsFixture.MOUNT_POINT[0]);
-            Dokan.RemoveMountPoint(DokanOperationsFixture.MOUNT_POINT.ToString(CultureInfo.InvariantCulture));
+            Dokan.RemoveMountPoint(DokanOperationsFixture.MOUNT_POINT);
         }
     }
 }

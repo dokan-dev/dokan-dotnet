@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.3;net4.6;net4.0</TargetFrameworks>
+    <AssemblyName>DokanNet</AssemblyName>
+    <RootNamespace>DokanNet</RootNamespace>
+    <Description>A user mode file system for windows. 
+
+This is a .NET wrapper over Dokan, and allows you to create your own file systems in Windows.</Description>
+    <Copyright>Copyright (C) 2017</Copyright>
+    <Version>1.1.0.3</Version>
+    <AssemblyVersion>1.1.0.3</AssemblyVersion>
+    <FileVersion>1.1.0.3</FileVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Company>MaximeC</Company>
+    <Authors>MaximeC</Authors>
+    <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/dokan-dev/dokan-dotnet/master/license.mit.txt</PackageLicenseUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/dokan-dev/dokan-dotnet/master/dokan_logo.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/dokan-dev/dokan-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>dokan file files disk directory storage filesystem io filestore FAT NTFS FUSE</PackageTags>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
+    <CLSCompliant>True</CLSCompliant>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="documentations\**" />
+    <EmbeddedResource Remove="documentations\**" />
+    <None Remove="documentations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.0'">
+    <PackageReference Include="StringInterpolationBridgeStrong" Version="0.9.1" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <!--Set to True to run Code Analysis-->
+    <RunCodeAnalysis>False</RunCodeAnalysis>
+  </PropertyGroup>
+</Project>
