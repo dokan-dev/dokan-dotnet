@@ -212,7 +212,7 @@ namespace DokanNet
                 UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
                 ThreadCount = (ushort) threadCount,
                 Options = (uint) mountOptions,
-                Timeout = (uint) timeout.Milliseconds,
+                Timeout = (uint) timeout.TotalMilliseconds,
                 AllocationUnitSize = (uint) allocationUnitSize,
                 SectorSize = (uint) sectorSize
             };

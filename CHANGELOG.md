@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Support for .NET Standard 1.3
 
-## [1.1.0.3] - 2017-03-29
+### Fixed
+- Proper use of timeout when mounting (See #144)
 
+## [1.1.0.3] - 2017-03-29
 ### Added
 - [``DokanHelper.DokanIsNameInExpression``][1.1.0.3-DokanIsNameInExpression] to help [``IDokanOperations.FindFilesWithPatter``][1.1.0.3-FindFilesWithPatter] filter the list of possible files.
 
