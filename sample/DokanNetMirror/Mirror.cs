@@ -151,7 +151,7 @@ namespace DokanNetMirror
                         if (pathExists)
                         {
                             if (readWriteAttributes || pathIsDirectory)
-                            // check if driver only wants to read attributes, security info, or open directory
+                                // check if driver only wants to read attributes, security info, or open directory
                             {
                                 if (pathIsDirectory && (access & FileAccess.Delete) == FileAccess.Delete
                                     && (access & FileAccess.Synchronize) != FileAccess.Synchronize)
@@ -193,7 +193,7 @@ namespace DokanNetMirror
                         readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
 
                     if (pathExists && (mode == FileMode.OpenOrCreate
-                        || mode == FileMode.Create))
+                                       || mode == FileMode.Create))
                         result = DokanResult.AlreadyExists;
 
                     if (mode == FileMode.CreateNew || mode == FileMode.Create) //Files are always created as Archive
@@ -380,7 +380,18 @@ namespace DokanNetMirror
         {
             try
             {
+                var stream = info.Context as FileStream;
+                if (stream != null)
+                {
+                    var ct = creationTime?.ToFileTime() ?? 0;
+                    var lat = lastAccessTime?.ToFileTime() ?? 0;
+                    var lwt = lastWriteTime?.ToFileTime() ?? 0;
+                    if (Win32.SetFileTime(stream.SafeFileHandle, ref ct, ref lat, ref lwt)) return NtStatus.Success;
+                    throw Marshal.GetExceptionForHR(Marshal.GetLastWin32Error());
+                }
+
                 var filePath = GetPath(fileName);
+
                 if (creationTime.HasValue)
                     File.SetCreationTime(filePath, creationTime.Value);
 
@@ -522,7 +533,7 @@ namespace DokanNetMirror
                     offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
 #else
-            // .NET Core 1.0 do not have support for FileStream.Lock
+// .NET Core 1.0 do not have support for FileStream.Lock
             return NtStatus.NotImplemented;
 #endif
         }
@@ -542,7 +553,7 @@ namespace DokanNetMirror
                     offset.ToString(CultureInfo.InvariantCulture), length.ToString(CultureInfo.InvariantCulture));
             }
 #else
-            // .NET Core 1.0 do not have support for FileStream.Unlock
+// .NET Core 1.0 do not have support for FileStream.Unlock
             return NtStatus.NotImplemented;
 #endif
         }
@@ -589,7 +600,7 @@ namespace DokanNetMirror
                 return Trace(nameof(GetFileSecurity), fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
 #else
-            // .NET Core 1.0 do not have support for Directory.GetAccessControl
+// .NET Core 1.0 do not have support for Directory.GetAccessControl
             security = null;
             return NtStatus.NotImplemented;
 #endif
@@ -616,7 +627,7 @@ namespace DokanNetMirror
                 return Trace(nameof(SetFileSecurity), fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
 #else
-            // .NET Core 1.0 do not have support for Directory.SetAccessControl
+// .NET Core 1.0 do not have support for Directory.SetAccessControl
             return NtStatus.NotImplemented;
 #endif
         }
@@ -672,6 +683,6 @@ namespace DokanNetMirror
             return Trace(nameof(FindFilesWithPattern), fileName, info, DokanResult.Success);
         }
 
-#endregion Implementation of IDokanOperations
+        #endregion Implementation of IDokanOperations
     }
 }
