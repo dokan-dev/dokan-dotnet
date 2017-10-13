@@ -150,8 +150,8 @@ namespace DokanNetMirror
 
                         if (pathExists)
                         {
+                            // check if driver only wants to read attributes, security info, or open directory
                             if (readWriteAttributes || pathIsDirectory)
-                                // check if driver only wants to read attributes, security info, or open directory
                             {
                                 if (pathIsDirectory && (access & FileAccess.Delete) == FileAccess.Delete
                                     && (access & FileAccess.Synchronize) != FileAccess.Synchronize)
@@ -380,13 +380,13 @@ namespace DokanNetMirror
         {
             try
             {
-                var stream = info.Context as FileStream;
-                if (stream != null)
+                if (info.Context is FileStream stream)
                 {
                     var ct = creationTime?.ToFileTime() ?? 0;
                     var lat = lastAccessTime?.ToFileTime() ?? 0;
                     var lwt = lastWriteTime?.ToFileTime() ?? 0;
-                    if (Win32.SetFileTime(stream.SafeFileHandle, ref ct, ref lat, ref lwt)) return NtStatus.Success;
+                    if (NativeMethods.SetFileTime(stream.SafeFileHandle, ref ct, ref lat, ref lwt))
+                        return NtStatus.Success;
                     throw Marshal.GetExceptionForHR(Marshal.GetLastWin32Error());
                 }
 
