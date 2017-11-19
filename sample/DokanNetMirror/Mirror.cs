@@ -202,6 +202,12 @@ namespace DokanNetMirror
                 }
                 catch (UnauthorizedAccessException) // don't have access rights
                 {
+                    if (info.Context is FileStream fileStream)
+                    {
+                        // returning AccessDenied cleanup and close won't be called
+                        fileStream.Dispose();
+                        info.Context = null;
+                    }
                     return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
                         DokanResult.AccessDenied);
                 }
