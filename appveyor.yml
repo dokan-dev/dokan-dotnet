@@ -23,7 +23,7 @@ install:
  - ps: |
      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
-              'https://github.com/dokan-dev/dokany/releases/download/v1.0.3/DokanSetup_redist.exe',
+              'https://github.com/dokan-dev/dokany/releases/download/v1.1.0/DokanSetup_redist.exe',
               'C:\projects\dokan-dotnet\DokanSetup.exe'
             )
             
