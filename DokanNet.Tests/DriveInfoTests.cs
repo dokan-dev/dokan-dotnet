@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static DokanNet.Tests.FileSettings;
@@ -55,7 +54,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
+            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.ReadWrite);
             fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 
@@ -189,7 +188,7 @@ namespace DokanNet.Tests
 #if LOGONLY
             fixture.SetupAny();
 #else
-            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
+            fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.ReadWrite);
             fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
 #endif
 

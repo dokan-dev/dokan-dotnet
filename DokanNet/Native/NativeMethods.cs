@@ -84,17 +84,21 @@ namespace DokanNet.Native
         /// <summary>
         /// Convert <see cref="DokanOperationProxy.ZwCreateFileDelegate"/> parameters to <see cref="IDokanOperations.CreateFile"/> parameters.
         /// </summary>
+        /// <param name="desiredAccess">DesiredAccess from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
         /// <param name="fileAttributes">FileAttributes from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
         /// <param name="createOptions">CreateOptions from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
         /// <param name="createDisposition">CreateDisposition from <see cref="DokanOperationProxy.ZwCreateFileDelegate"/>.</param>
+        /// <param name="outDesiredAccess">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile (MSDN)</a> dwDesiredAccess.</param>
         /// <param name="outFileAttributesAndFlags">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile (MSDN)</a> dwFlagsAndAttributes.</param>
         /// <param name="outCreationDisposition">New <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile (MSDN)</a> dwCreationDisposition.</param>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx">CreateFile function (MSDN)</a>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern void DokanMapKernelToUserCreateFileFlags(
+            uint desiredAccess,
             uint fileAttributes,
             uint createOptions,
             uint createDisposition,
+            ref uint outDesiredAccess,
             ref int outFileAttributesAndFlags,
             ref int outCreationDisposition);
 

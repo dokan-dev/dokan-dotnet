@@ -289,16 +289,19 @@ namespace DokanNet
             {
                 var fileAttributesAndFlags = 0;
                 var creationDisposition = 0;
+                var outDesiredAccess = 0u;
                 NativeMethods.DokanMapKernelToUserCreateFileFlags(
+                    rawDesiredAccess,
                     rawFileAttributes,
                     rawCreateOptions,
                     rawCreateDisposition,
+                    ref outDesiredAccess,
                     ref fileAttributesAndFlags,
                     ref creationDisposition);
 
                 var fileAttributes = (FileAttributes)(fileAttributesAndFlags & FileAttributeMask);
                 var fileOptions    = (FileOptions   )(fileAttributesAndFlags & FileOptionsMask);
-                var desiredAccess  = (FileAccess    )(rawDesiredAccess       & FileAccessMask);
+                var desiredAccess  = (FileAccess    )(outDesiredAccess       & FileAccessMask);
                 var shareAccess    = (FileShare     )(rawShareAccess         & FileShareMask);
 
                 logger.Debug("CreateFileProxy : {0}", rawFileName);

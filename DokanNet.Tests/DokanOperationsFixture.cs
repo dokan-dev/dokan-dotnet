@@ -388,6 +388,8 @@ namespace DokanNet.Tests
 
         private long pendingFiles;
 
+        public static bool HasPendingFiles => Instance?.pendingFiles > 0;
+
         internal static IDokanOperations Operations => proxy;
 
         internal static DokanOperationsFixture Instance { get; private set; }
@@ -984,7 +986,7 @@ namespace DokanNet.Tests
         internal void ExpectOpenDirectoryWithoutCleanup(string path, FileAccess access = FileAccess.Synchronize, FileShare share = FileShare.None, FileAttributes attributes = EmptyFileAttributes)
         {
             operations
-                .Setup(d => d.CreateFile(path, access, share, FileMode.Open, ReadFileOptions, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, FileMode.Open, ReadFileOptions, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess _access, FileShare _share, FileMode mode, FileOptions options, FileAttributes _attributes, DokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.CreateFile)}-NoCleanup[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {mode}, [{options}], [{_attributes}], {info.Log()})"))
@@ -1006,7 +1008,7 @@ namespace DokanNet.Tests
             return new[]
             {
                 operations
-                    .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
+                    .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory)))
                     .Returns(DokanResult.Success)
                     .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions _options, FileAttributes _attributes, DokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.CreateFile)}[{Interlocked.Increment(ref pendingFiles)}] (\"{fileName}\", [{_access}], [{_share}], {_mode}, [{_options}], [{_attributes}], {info.Log()})")),
@@ -1064,7 +1066,7 @@ namespace DokanNet.Tests
         private IVerifies SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
         {
             return operations
-                .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
+                .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions _options, FileAttributes _attributes, DokanFileInfo info)
                     =>
@@ -1091,7 +1093,7 @@ namespace DokanNet.Tests
         internal void ExpectCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
         {
             operations
-                .Setup(d => d.CreateFile(path, access, share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
+                .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<DokanFileInfo>(i => i.IsDirectory == isDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, FileAccess _access, FileShare _share, FileMode _mode, FileOptions _options, FileAttributes _attributes, DokanFileInfo info)
                     =>
