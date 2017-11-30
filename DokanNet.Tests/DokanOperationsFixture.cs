@@ -388,6 +388,8 @@ namespace DokanNet.Tests
 
         private long pendingFiles;
 
+        public static bool HasPendingFiles => Instance?.pendingFiles > 0;
+
         internal static IDokanOperations Operations => proxy;
 
         internal static DokanOperationsFixture Instance { get; private set; }

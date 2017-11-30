@@ -27,6 +27,8 @@ namespace DokanNet.Tests
             var drive = new DriveInfo(DokanOperationsFixture.MOUNT_POINT);
             while (!drive.IsReady)
                 Thread.Sleep(50);
+            while (DokanOperationsFixture.HasPendingFiles)
+                Thread.Sleep(50);
         }
 
         [AssemblyCleanup]
