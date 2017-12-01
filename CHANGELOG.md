@@ -5,11 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.1.0] - 2017-12-01
 ### Added
 - Support for .NET Standard 1.3
 
+### Changed
+- Migrate to Visual Studio 2017
+- Update the NuGet icon to the new icon 
+- Library - Adapt to API changes for dokany 1.1.0 
+
 ### Fixed
-- Proper use of timeout when mounting (See #144)
+- Library -Proper use of timeout when mounting (See #144)
+- Mirror - Implementation of SetTime to work on open files
+- Mirror - Only SetAttributes when attributes not 0 
+- Test - Appveyor is now Green !
 
 ## [1.1.0.3] - 2017-03-29
 ### Added
