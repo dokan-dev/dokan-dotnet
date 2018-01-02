@@ -138,4 +138,7 @@
   <data name="ErrorDokan" xml:space="preserve">
     <value>Dokan error</value>
   </data>
+  <data name="ErrorUnknown" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
 </root>

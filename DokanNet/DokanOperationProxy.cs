@@ -468,7 +468,7 @@ namespace DokanNet
                 logger.Debug("GetFileInformationProxy : {0}", rawFileName);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.GetFileInformation(rawFileName, out FileInformation fi, rawFileInfo);
+                var result = operations.GetFileInformation(rawFileName, out var fi, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
@@ -988,7 +988,7 @@ namespace DokanNet
             {
                 logger.Debug("GetVolumeInformationProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
-                var result = operations.GetVolumeInformation(out string label, out rawFileSystemFlags, out string name, rawFileInfo);
+                var result = operations.GetVolumeInformation(out var label, out rawFileSystemFlags, out var name, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
@@ -1086,7 +1086,7 @@ namespace DokanNet
                 logger.Debug("\tFileSystemSecurity\t{0}", sect);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.GetFileSecurity(rawFileName, out FileSystemSecurity sec, sect, rawFileInfo);
+                var result = operations.GetFileSecurity(rawFileName, out var sec, sect, rawFileInfo);
                 if (result == DokanResult.Success /*&& sec != null*/)
                 {
                     Debug.Assert(sec != null, $"{nameof(sec)} must not be null");

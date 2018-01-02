@@ -15,7 +15,7 @@ namespace DokanNet
         /// <summary>
         /// A constant string that represents what to use if the formated object is <c>null</c>.
         /// </summary>
-        public static readonly string NullStringRepresentation = "<null>";
+        public const string NullStringRepresentation = "<null>";
 
         /// <summary>
         /// Prevents a default instance of the <see cref="FormatProviders"/> class from being created. 

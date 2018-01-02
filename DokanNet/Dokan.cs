@@ -264,6 +264,8 @@ namespace DokanNet
                     throw new DokanException(status, Resources.ErrorMountPointInvalid);
                 case DOKAN_VERSION_ERROR:
                     throw new DokanException(status, Resources.ErrorVersion);
+                default:
+                    throw new DokanException(status, Resources.ErrorUnknown);
             }
         }
 
