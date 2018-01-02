@@ -18,6 +18,11 @@ namespace DokanNet
     public enum FileAccess : long
     {
         /// <summary>
+        /// No access defined.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// Read access right to an object.
         /// </summary>
         /// \native
