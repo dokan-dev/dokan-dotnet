@@ -5,8 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.1.1] - 2018-04-25
 ### Added
 - Enum value ``FileAccess.None``.
+- Handle unknown errors from Dokan.
+
+### Changed
+- Make ``MaximumComponentLength`` param available for ``GetVolumeInformation``.
 
 ## [1.1.1.0] - 2017-12-01
 ### Added
