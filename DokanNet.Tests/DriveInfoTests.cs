@@ -55,7 +55,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.ReadWrite);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT);
@@ -189,7 +189,7 @@ namespace DokanNet.Tests
             fixture.SetupAny();
 #else
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.ReadWrite);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
 #endif
 
             var sut = new DriveInfo(DokanOperationsFixture.MOUNT_POINT);

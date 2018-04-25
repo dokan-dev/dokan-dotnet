@@ -336,6 +336,7 @@ namespace DokanNet
         /// <param name="volumeLabel">Volume name</param>
         /// <param name="features"><see cref="FileSystemFeatures"/> with features enabled on the volume.</param>
         /// <param name="fileSystemName">The name of the specified volume.</param>
+        /// <param name="maximumComponentLength">File name component that the specified file system supports.</param>
         /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa364993(v=vs.85).aspx"> GetVolumeInformation function (MSDN)</a>
@@ -343,6 +344,7 @@ namespace DokanNet
             out string volumeLabel,
             out FileSystemFeatures features,
             out string fileSystemName,
+            out uint maximumComponentLength,
             DokanFileInfo info);
 
         /// <summary>

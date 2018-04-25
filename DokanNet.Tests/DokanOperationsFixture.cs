@@ -29,6 +29,8 @@ namespace DokanNet.Tests
 
             private delegate TResult FuncOut123<T1, T2, T3, in T4, out TResult>(out T1 arg1, out T2 arg2, out T3 arg3, T4 arg4);
 
+            private delegate TResult FuncOut1234<T1, T2, T3, T4, in T5, out TResult>(out T1 arg1, out T2 arg2, out T3 arg3, out T4 arg4, T5 arg5);
+
             private delegate TResult FuncOut23<in T1, in T2, T3, T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, out T4 arg4, T5 arg5);
 
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4);
@@ -241,6 +243,35 @@ namespace DokanNet.Tests
             }
 
             [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
+            private NtStatus TryExecute<TOut1, TOut2, TOut3, TOut4>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, out TOut4 argOut4, DokanFileInfo info, FuncOut1234<TOut1, TOut2, TOut3, TOut4, DokanFileInfo, NtStatus> func, string funcName)
+            {
+                if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    argOut3 = default(TOut3);
+                    argOut4 = default(TOut4);
+                    return DokanResult.AccessDenied;
+                }
+
+                try
+                {
+                    return func(out argOut1, out argOut2, out argOut3, out argOut4, info);
+                }
+                catch (Exception ex)
+                {
+                    Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
+                    if (ex is MockException)
+                        HasUnmatchedInvocations = true;
+                    argOut1 = default(TOut1);
+                    argOut2 = default(TOut2);
+                    argOut3 = default(TOut3);
+                    argOut4 = default(TOut4);
+                    return DokanResult.InvalidParameter;
+                }
+            }
+
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
             private NtStatus TryExecute<TOut1, TOut2, TOut3>(out TOut1 argOut1, out TOut2 argOut2, out TOut3 argOut3, DokanFileInfo info, FuncOut123<TOut1, TOut2, TOut3, DokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
@@ -303,8 +334,8 @@ namespace DokanNet.Tests
             public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections, DokanFileInfo info)
                 => TryExecute(fileName, out security, sections, info, (string f, out FileSystemSecurity s, AccessControlSections a, DokanFileInfo i) => Target.GetFileSecurity(f, out s, a, i), nameof(GetFileSecurity));
 
-            public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features, out string fileSystemName, DokanFileInfo info)
-                => TryExecute(out volumeLabel, out features, out fileSystemName, info, (out string v, out FileSystemFeatures f, out string n, DokanFileInfo i) => Target.GetVolumeInformation(out v, out f, out n, i), nameof(GetVolumeInformation));
+            public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features, out string fileSystemName, out uint maximumComponentLength, DokanFileInfo info)
+                => TryExecute(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, info, (out string v, out FileSystemFeatures f, out string n, out uint c, DokanFileInfo i) => Target.GetVolumeInformation(out v, out f, out n, out c, i), nameof(GetVolumeInformation));
 
             public NtStatus LockFile(string fileName, long offset, long length, DokanFileInfo info)
                 => TryExecute(fileName, offset, length, info, (f, o, l, i) => Target.LockFile(f, o, l, i), nameof(LockFile));
@@ -765,8 +796,9 @@ namespace DokanNet.Tests
             var volumeLabel = VOLUME_LABEL;
             var features = TestFileSystemFeatures;
             var fileSystemName = FILESYSTEM_NAME;
+            uint maximumComponentLength = 256;
             operations
-                .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, It.IsAny<DokanFileInfo>()))
+                .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", {info.Log()})"));
@@ -892,11 +924,11 @@ namespace DokanNet.Tests
                 .Verifiable();
         }
 
-        internal void ExpectGetVolumeInformation(string volumeLabel, string fileSystemName)
+        internal void ExpectGetVolumeInformation(string volumeLabel, string fileSystemName, uint maximumComponentLength)
         {
             var features = TestFileSystemFeatures;
             operations
-                .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, It.IsAny<DokanFileInfo>()))
+                .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, DokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", {info.Log()})"))

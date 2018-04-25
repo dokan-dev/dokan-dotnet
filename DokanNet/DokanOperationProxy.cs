@@ -982,25 +982,26 @@ namespace DokanNet
             uint rawFileSystemNameSize,
             DokanFileInfo rawFileInfo)
         {
-            rawMaximumComponentLength = 256;
             rawVolumeSerialNumber = serialNumber;
             try
             {
                 logger.Debug("GetVolumeInformationProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
-                var result = operations.GetVolumeInformation(out var label, out rawFileSystemFlags, out var name, rawFileInfo);
+                var result = operations.GetVolumeInformation(out var volumeName, out rawFileSystemFlags, out var name, out var maximumComponentLength, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
                     Debug.Assert(!string.IsNullOrEmpty(name), "name must not be null");
-                    Debug.Assert(!string.IsNullOrEmpty(label), "Label must not be null");
-                    rawVolumeNameBuffer.Append(label);
+                    Debug.Assert(!string.IsNullOrEmpty(volumeName), "Label must not be null");
+                    rawVolumeNameBuffer.Append(volumeName);
                     rawFileSystemNameBuffer.Append(name);
+                    rawMaximumComponentLength = maximumComponentLength;
 
                     logger.Debug("\tVolumeNameBuffer\t{0}", rawVolumeNameBuffer);
                     logger.Debug("\tFileSystemNameBuffer\t{0}", rawFileSystemNameBuffer);
                     logger.Debug("\tVolumeSerialNumber\t{0}", rawVolumeSerialNumber);
                     logger.Debug("\tFileSystemFlags\t{0}", rawFileSystemFlags);
+                    logger.Debug("\tMaximumComponentLength\t{0}", rawMaximumComponentLength);
                 }
 
                 logger.Debug("GetVolumeInformationProxy Return : {0}", result);

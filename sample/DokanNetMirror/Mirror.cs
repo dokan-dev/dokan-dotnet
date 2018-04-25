@@ -573,10 +573,11 @@ namespace DokanNetMirror
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
-            out string fileSystemName, DokanFileInfo info)
+            out string fileSystemName, out uint maximumComponentLength, DokanFileInfo info)
         {
             volumeLabel = "DOKAN";
             fileSystemName = "NTFS";
+            maximumComponentLength = 256;
 
             features = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch |
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |

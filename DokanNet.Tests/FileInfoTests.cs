@@ -260,7 +260,7 @@ namespace DokanNet.Tests
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
             fixture.PermitCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectSetFileAttributes(destinationPath, default(FileAttributes));
             fixture.ExpectSetFileTime(destinationPath);
@@ -291,7 +291,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: value.Length);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectSetEndOfFile(destinationPath, value.Length);
 #if NETWORK_DRIVE
@@ -330,7 +330,7 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
             fixture.ExpectCreateFile(destinationPath, CopyToAccess, WriteShare, FileMode.CreateNew, FileOptions.SequentialScan, attributes: FileAttributes.Normal);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
             fixture.ExpectGetFileInformation(destinationPath, FileAttributes.Normal);
             fixture.ExpectFindStreams(path, new FileInformation[0]);
             fixture.ExpectSetEndOfFile(destinationPath, largeData.Length);
@@ -1495,7 +1495,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectSetFileAttributes(path, FileAttributes.Normal);
             fixture.ExpectSetFileTime(path);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
             fixture.PermitGetFileInformationToFail(destinationBackupPath, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(DokanOperationsFixture.RootName, ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);
@@ -1538,7 +1538,7 @@ namespace DokanNet.Tests
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
             fixture.ExpectSetFileAttributes(path, FileAttributes.Normal);
             fixture.ExpectSetFileTime(path);
-            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME);
+            fixture.ExpectGetVolumeInformation(DokanOperationsFixture.VOLUME_LABEL, DokanOperationsFixture.FILESYSTEM_NAME, 256);
             fixture.ExpectFindStreams(destinationPath, new FileInformation[0]);
             fixture.PermitGetFileInformationToFail(destinationBackupPath, NtStatus.ObjectPathNotFound, true);
             fixture.PermitOpenDirectory(fixture.DestinationDirectoryName.AsRootedPath(), ReadDirectoryAccess, ReadWriteShare, attributes: FileAttributes.Normal);

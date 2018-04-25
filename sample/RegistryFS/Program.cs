@@ -265,11 +265,12 @@ namespace RegistryFS
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
-            out string fileSystemName, DokanFileInfo info)
+            out string fileSystemName, out uint maximumComponentLength, DokanFileInfo info)
         {
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
             fileSystemName = string.Empty;
+            maximumComponentLength = 256;
             return DokanResult.Error;
         }
 
