@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using DokanNet.Native;
+using Microsoft.Win32.SafeHandles;
 using static DokanNet.FormatProviders;
 
 #pragma warning disable 649,169
@@ -137,7 +138,10 @@ namespace DokanNet
         {
             try
             {
-                return new WindowsIdentity(NativeMethods.DokanOpenRequestorToken(this));
+                using (var sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
+                {
+                    return new WindowsIdentity(sfh.DangerousGetHandle());
+                }
             }
             catch
             {
