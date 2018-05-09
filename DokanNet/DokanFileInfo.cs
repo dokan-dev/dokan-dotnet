@@ -150,7 +150,10 @@ namespace DokanNet
             }
             finally
             {
-                sfh.Dispose();
+                if (sfh != null)
+                {
+                    sfh.Dispose();
+                }
             }
         }
 
