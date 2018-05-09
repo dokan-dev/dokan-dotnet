@@ -136,9 +136,10 @@ namespace DokanNet
         /// -or- <c>null</c> if the operation was not successful.</returns>
         public WindowsIdentity GetRequestor()
         {
+            SafeFileHandle sfh = null;
             try
             {
-                using (var sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
+                using (sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
                 {
                     return new WindowsIdentity(sfh.DangerousGetHandle());
                 }
@@ -146,6 +147,10 @@ namespace DokanNet
             catch
             {
                 return null;
+            }
+            finally
+            {
+                sfh.Dispose();
             }
         }
 
