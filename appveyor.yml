@@ -21,13 +21,14 @@ branches:
 
 install:
  - ps: |
-     Add-Type -AssemblyName System.IO.Compression.FileSystem
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
             (new-object System.Net.WebClient).DownloadFile(
               'https://github.com/dokan-dev/dokany/releases/download/v1.1.0.2000/DokanSetup_redist.exe',
               'C:\projects\dokan-dotnet\DokanSetup.exe'
             )
-            
+      Write-Host "Dokan downloaded." -ForegroundColor Green
       & choco install doxygen.portable
+      Write-Host "Doxygen installed." -ForegroundColor Green
  - cmd: |
      C:\projects\dokan-dotnet\DokanSetup.exe /quiet
 
