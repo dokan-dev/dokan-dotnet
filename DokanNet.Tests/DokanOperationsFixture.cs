@@ -800,8 +800,8 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
-                .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", {info.Log()})"));
+                .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, uint _maximumComponentLength, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", out \"{_maximumComponentLength}\", {info.Log()})"));
 
             operations
                 .Setup(d => d.LockFile(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<long>(), It.IsAny<DokanFileInfo>()))
@@ -930,8 +930,8 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.GetVolumeInformation(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, It.IsAny<DokanFileInfo>()))
                 .Returns(DokanResult.Success)
-                .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, DokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", {info.Log()})"))
+                .Callback((string _volumeLabel, FileSystemFeatures _features, string _fileSystemName, uint _maximumComponentLength, DokanFileInfo info)
+                    => Trace($"{nameof(IDokanOperations.GetVolumeInformation)}[{Interlocked.Read(ref pendingFiles)}] (out \"{_volumeLabel}\", out [{_features}], out \"{_fileSystemName}\", out \"{_maximumComponentLength}\", {info.Log()})"))
                 .Verifiable();
         }
 
