@@ -503,8 +503,15 @@ namespace DokanNet
                     rawHandleFileInformation.nFileSizeLow = (uint)(fi.Length & 0xffffffff);
                     rawHandleFileInformation.nFileSizeHigh = (uint)(fi.Length >> 32);
                     rawHandleFileInformation.dwNumberOfLinks = 1;
-                    rawHandleFileInformation.nFileIndexHigh = 0;
-                    rawHandleFileInformation.nFileIndexLow = (uint)(fi.FileName?.GetHashCode() ?? 0);
+                    if (fi.ObjectID == default(Int64))
+                    {
+                        rawHandleFileInformation.nFileIndexHigh = 0;
+                        rawHandleFileInformation.nFileIndexLow = (uint)(fi.FileName?.GetHashCode() ?? 0);
+                    } else
+                    {
+                        rawHandleFileInformation.nFileIndexLow = (uint)fi.ObjectID & 0xffffffff;
+                        rawHandleFileInformation.nFileIndexHigh = (uint)((fi.ObjectID >> 32) & 0xffffffff);
+                    }
                 }
 
                 logger.Debug("GetFileInformationProxy : {0} Return : {1}", rawFileName, result);
