@@ -355,6 +355,10 @@ namespace DokanNet
             {
                 logger.Error("CloseFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
             }
+            finally
+            {
+                rawFileInfo.Context = null;
+            }
         }
 
         ////
