@@ -48,5 +48,16 @@ namespace DokanNet
         /// Gets or sets the length of the file.
         /// </summary>
         public long Length { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ObjectID of the file. The ObjectID stays the same, even if the name
+        /// of the file changes, even if the file is moved across volumes.
+        /// </summary>
+        /// <remarks>
+        /// If you don't touch this, the default is that the high 32 bits are zeroed out, and the
+        /// low 32 bits are the HashCode of the name of the file. This does not match the
+        /// documented behavior of ObjectIDs, so working with and storing this is necessary if
+        /// your filesystem claims FileSystemFeatures.SupportsObjectIDs.</remarks>
+        public Int64 ObjectID { get; set; }
     }
 }
