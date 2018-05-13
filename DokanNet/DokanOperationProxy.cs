@@ -357,7 +357,6 @@ namespace DokanNet
             }
             finally
             {
-                (rawFileInfo.Context as IDisposable)?.Dispose();
                 rawFileInfo.Context = null;
             }
         }
