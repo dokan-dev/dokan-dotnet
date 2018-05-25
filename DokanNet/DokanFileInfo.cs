@@ -46,11 +46,25 @@ namespace DokanNet
         [MarshalAs(UnmanagedType.U1)] private bool _writeToEndOfFile;
 
         /// <summary>
+        /// Determine if this instance was constructed for testing, or by the kernel.
+        /// </summary>
+        public bool Testing { get; private set; }
+
+        /// <summary>
         /// Prevents a default instance of the <see cref="DokanFileInfo"/> class from being created. 
         /// The class is created by the %Dokan kernel driver.
         /// </summary>
         private DokanFileInfo()
         {
+        }
+
+        /// <summary>
+        /// Construct an instance of this class for testing purposes. (You do not need to construct instances unless you are testing.)
+        /// </summary>
+        /// <param name="testing"></param>
+        public DokanFileInfo(bool testing = true)
+        {
+            Testing = true;
         }
 
         /// <summary>
@@ -60,8 +74,8 @@ namespace DokanNet
         /// </summary>
         public object Context
         {
-            get => _context != 0 
-                ? ((GCHandle)(IntPtr)_context).Target 
+            get => _context != 0
+                ? ((GCHandle)(IntPtr)_context).Target
                 : null;
             set
             {
@@ -108,23 +122,59 @@ namespace DokanNet
         /// <summary>
         /// Read or write is paging IO.
         /// </summary>
-        public bool PagingIo => _pagingIo;
+        public bool PagingIo
+        {
+            get => _pagingIo;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _pagingIo = value;
+            }
+        }
 
         /// <summary>
         /// Read or write is synchronous IO.
         /// </summary>
-        public bool SynchronousIo => _synchronousIo;
+        public bool SynchronousIo
+        {
+            get => _synchronousIo;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _synchronousIo = value;
+            }
+        }
 
         /// <summary>
         /// Read or write directly from data source without cache.
         /// </summary>
-        public bool NoCache => _noCache;
+        public bool NoCache
+        {
+            get => _noCache;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _noCache = value;
+            }
+        }
 
         /// <summary>
         /// If <c>true</c>, write to the current end of file instead 
         /// of using the <c>Offset</c> parameter.
         /// </summary>
-        public bool WriteToEndOfFile => _writeToEndOfFile;
+        public bool WriteToEndOfFile
+        {
+            get => _writeToEndOfFile;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _writeToEndOfFile = value;
+            }
+        }
 
         /// <summary>
         /// This method needs to be called in <see cref="IDokanOperations.CreateFile"/>.
@@ -133,24 +183,39 @@ namespace DokanNet
         /// -or- <c>null</c> if the operation was not successful.</returns>
         public WindowsIdentity GetRequestor()
         {
-            SafeFileHandle sfh = null;
-            try
+            if (!Testing)
             {
-                using (sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
+
+                SafeFileHandle sfh = null;
+                try
                 {
-                    return new WindowsIdentity(sfh.DangerousGetHandle());
+                    using (sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
+                    {
+                        return new WindowsIdentity(sfh.DangerousGetHandle());
+                    }
+                }
+                catch
+                {
+                    try
+                    {
+                        return new WindowsIdentity(NativeMethods.DokanOpenRequestorToken(this));
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+                finally
+                {
+                    if (sfh != null)
+                    {
+                        sfh.Dispose();
+                    }
                 }
             }
-            catch
+            else
             {
-                return null;
-            }
-            finally
-            {
-                if (sfh != null)
-                {
-                    sfh.Dispose();
-                }
+                return IdentityOfRequestor;
             }
         }
 
@@ -161,7 +226,9 @@ namespace DokanNet
         /// <returns>If the operation was successful.</returns>
         public bool TryResetTimeout(int milliseconds)
         {
-            return NativeMethods.DokanResetTimeout((uint)milliseconds, this);
+            if (!Testing)
+                return NativeMethods.DokanResetTimeout((uint)milliseconds, this);
+            return ResetTimeoutReturn;
         }
 
         /// <summary>Returns a string that represents the current object.</summary>
@@ -172,6 +239,42 @@ namespace DokanNet
                 DokanFormat(
                     $"{{{Context}, {DeleteOnClose}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
         }
+
+        #region Test setup members
+        private WindowsIdentity _requestor;
+
+        /// <summary>
+        /// For testing, set the WindowsIdentity returned by <see cref="GetRequestor"/>.
+        /// </summary>
+        /// <remarks>GetRequestor() can return null if the <see cref="WindowsIdentity"/> constructor fails.
+        /// As such, this can be left or explicitly set null.</remarks>
+        public WindowsIdentity IdentityOfRequestor
+        {
+            private get => _requestor;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _requestor = value;
+            }
+        }
+
+        private bool _resetTimeoutReturn;
+
+        /// <summary>
+        /// For testing, set the return value of <see cref="TryResetTimeout"/>.
+        /// </summary>
+        public bool ResetTimeoutReturn
+        {
+            private get => _resetTimeoutReturn;
+            set
+            {
+                if (!Testing)
+                    throw new InvalidOperationException();
+                _resetTimeoutReturn = true;
+            }
+        }
+        #endregion
     }
 }
 
