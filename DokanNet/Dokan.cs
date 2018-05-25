@@ -250,6 +250,8 @@ namespace DokanNet
 
             switch (status)
             {
+                case DOKAN_SUCCESS:
+                    break;
                 case DOKAN_ERROR:
                     throw new DokanException(status, Resources.ErrorDokan);
                 case DOKAN_DRIVE_LETTER_ERROR:
