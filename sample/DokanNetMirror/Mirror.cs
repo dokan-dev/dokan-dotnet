@@ -206,7 +206,7 @@ namespace DokanNetMirror
                     {
                         // returning AccessDenied cleanup and close won't be called
                         fileStream.Dispose();
-                        info.Context = null;
+                        info.Context = new object();
                     }
                     return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
                         DokanResult.AccessDenied);
