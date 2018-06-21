@@ -250,6 +250,8 @@ namespace DokanNet
 
             switch (status)
             {
+                case DOKAN_SUCCESS:
+                    break;
                 case DOKAN_ERROR:
                     throw new DokanException(status, Resources.ErrorDokan);
                 case DOKAN_DRIVE_LETTER_ERROR:
@@ -264,6 +266,8 @@ namespace DokanNet
                     throw new DokanException(status, Resources.ErrorMountPointInvalid);
                 case DOKAN_VERSION_ERROR:
                     throw new DokanException(status, Resources.ErrorVersion);
+                default:
+                    throw new DokanException(status, Resources.ErrorUnknown);
             }
         }
 

@@ -364,7 +364,10 @@ namespace DokanNetMirror
         {
             try
             {
-                File.SetAttributes(GetPath(fileName), attributes);
+                // MS-FSCC 2.6 File Attributes : There is no file attribute with the value 0x00000000
+                // because a value of 0x00000000 in the FileAttributes field means that the file attributes for this file MUST NOT be changed when setting basic information for the file
+                if (attributes != 0)
+                    File.SetAttributes(GetPath(fileName), attributes);
                 return Trace(nameof(SetFileAttributes), fileName, info, DokanResult.Success, attributes.ToString());
             }
             catch (UnauthorizedAccessException)
@@ -576,10 +579,11 @@ namespace DokanNetMirror
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
-            out string fileSystemName, DokanFileInfo info)
+            out string fileSystemName, out uint maximumComponentLength, DokanFileInfo info)
         {
             volumeLabel = "DOKAN";
             fileSystemName = "NTFS";
+            maximumComponentLength = 256;
 
             features = FileSystemFeatures.CasePreservedNames | FileSystemFeatures.CaseSensitiveSearch |
                        FileSystemFeatures.PersistentAcls | FileSystemFeatures.SupportsRemoteStorage |

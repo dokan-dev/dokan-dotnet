@@ -289,16 +289,19 @@ namespace DokanNet
             {
                 var fileAttributesAndFlags = 0;
                 var creationDisposition = 0;
+                var outDesiredAccess = 0u;
                 NativeMethods.DokanMapKernelToUserCreateFileFlags(
+                    rawDesiredAccess,
                     rawFileAttributes,
                     rawCreateOptions,
                     rawCreateDisposition,
+                    ref outDesiredAccess,
                     ref fileAttributesAndFlags,
                     ref creationDisposition);
 
                 var fileAttributes = (FileAttributes)(fileAttributesAndFlags & FileAttributeMask);
                 var fileOptions    = (FileOptions   )(fileAttributesAndFlags & FileOptionsMask);
-                var desiredAccess  = (FileAccess    )(rawDesiredAccess       & FileAccessMask);
+                var desiredAccess  = (FileAccess    )(outDesiredAccess       & FileAccessMask);
                 var shareAccess    = (FileShare     )(rawShareAccess         & FileShareMask);
 
                 logger.Debug("CreateFileProxy : {0}", rawFileName);
@@ -362,6 +365,10 @@ namespace DokanNet
             catch (Exception ex)
             {
                 logger.Error("CloseFileProxy : {0} Throw : {1}", rawFileName, ex.Message);
+            }
+            finally
+            {
+                rawFileInfo.Context = null;
             }
         }
 
@@ -465,7 +472,7 @@ namespace DokanNet
                 logger.Debug("GetFileInformationProxy : {0}", rawFileName);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.GetFileInformation(rawFileName, out FileInformation fi, rawFileInfo);
+                var result = operations.GetFileInformation(rawFileName, out var fi, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
@@ -979,25 +986,26 @@ namespace DokanNet
             uint rawFileSystemNameSize,
             DokanFileInfo rawFileInfo)
         {
-            rawMaximumComponentLength = 256;
             rawVolumeSerialNumber = serialNumber;
             try
             {
                 logger.Debug("GetVolumeInformationProxy:");
                 logger.Debug("\tContext\t{0}", rawFileInfo);
-                var result = operations.GetVolumeInformation(out string label, out rawFileSystemFlags, out string name, rawFileInfo);
+                var result = operations.GetVolumeInformation(out var volumeName, out rawFileSystemFlags, out var name, out var maximumComponentLength, rawFileInfo);
 
                 if (result == DokanResult.Success)
                 {
                     Debug.Assert(!string.IsNullOrEmpty(name), "name must not be null");
-                    Debug.Assert(!string.IsNullOrEmpty(label), "Label must not be null");
-                    rawVolumeNameBuffer.Append(label);
+                    Debug.Assert(!string.IsNullOrEmpty(volumeName), "Label must not be null");
+                    rawVolumeNameBuffer.Append(volumeName);
                     rawFileSystemNameBuffer.Append(name);
+                    rawMaximumComponentLength = maximumComponentLength;
 
                     logger.Debug("\tVolumeNameBuffer\t{0}", rawVolumeNameBuffer);
                     logger.Debug("\tFileSystemNameBuffer\t{0}", rawFileSystemNameBuffer);
                     logger.Debug("\tVolumeSerialNumber\t{0}", rawVolumeSerialNumber);
                     logger.Debug("\tFileSystemFlags\t{0}", rawFileSystemFlags);
+                    logger.Debug("\tMaximumComponentLength\t{0}", rawMaximumComponentLength);
                 }
 
                 logger.Debug("GetVolumeInformationProxy Return : {0}", result);
@@ -1083,7 +1091,7 @@ namespace DokanNet
                 logger.Debug("\tFileSystemSecurity\t{0}", sect);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.GetFileSecurity(rawFileName, out FileSystemSecurity sec, sect, rawFileInfo);
+                var result = operations.GetFileSecurity(rawFileName, out var sec, sect, rawFileInfo);
                 if (result == DokanResult.Success /*&& sec != null*/)
                 {
                     Debug.Assert(sec != null, $"{nameof(sec)} must not be null");

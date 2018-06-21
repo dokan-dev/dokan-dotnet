@@ -5,11 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.1.1] - 2018-04-25
+### Added
+- Enum value ``FileAccess.None``.
+- Handle unknown errors from Dokan.
+
+### Changed
+- Make ``MaximumComponentLength`` param available for ``GetVolumeInformation``.
+
+## [1.1.1.0] - 2017-12-01
 ### Added
 - Support for .NET Standard 1.3
 
+### Changed
+- Migrate to Visual Studio 2017
+- Update the NuGet icon to the new icon 
+- Library - Adapt to API changes for dokany 1.1.0 
+
 ### Fixed
-- Proper use of timeout when mounting (See #144)
+- Library -Proper use of timeout when mounting (See #144)
+- Mirror - Implementation of SetTime to work on open files
+- Mirror - Only SetAttributes when attributes not 0 
+- Test - Appveyor is now Green !
 
 ## [1.1.0.3] - 2017-03-29
 ### Added
@@ -97,7 +115,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.3...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.1.0...HEAD
+[1.1.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.3...v1.1.1.0
 [1.1.0.3]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.1...v1.1.0.3
 [1.1.0.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.0...v1.1.0.1
 [1.1.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.0.8.0...v1.1.0.0

@@ -7,31 +7,31 @@ namespace DokanNet
         /// <summary>
         /// Matches zero or more characters until encountering and matching the final . in the name.
         /// </summary>
-        const char DOS_STAR = '<';
+        private const char DOS_STAR = '<';
 
         /// <summary>
         /// Matches any single character or, upon encountering a period or end
         /// of name string, advances the expression to the end of the set of
         /// contiguous DOS_QMs.
         /// </summary>
-        const char DOS_QM = '>';
+        private const char DOS_QM = '>';
 
         /// <summary>
         /// Matches either a period or zero characters beyond the name string.
         /// </summary>
-        const char DOS_DOT = '"';
+        private const char DOS_DOT = '"';
 
         /// <summary>
         /// Matches zero or more characters.
         /// </summary>
-        const char ASTERISK = '*';
+        private const char ASTERISK = '*';
 
         /// <summary>
         /// Matches a single character.
         /// </summary>
-        const char QUESTION_MARK = '?';
+        private const char QUESTION_MARK = '?';
 
-        private readonly static char[] CharsThatMatchEmptyStringsAtEnd = new char[] { DOS_DOT, DOS_STAR, ASTERISK };
+        private readonly static char[] CharsThatMatchEmptyStringsAtEnd = { DOS_DOT, DOS_STAR, ASTERISK };
 
         /// <summary>
         /// Check whether <paramref name="name">Name</paramref> matches <paramref name="expression">Expression</paramref>.
@@ -52,96 +52,96 @@ namespace DokanNet
 
             while (ei < expression.Length && ni < name.Length)
             {
-                if (expression[ei] == ASTERISK)
+                switch (expression[ei])
                 {
-                    ei++;
-                    if (ei > expression.Length)
-                        return true;
-
-                    while (ni < name.Length)
-                    {
-                        if (DokanIsNameInExpression(expression.Substring(ei), name.Substring(ni), ignoreCase))
+                    case ASTERISK:
+                        ei++;
+                        if (ei > expression.Length)
                             return true;
-                        ni++;
-                    }
 
-                }
-                else if (expression[ei] == DOS_STAR)
-                {
-                    var lastDotIndex = name.LastIndexOf('.');
-                    ei++;
-
-                    var endReached = false;
-                    while (!endReached)
-                    {
-                        endReached = (ni >= name.Length || lastDotIndex > -1 && ni > lastDotIndex);
-
-                        if (!endReached)
+                        while (ni < name.Length)
                         {
                             if (DokanIsNameInExpression(expression.Substring(ei), name.Substring(ni), ignoreCase))
                                 return true;
                             ni++;
                         }
-                    }
-                }
-                else if (expression[ei] == DOS_QM)
-                {
-                    ei++;
-                    if (name[ni] != '.')
-                    {
-                        ni++;
-                    }
-                    else
-                    {
-                        var p = ni + 1;
-                        while (p < name.Length)
+
+                        break;
+                    case DOS_STAR:
+                        var lastDotIndex = name.LastIndexOf('.');
+                        ei++;
+
+                        var endReached = false;
+                        while (!endReached)
                         {
-                            if (name[p] == '.')
-                                break;
-                            p++;
+                            endReached = (ni >= name.Length || lastDotIndex > -1 && ni > lastDotIndex);
+
+                            if (!endReached)
+                            {
+                                if (DokanIsNameInExpression(expression.Substring(ei), name.Substring(ni), ignoreCase))
+                                    return true;
+                                ni++;
+                            }
                         }
 
-                        if (p < name.Length && name[p] == '.')
-                            ni++;
-                    }
-                }
-                else if (expression[ei] == DOS_DOT)
-                {
-                    if (ei < expression.Length)
-                    {
+                        break;
+                    case DOS_QM:
+                        ei++;
                         if (name[ni] != '.')
-                            return false;
+                        {
+                            ni++;
+                        }
                         else
+                        {
+                            var p = ni + 1;
+                            while (p < name.Length)
+                            {
+                                if (name[p] == '.')
+                                    break;
+                                p++;
+                            }
+
+                            if (p < name.Length && name[p] == '.')
+                                ni++;
+                        }
+
+                        break;
+                    case DOS_DOT:
+                        if (ei < expression.Length)
+                        {
+                            if (name[ni] != '.')
+                                return false;
+                            else
+                                ni++;
+                        }
+                        else
+                        {
+                            if (name[ni] == '.')
+                                ni++;
+                        }
+                        ei++;
+                        break;
+                    case QUESTION_MARK:
+                        ei++;
+                        ni++;
+                        break;
+                    default:
+                        if (ignoreCase && char.ToUpperInvariant(expression[ei]) == char.ToUpperInvariant(name[ni]))
+                        {
+                            ei++;
                             ni++;
-                    }
-                    else
-                    {
-                        if (name[ni] == '.')
+                        }
+                        else if (!ignoreCase && expression[ei] == name[ni])
+                        {
+                            ei++;
                             ni++;
-                    }
-                    ei++;
-                }
-                else
-                {
-                    if (expression[ei] == QUESTION_MARK)
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else if (ignoreCase && char.ToUpperInvariant(expression[ei]) == char.ToUpperInvariant(name[ni]))
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else if (!ignoreCase && expression[ei] == name[ni])
-                    {
-                        ei++;
-                        ni++;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                        break;
                 }
             }
 
