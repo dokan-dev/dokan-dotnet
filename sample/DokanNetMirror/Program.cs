@@ -1,16 +1,47 @@
 using System;
+using System.Linq;
 using DokanNet;
 
 namespace DokanNetMirror
 {
     internal class Program
     {
-        private static void Main()
+        private const string MirrorKey = "/what";
+        private const string MountKey = "/where";
+        private static void Main(string[] args)
         {
+            
             try
             {
-                var mirror = new Mirror("C:");
-                mirror.Mount("n:\\", DokanOptions.DebugMode, 5);
+                var arguments = args
+                   .Select(x => x.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries))
+                    .ToDictionary(x => x[0], x => x[1]);
+
+                String mirrorPath;
+                if (arguments.ContainsKey(MirrorKey))
+                {
+                    mirrorPath = arguments[MirrorKey];
+                }
+                else
+                {
+                    Console.WriteLine("imput what you want to mirror");
+                    mirrorPath = Console.ReadLine();
+                }
+
+
+                String mountPath;
+                if (arguments.ContainsKey(MountKey))
+                {
+                    mountPath = arguments[MountKey];
+                }
+                else
+                {
+                    Console.WriteLine("imput where you want to mirror");
+                    mountPath = Console.ReadLine();
+                }
+
+                var mirror = new Mirror(mirrorPath);
+                mirror.Mount(mountPath, DokanOptions.DebugMode, 5);
 
                 Console.WriteLine(@"Success");
             }

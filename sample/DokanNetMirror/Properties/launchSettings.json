@@ -1,7 +1,8 @@
 {
   "profiles": {
     "DokanNetMirror (net4.6)": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "/what=C:\\ /where=N:\\"
     },
     "DokanNetMirror (net4.0)": {
       "commandName": "Executable",
