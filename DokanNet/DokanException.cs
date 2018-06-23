@@ -17,7 +17,7 @@ namespace DokanNet
         /// <param name="message">
         /// The error message.
         /// </param>
-        internal DokanException(int status, string message) : base(message)
+        internal DokanException(int status, string message) : base(String.Format ("{0}. (Dokan hr=0X{1:X})", message, status))
         {
             HResult = status;
         }
