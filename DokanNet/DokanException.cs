@@ -12,14 +12,18 @@ namespace DokanNet
         /// Initializes a new instance of the <see cref="DokanException"/> class with a <see cref="Exception.HResult"/>.
         /// </summary>
         /// <param name="status">
-        /// The status for <see cref="Exception.HResult"/>.
+        /// The error status also written to <see cref="Exception.HResult"/>.
         /// </param>
         /// <param name="message">
         /// The error message.
         /// </param>
-        internal DokanException(int status, string message) : base(message)
+        internal DokanException(DokanStatus status, string message)
+            : base(message)
         {
-            HResult = status;
+            ErrorStatus = status;
+            HResult = (int)status;
         }
+
+        public DokanStatus ErrorStatus { get; private set; }
     }
 }

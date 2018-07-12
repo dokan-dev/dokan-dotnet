@@ -19,62 +19,7 @@ namespace DokanNet
         private const ushort DOKAN_VERSION = 100;
 
         #endregion Dokan Driver Options
-
-        #region Dokan Driver Errors
-        /**
-        * \if PRIVATE
-        * \defgroup DokanMain DokanMain
-        * \brief DokanMain returns error codes.
-        * \endif
-        */
-        /** @{ */
-        /// <summary>
-        /// %Dokan mount succeed.
-        /// </summary>
-        private const int DOKAN_SUCCESS = 0;
-
-        /// <summary>
-        /// %Dokan mount error.
-        /// </summary>
-        private const int DOKAN_ERROR = -1;
-
-        /// <summary>
-        /// %Dokan mount failed - Bad drive letter.
-        /// </summary>
-        private const int DOKAN_DRIVE_LETTER_ERROR = -2;
-
-        /// <summary>
-        /// %Dokan mount failed - Can't install driver.
-        /// </summary>
-        private const int DOKAN_DRIVER_INSTALL_ERROR = -3;
-
-        /// <summary>
-        /// %Dokan mount failed - Driver answer that something is wrong.
-        /// </summary>
-        private const int DOKAN_START_ERROR = -4;
-
-        /// <summary>
-        /// %Dokan mount failed.
-        /// Can't assign a drive letter or mount point.
-        /// Probably already used by another volume.
-        /// </summary>
-        private const int DOKAN_MOUNT_ERROR = -5;
-
-        /// <summary>
-        /// %Dokan mount failed.
-        /// Mount point is invalid.
-        /// </summary>
-        private const int DOKAN_MOUNT_POINT_ERROR = -6;
-
-        /// <summary>
-        /// %Dokan mount failed.
-        /// Requested an incompatible version.
-        /// </summary>
-        private const int DOKAN_VERSION_ERROR = -7;
-
-        /** @} */
-        #endregion Dokan Driver Errors
-
+        
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
@@ -246,25 +191,25 @@ namespace DokanNet
                 FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
-            var status = NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
+            DokanStatus status = (DokanStatus)NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
 
             switch (status)
             {
-                case DOKAN_SUCCESS:
+                case DokanStatus.Success:
                     break;
-                case DOKAN_ERROR:
+                case DokanStatus.Error:
                     throw new DokanException(status, Resources.ErrorDokan);
-                case DOKAN_DRIVE_LETTER_ERROR:
+                case DokanStatus.DriveLetterError:
                     throw new DokanException(status, Resources.ErrorBadDriveLetter);
-                case DOKAN_DRIVER_INSTALL_ERROR:
+                case DokanStatus.DriverInstallError:
                     throw new DokanException(status, Resources.ErrorDriverInstall);
-                case DOKAN_MOUNT_ERROR:
+                case DokanStatus.MountError:
                     throw new DokanException(status, Resources.ErrorAssignDriveLetter);
-                case DOKAN_START_ERROR:
+                case DokanStatus.StartError:
                     throw new DokanException(status, Resources.ErrorStart);
-                case DOKAN_MOUNT_POINT_ERROR:
+                case DokanStatus.MountPointError:
                     throw new DokanException(status, Resources.ErrorMountPointInvalid);
-                case DOKAN_VERSION_ERROR:
+                case DokanStatus.VersionError:
                     throw new DokanException(status, Resources.ErrorVersion);
                 default:
                     throw new DokanException(status, Resources.ErrorUnknown);
