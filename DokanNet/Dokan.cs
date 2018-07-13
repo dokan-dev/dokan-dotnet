@@ -1,7 +1,6 @@
 using System;
 using DokanNet.Logging;
 using DokanNet.Native;
-using DokanNet.Properties;
 
 namespace DokanNet
 {
@@ -192,28 +191,8 @@ namespace DokanNet
             };
 
             DokanStatus status = (DokanStatus)NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
-
-            switch (status)
-            {
-                case DokanStatus.Success:
-                    break;
-                case DokanStatus.Error:
-                    throw new DokanException(status, Resources.ErrorDokan);
-                case DokanStatus.DriveLetterError:
-                    throw new DokanException(status, Resources.ErrorBadDriveLetter);
-                case DokanStatus.DriverInstallError:
-                    throw new DokanException(status, Resources.ErrorDriverInstall);
-                case DokanStatus.MountError:
-                    throw new DokanException(status, Resources.ErrorAssignDriveLetter);
-                case DokanStatus.StartError:
-                    throw new DokanException(status, Resources.ErrorStart);
-                case DokanStatus.MountPointError:
-                    throw new DokanException(status, Resources.ErrorMountPointInvalid);
-                case DokanStatus.VersionError:
-                    throw new DokanException(status, Resources.ErrorVersion);
-                default:
-                    throw new DokanException(status, Resources.ErrorUnknown);
-            }
+            if (status != DokanStatus.Success)
+                throw new DokanException(status);
         }
 
         /// <summary>
