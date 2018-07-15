@@ -350,6 +350,10 @@ namespace DokanNet
         /// <summary>
         /// Get specified information about the security of a file or directory. 
         /// </summary>
+        /// <remarks>
+        /// If <see cref="NtStatus.NotImplemented"/> is returned, dokan library will handle the request by
+        /// building a sddl of the current process user with authenticate user rights for context menu.
+        /// </remarks>
         /// \since Supported since version 0.6.0. You must specify the version in <see cref="Dokan.Mount(IDokanOperations, string, DokanOptions,int, int, TimeSpan, string, int,int, Logging.ILogger)"/>.
         /// 
         /// <param name="fileName">File or directory name.</param>
