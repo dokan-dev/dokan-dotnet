@@ -87,7 +87,7 @@ namespace DokanNetMirror
                                 {
                                     if (!File.GetAttributes(filePath).HasFlag(FileAttributes.Directory))
                                         return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
-                                            attributes, NtStatus.NotADirectory);
+                                            attributes, DokanResult.NotADirectory);
                                 }
                                 catch (Exception)
                                 {
