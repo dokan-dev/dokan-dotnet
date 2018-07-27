@@ -105,6 +105,11 @@
         public const NtStatus Unsuccessful = NtStatus.Unsuccessful;
 
         /// <summary>
+        /// Error - A directory semantics call was made but the accessed file was not a directory.
+        /// </summary>
+        public const NtStatus NotADirectory = NtStatus.NotADirectory;
+
+        /// <summary>
         /// Error - The parameter is incorrect.
         /// </summary>
         public const NtStatus InvalidParameter = NtStatus.InvalidParameter;
