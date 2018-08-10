@@ -15,7 +15,7 @@ namespace DokanNet
         /// The %Dokan version that DokanNet is compatible with. Currently it is version 1.0.0.
         /// </summary>
         /// <see cref="DOKAN_OPTIONS.Version"/>
-        private const ushort DOKAN_VERSION = 100;
+        private const ushort DOKAN_VERSION = 120;
 
         #endregion Dokan Driver Options
         
