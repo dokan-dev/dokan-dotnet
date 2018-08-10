@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.2.0] - 2018-08-10
+### Added
+- Included a strongly typed error code in DokanException to better communicate the reason why mounting failed.
+- NotADirectory enum value to DokanResult.
+
+### Changed
+- Status error message is now dispatched by DokanException itself instead of Dokan class.
+- Replaced usages of NtStatus with DokanResult in DokanNetMirror. 
+
+### Fixed
+- Leak of the token handle in GetRequestor()
+- DokanFileInfo.Context leaks GCHandle if not set null
+- DokanMain throw wrongly when success
+
 ## [1.1.1.1] - 2018-04-25
 ### Added
 - Enum value ``FileAccess.None``.
