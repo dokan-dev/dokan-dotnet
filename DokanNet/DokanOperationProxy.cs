@@ -50,7 +50,7 @@ namespace DokanNet
 
         public delegate NtStatus ReadFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2), Out] byte[] rawBuffer,
+            IntPtr rawBuffer,
             uint rawBufferLength,
             ref int rawReadLength,
             long rawOffset,
@@ -58,7 +58,7 @@ namespace DokanNet
 
         public delegate NtStatus WriteFileDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] rawBuffer,
+            IntPtr rawBuffer,
             uint rawNumberOfBytesToWrite,
             ref int rawNumberOfBytesWritten,
             long rawOffset,
@@ -376,7 +376,7 @@ namespace DokanNet
 
         public NtStatus ReadFileProxy(
             string rawFileName,
-            byte[] rawBuffer,
+            IntPtr rawBuffer,
             uint rawBufferLength,
             ref int rawReadLength,
             long rawOffset,
@@ -389,7 +389,27 @@ namespace DokanNet
                 logger.Debug("\tOffset\t" + rawOffset);
                 logger.Debug("\tContext\t" + rawFileInfo);
 
-                var result = operations.ReadFile(rawFileName, rawBuffer, out rawReadLength, rawOffset, rawFileInfo);
+                // Check if the file system has implemented the unsafe Dokan interface.
+                // If so, pass the raw IntPtr through instead of marshalling.
+                NtStatus result;
+                if (operations is IDokanOperationsUnsafe unsafeOperations)
+                {
+                    result = unsafeOperations.ReadFile(rawFileName, rawBuffer, rawBufferLength, out rawReadLength, rawOffset, rawFileInfo);
+                }
+                else
+                {
+                    // Pool the read buffer and return it to the pool when we're done with it.
+                    byte[] buffer = BufferPool.Default.RentBuffer(rawBufferLength, logger);
+                    try
+                    {
+                        result = operations.ReadFile(rawFileName, buffer, out rawReadLength, rawOffset, rawFileInfo);
+                        Marshal.Copy(buffer, 0, rawBuffer, (int)rawBufferLength);
+                    }
+                    finally
+                    {
+                        BufferPool.Default.ReturnBuffer(buffer, logger);
+                    }
+                }
 
                 logger.Debug("ReadFileProxy : " + rawFileName + " Return : " + result + " ReadLength : " + rawReadLength);
                 return result;
@@ -405,7 +425,7 @@ namespace DokanNet
 
         public NtStatus WriteFileProxy(
             string rawFileName,
-            byte[] rawBuffer,
+            IntPtr rawBuffer,
             uint rawNumberOfBytesToWrite,
             ref int rawNumberOfBytesWritten,
             long rawOffset,
@@ -418,12 +438,32 @@ namespace DokanNet
                 logger.Debug("\tOffset\t{0}", rawOffset);
                 logger.Debug("\tContext\t{0}", rawFileInfo);
 
-                var result = operations.WriteFile(
-                    rawFileName,
-                    rawBuffer,
-                    out rawNumberOfBytesWritten,
-                    rawOffset,
-                    rawFileInfo);
+                // Check if the file system has implemented the unsafe Dokan interface.
+                // If so, pass the raw IntPtr through instead of marshalling.
+                NtStatus result;
+                if (operations is IDokanOperationsUnsafe unsafeOperations)
+                {
+                    result = unsafeOperations.WriteFile(rawFileName, rawBuffer, rawNumberOfBytesToWrite, out rawNumberOfBytesWritten, rawOffset, rawFileInfo);
+                }
+                else
+                {
+                    // Pool the write buffer and return it to the pool when we're done with it.
+                    byte[] buffer = BufferPool.Default.RentBuffer(rawNumberOfBytesToWrite, logger);
+                    try
+                    {
+                        Marshal.Copy(rawBuffer, buffer, 0, (int)rawNumberOfBytesToWrite);
+                        result = operations.WriteFile(
+                            rawFileName,
+                            buffer,
+                            out rawNumberOfBytesWritten,
+                            rawOffset,
+                            rawFileInfo);
+                    }
+                    finally
+                    {
+                        BufferPool.Default.ReturnBuffer(buffer, logger);
+                    }
+                }
 
                 logger.Debug(
                     "WriteFileProxy : {0} Return : {1} NumberOfBytesWritten : {2}",

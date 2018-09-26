@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -338,13 +339,12 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void Delete_WhereRecurseIsTrueAndDirectoryIsNonempty_CallsApiCorrectly()
-        {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
+        public static IEnumerable<object[]> ConfigFindFilesData
+            => new object[][] { new object[] { true }, new object[] { false } };
 
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void Delete_WhereRecurseIsTrueAndDirectoryIsNonempty_CallsApiCorrectly(bool supportsPatternSearch)
+        {
             var fixture = DokanOperationsFixture.Instance;
 
             string path = fixture.DirectoryName.AsRootedPath(),
@@ -397,13 +397,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void Delete_WhereRecurseIsTrueAndDirectoryIsEmpty_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void Delete_WhereRecurseIsTrueAndDirectoryIsEmpty_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName.AsRootedPath();
@@ -515,13 +511,9 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetDirectories_OnSubDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetDirectories_OnSubDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName.AsRootedPath();
@@ -557,13 +549,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetDirectoriesWithFilter_OnRootDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetDirectoriesWithFilter_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = DokanOperationsFixture.RootName;
@@ -602,13 +590,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFiles_OnRootDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFiles_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = DokanOperationsFixture.RootName;
@@ -645,13 +629,9 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFiles_OnSubDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFiles_OnSubDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName.AsRootedPath();
@@ -687,13 +667,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFilesWithFilter_OnRootDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFilesWithFilter_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = DokanOperationsFixture.RootName;
@@ -732,13 +708,9 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFiles_UnknownDates_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFiles_UnknownDates_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName.AsRootedPath();
@@ -795,13 +767,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFileSystemInfos_OnRootDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFileSystemInfos_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = DokanOperationsFixture.RootName;
@@ -836,13 +804,9 @@ namespace DokanNet.Tests
         }
 
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "SubDirectory")]
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFileSystemInfos_OnSubDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFileSystemInfos_OnSubDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName.AsRootedPath();
@@ -876,13 +840,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFileSystemInfosWithFilter_OnRootDirectory_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFileSystemInfosWithFilter_OnRootDirectory_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = DokanOperationsFixture.RootName;
@@ -918,13 +878,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void GetFileSystemInfos_OnRootDirectory_WhereSearchOptionIsAllDirectories_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void GetFileSystemInfos_OnRootDirectory_WhereSearchOptionIsAllDirectories_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var pathsAndItems = new[]
@@ -1075,13 +1031,9 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
-        [DeploymentItem("DirectoryInfoTests.Configuration.xml")]
-        [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\DirectoryInfoTests.Configuration.xml", "ConfigFindFiles", DataAccessMethod.Sequential)]
-        public void SetAccessControl_CallsApiCorrectly()
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        public void SetAccessControl_CallsApiCorrectly(bool supportsPatternSearch)
         {
-            var supportsPatternSearch = bool.Parse((string) TestContext.DataRow["SupportsPatternSearch"]);
-
             var fixture = DokanOperationsFixture.Instance;
 
             var path = fixture.DirectoryName;
