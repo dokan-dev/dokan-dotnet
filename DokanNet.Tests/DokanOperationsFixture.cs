@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
@@ -35,7 +36,7 @@ namespace DokanNet.Tests
 
             private delegate TResult FuncOut3<in T1, in T2, T3, in T4, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4);
 
-            private delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
+            protected delegate TResult FuncOut3<in T1, in T2, T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, out T3 arg3, T4 arg4, T5 arg5);
 
             [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
             private void TryExecute(string fileName, DokanFileInfo info, Action<string, DokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
@@ -374,29 +375,66 @@ namespace DokanNet.Tests
                 => TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, DokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
         }
 
-        private static string _mount_point;
-
-        public static string MOUNT_POINT
+        /// <summary>
+        /// Subclass of <see cref="Proxy"/> that implements <see cref="IDokanOperationsUnsafe"/> by manually marshalling the unmanaged buffers
+        /// to managed byte[] arrays and subsequently invoking the regular Read/WriteFile(byte[]) overload on the base proxy class.
+        /// </summary>
+        private class UnsafeProxy : Proxy, IDokanOperationsUnsafe
         {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_mount_point))
-                {
-                    var drives = Environment.GetLogicalDrives()
-                        .Select(x => x[0])
-                        .ToArray();
-                    var alphabet = new Stack<char>("ABCDEFGHILMNOPQRSTUVZ");
+            public NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, DokanFileInfo info)
+                => MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesRead, offset, info,
+                    (string f, byte[] buf, out int r, long o, DokanFileInfo i) => base.ReadFile(f, buf, out r, o, i));
 
-                    while (alphabet.Any() && string.IsNullOrWhiteSpace(_mount_point))
-                    {
-                        var letter = alphabet.Pop();
-                        if (!drives.Contains(letter))
-                            _mount_point = $@"{letter}:";
-                    }
-                }
-                return _mount_point;
+            public NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, DokanFileInfo info)
+                => MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesWritten, offset, info,
+                    (string f, byte[] buf, out int r, long o, DokanFileInfo i) => base.WriteFile(f, buf, out r, o, i));
+
+            [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Explicit Exception handler")]
+            private NtStatus MarshalUnsafeCall(string fileName, IntPtr nativeBuffer, uint bufferLength, out int bytes, long offset, DokanFileInfo info,
+                FuncOut3<string, byte[], int, long, DokanFileInfo, NtStatus> func)
+            {
+                byte[] managedBuffer = new byte[bufferLength];
+                Marshal.Copy(source: nativeBuffer, destination: managedBuffer, startIndex: 0, length: (int)bufferLength);
+                NtStatus result = func(fileName, managedBuffer, out bytes, offset, info);
+                Marshal.Copy(source: managedBuffer, startIndex: 0, destination: nativeBuffer, length: (int)bufferLength);
+                return result;
             }
         }
+
+        /// <summary>The mount point in use for the <see cref="IDokanOperations"/> implementation.</summary>
+        public static string NormalMountPoint { get; private set; }
+
+        /// <summary>The mount point in use for the <see cref="IDokanOperationsUnsafe"/> implementation.</summary>
+        public static string UnsafeMountPoint { get; private set; }
+
+        /// <summary>
+        /// Initializes the mount points by finding the next available drive letters.
+        /// </summary>
+        private static void InitMountPoints()
+        {
+            var drives = Environment.GetLogicalDrives()
+                .Select(x => x[0])
+                .ToArray();
+
+            var alphabet = new Stack<char>("ABCDEFGHILMNOPQRSTUVZ");
+
+            NormalMountPoint = GetMountPoint();
+            UnsafeMountPoint = GetMountPoint();
+
+            string GetMountPoint()
+            {
+                while (alphabet.Any())
+                {
+                    var letter = alphabet.Pop();
+                    if (!drives.Contains(letter))
+                        return $"{letter}:";
+                }
+
+                throw new InvalidOperationException("No drive letters available to test with.");
+            }
+        }
+
+        public static string MOUNT_POINT { get; private set; }
 
         public const string VOLUME_LABEL = "Dokan Volume";
 
@@ -411,6 +449,7 @@ namespace DokanNet.Tests
         private const FileAttributes EmptyFileAttributes = default(FileAttributes);
 
         private static Proxy proxy = new Proxy();
+        private static Proxy unsafeProxy = new UnsafeProxy();
 
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private string currentTestName;
@@ -422,10 +461,11 @@ namespace DokanNet.Tests
         public static bool HasPendingFiles => Instance?.pendingFiles > 0;
 
         internal static IDokanOperations Operations => proxy;
+        internal static IDokanOperations UnsafeOperations => unsafeProxy;
 
         internal static DokanOperationsFixture Instance { get; private set; }
 
-        internal static string DriveName = MOUNT_POINT;
+        internal static string DriveName => MOUNT_POINT;
 
         internal static string RootName => @"\";
 
@@ -595,6 +635,7 @@ namespace DokanNet.Tests
             Instance.PermitMount();
 
             InitSecurity();
+            InitMountPoints();
         }
 
         private static DateTime ToDateTime(string value) => DateTime.Parse(value, CultureInfo.InvariantCulture);
@@ -611,11 +652,22 @@ namespace DokanNet.Tests
         internal static string RootedPath(string fileName)
             => Path.DirectorySeparatorChar + fileName.TrimStart(Path.DirectorySeparatorChar);
 
-        internal static void InitInstance(string currentTestName)
+        /// <summary>
+        /// Initializes the test fixture for running a test.
+        /// </summary>
+        /// <param name="currentTestName">The name of the test.</param>
+        /// <param name="unsafeOperations">True to test IDokanOperationsUnsafe, false to test IDokanOperations.</param>
+        internal static void InitInstance(string currentTestName, bool unsafeOperations = false)
         {
             Instance = new DokanOperationsFixture(currentTestName);
+
             proxy.Target = Instance.operations.Object;
             proxy.HasUnmatchedInvocations = false;
+            unsafeProxy.Target = Instance.operations.Object;
+            unsafeProxy.HasUnmatchedInvocations = false;
+
+            // Choose the mount point to operate on based on whether we're testing IDokanOperation of IDokanOperationsUnsafe.
+            MOUNT_POINT = unsafeOperations ? UnsafeMountPoint : NormalMountPoint;
         }
 
         internal static void ClearInstance(out bool hasUnmatchedInvocations)
@@ -623,9 +675,13 @@ namespace DokanNet.Tests
             // Allow pending calls to process
             Thread.Sleep(2);
 
-            hasUnmatchedInvocations = proxy.HasUnmatchedInvocations;
+            Proxy proxyInUse = MOUNT_POINT == UnsafeMountPoint ? unsafeProxy : proxy;
+            hasUnmatchedInvocations = proxyInUse.HasUnmatchedInvocations;
+
             proxy.Target = null;
+            unsafeProxy.Target = null;
             Instance = null;
+            MOUNT_POINT = null;
         }
 
         internal static void Trace(string message)

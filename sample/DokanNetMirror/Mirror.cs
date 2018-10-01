@@ -34,12 +34,12 @@ namespace DokanNetMirror
             this.path = path;
         }
 
-        private string GetPath(string fileName)
+        protected string GetPath(string fileName)
         {
             return path + fileName;
         }
 
-        private NtStatus Trace(string method, string fileName, DokanFileInfo info, NtStatus result,
+        protected NtStatus Trace(string method, string fileName, DokanFileInfo info, NtStatus result,
             params object[] parameters)
         {
 #if TRACE

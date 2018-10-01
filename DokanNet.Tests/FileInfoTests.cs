@@ -11,7 +11,7 @@ using static DokanNet.Tests.FileSettings;
 namespace DokanNet.Tests
 {
     [TestClass]
-    public sealed class FileInfoTests
+    public class FileInfoTests
     {
         private const int FILE_BUFFER_SIZE = 262144;
 
@@ -41,13 +41,13 @@ namespace DokanNet.Tests
         }
 
         [TestInitialize]
-        public void Initialize()
+        public virtual void Initialize()
         {
             DokanOperationsFixture.InitInstance(TestContext.TestName);
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public virtual void Cleanup()
         {
             DokanOperationsFixture.ClearInstance(out bool hasUnmatchedInvocations);
             Assert.IsFalse(hasUnmatchedInvocations, "Found Mock invocations without corresponding setups");
