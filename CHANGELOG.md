@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.2.1] - 2018-12-20
+### Changed
+- Improve Buffer Handling to Reduce GC Pressure.
+
 ## [1.1.2.0] - 2018-08-10
 ### Added
 - Included a strongly typed error code in DokanException to better communicate the reason why mounting failed.
