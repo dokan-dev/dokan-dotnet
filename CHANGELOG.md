@@ -12,22 +12,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.2.0] - 2018-08-10
 ### Added
-- Included a strongly typed error code in DokanException to better communicate the reason why mounting failed.
-- NotADirectory enum value to DokanResult.
+- Included a strongly typed error code in ``DokanException`` to better communicate the reason why mounting failed.
+- [``NotADirectory``][1.1.2.0-NotADirectory] enum value to ``DokanResult``.
+
+[1.1.2.0-NotADirectory]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.1.2.0/DokanNet/DokanResult.cs#L110
 
 ### Changed
-- Status error message is now dispatched by DokanException itself instead of Dokan class.
-- Replaced usages of NtStatus with DokanResult in DokanNetMirror. 
+- Status error message is now dispatched by ``DokanException`` itself instead of ``Dokan`` class.
+- Replaced usages of ``NtStatus`` with ``DokanResult`` in DokanNetMirror. 
 
 ### Fixed
-- Leak of the token handle in GetRequestor()
-- DokanFileInfo.Context leaks GCHandle if not set null
-- DokanMain throw wrongly when success
+- Leak of the token handle in ``GetRequestor()``
+- ``DokanFileInfo.Context`` leaks GCHandle if not set ``null``
+- ``DokanMain`` throw wrongly when success
 
 ## [1.1.1.1] - 2018-04-25
 ### Added
-- Enum value ``FileAccess.None``.
+- Enum value [``FileAccess.None``][1.1.1.1-FileAccess.None].
 - Handle unknown errors from Dokan.
+
+[1.1.1.1-FileAccess.None]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.1.1.1/DokanNet/FileAccess.cs#L23
 
 ### Changed
 - Make ``MaximumComponentLength`` param available for ``GetVolumeInformation``.
@@ -133,7 +137,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.2.0...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.2.1...HEAD
+[1.1.2.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.2.0...v1.1.2.1
 [1.1.2.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.1.1...v1.1.2.0
 [1.1.1.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.1.0...v1.1.1.1
 [1.1.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.0.3...v1.1.1.0
