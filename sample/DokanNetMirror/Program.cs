@@ -1,19 +1,34 @@
 using System;
+using System.Linq;
 using DokanNet;
 
 namespace DokanNetMirror
 {
     internal class Program
     {
+        private const string MirrorKey = "-what";
+        private const string MountKey = "-where";
+        private const string UseUnsafeKey = "-unsafe";
+
         private static void Main(string[] args)
         {
             try
             {
-                bool unsafeReadWrite = args.Length > 0 && args[0].Equals("-unsafe", StringComparison.OrdinalIgnoreCase);
+                var arguments = args
+                   .Select(x => x.Split(new char[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries))
+                   .ToDictionary(x => x[0], x => x.Length > 1 ? x[1] as object : true, StringComparer.OrdinalIgnoreCase);
 
-                Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
-                var mirror = unsafeReadWrite ? new UnsafeMirror("C:") : new Mirror("C:");
-                mirror.Mount("n:\\", DokanOptions.DebugMode, 5);
+                var mirrorPath = arguments.ContainsKey(MirrorKey)
+                   ? arguments[MirrorKey] as string
+                   : @"C:\";
+
+                var mountPath = arguments.ContainsKey(MountKey)
+                   ? arguments[MountKey] as string
+                   : @"N:\";
+
+                var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
+                var mirror = unsafeReadWrite ? new UnsafeMirror(mirrorPath) : new Mirror(mirrorPath);
+                mirror.Mount(mountPath, DokanOptions.DebugMode, 5); mirror.Mount(mountPath, DokanOptions.DebugMode, 5);
 
                 Console.WriteLine(@"Success");
             }
