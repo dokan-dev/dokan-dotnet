@@ -27,6 +27,7 @@ namespace DokanNetMirror
                    : @"N:\";
 
                 var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
+                Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
                 var mirror = unsafeReadWrite ? new UnsafeMirror(mirrorPath) : new Mirror(mirrorPath);
                 mirror.Mount(mountPath, DokanOptions.DebugMode, 5); mirror.Mount(mountPath, DokanOptions.DebugMode, 5);
 
