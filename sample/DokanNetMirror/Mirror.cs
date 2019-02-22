@@ -138,7 +138,7 @@ namespace DokanNetMirror
                 try
                 {
                     pathExists = (Directory.Exists(filePath) || File.Exists(filePath));
-                    pathIsDirectory = File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
+                    pathIsDirectory = pathExists ? File.GetAttributes(filePath).HasFlag(FileAttributes.Directory) : false;
                 }
                 catch (IOException)
                 {
