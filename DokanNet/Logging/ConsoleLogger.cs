@@ -8,6 +8,7 @@ namespace DokanNet.Logging
     public class ConsoleLogger : ILogger
     {
         private readonly string _loggerName;
+        private readonly object _colorLock = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleLogger"/> class.
@@ -50,17 +51,20 @@ namespace DokanNet.Logging
 
         private void WriteToConsole(ConsoleColor newColor, string message, params object[] args)
         {
-            var origForegroundColor = Console.ForegroundColor;
-            try
+            lock (_colorLock)
             {
-                Console.ForegroundColor = newColor;
-                if (args.Length > 0)
-                    message = string.Format(message, args);
-                Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
-            }
-            finally
-            {
-                Console.ForegroundColor = origForegroundColor;
+                var origForegroundColor = Console.ForegroundColor;
+                try
+                {
+                    Console.ForegroundColor = newColor;
+                    if (args.Length > 0)
+                        message = string.Format(message, args);
+                    Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
+                }
+                finally
+                {
+                    Console.ForegroundColor = origForegroundColor;
+                }
             }
         }
     }
