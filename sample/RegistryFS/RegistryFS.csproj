@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net4.6;net4.0</TargetFrameworks>
+    <TargetFrameworks>net46;net40</TargetFrameworks>
     <RuntimeIdentifier>win</RuntimeIdentifier>
   </PropertyGroup>
  
