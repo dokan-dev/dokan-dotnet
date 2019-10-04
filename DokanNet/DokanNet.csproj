@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;net4.6;net4.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;net46;net40</TargetFrameworks>
     <AssemblyName>DokanNet</AssemblyName>
     <RootNamespace>DokanNet</RootNamespace>
     <Description>A user mode file system for windows. 
@@ -15,8 +15,8 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <Company>MaximeC</Company>
     <Authors>MaximeC</Authors>
     <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/dokan-dev/dokan-dotnet/master/license.mit.txt</PackageLicenseUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/dokan-dev/dokan-dotnet/master/dokan_logo.png</PackageIconUrl>
+    <PackageLicense>license.mit.txt</PackageLicense>
+    <PackageIcon>dokan_logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/dokan-dev/dokan-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dokan file files disk directory storage filesystem io filestore FAT NTFS FUSE</PackageTags>
@@ -29,6 +29,11 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <Compile Remove="documentations\**" />
     <EmbeddedResource Remove="documentations\**" />
     <None Remove="documentations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\license.mit.txt" Pack="true" PackagePath="\" />
+    <None Include="..\dokan_logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +59,7 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <PackageReference Include="System.Security.Principal.Windows" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
     <PackageReference Include="StringInterpolationBridgeStrong" Version="0.9.1" />
   </ItemGroup>
 
