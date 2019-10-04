@@ -15,7 +15,7 @@
     net4.6              net4.6
     netstandard1.3      <missing>
     -->
-    <TargetFrameworks>net4.5;net4.6</TargetFrameworks>
+    <TargetFrameworks>net45;net46</TargetFrameworks>
     
     <!--Add the Target Framework to the output file names. -->
     <AssemblyName>$(MSBuildProjectName).$(TargetFramework)</AssemblyName>
