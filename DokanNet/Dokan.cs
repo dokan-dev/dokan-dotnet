@@ -236,6 +236,8 @@ namespace DokanNet
         {
             StringBuilder FilePathBuilder = new StringBuilder();
             FilePathBuilder.Append(dfi.NativeDokanOptions.MountPoint);
+            // Remove the trailing backslash from the MountPoint, because FilePath includes a leading backslash
+            FilePathBuilder.Remove(FilePathBuilder.Length - 1, 1);
             FilePathBuilder.Append(FilePath);
             return FilePathBuilder.ToString();
         }
