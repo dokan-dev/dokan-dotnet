@@ -232,80 +232,61 @@ namespace DokanNet
         /// <returns>Return native dokan driver version supported.</returns>
         public static int DriverVersion => (int) NativeMethods.DokanDriverVersion();
 
-        private static string BuildFilePath(string FilePath, DokanFileInfo dfi)
-        {
-            StringBuilder FilePathBuilder = new StringBuilder();
-            FilePathBuilder.Append(dfi.NativeDokanOptions.MountPoint);
-            if (FilePathBuilder[FilePathBuilder.Length - 1] == '\\')
-            {
-                // Remove the trailing backslash from the MountPoint, because FilePath includes a leading backslash
-                FilePathBuilder.Remove(FilePathBuilder.Length - 1, 1);
-            }
-            FilePathBuilder.Append(FilePath);
-            return FilePathBuilder.ToString();
-        }
-
         /// <summary>
         /// Notify Dokan that a file or directory has been created.
         /// </summary>
         /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
-        /// <param name="dfi">The DokanFileInfo that refers to this file.</param>
         /// <returns>true if the notification succeeded.</returns>
-        public static bool DokanNotifyCreate(string FilePath, bool isDirectory, DokanFileInfo dfi)
+        public static bool DokanNotifyCreate(string FilePath, bool isDirectory)
         {
-            return NativeMethods.DokanNotifyCreate(BuildFilePath(FilePath,dfi), isDirectory);
+            return NativeMethods.DokanNotifyCreate(FilePath, isDirectory);
         }
 
         /// <summary>
         /// Notify Dokan that a file or directory has been deleted.
         /// </summary>
-        /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
+        /// <param name="FilePath">Full path to the file or directory.</param>
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
-        /// <param name="dfi">The DokanFileInfo that refers to this file.</param>
         /// <returns>true if notification succeeded.</returns>
-        public static bool DokanNotifyDelete(string FilePath, bool isDirectory, DokanFileInfo dfi)
+        public static bool DokanNotifyDelete(string FilePath, bool isDirectory)
         {
-            return NativeMethods.DokanNotifyDelete(BuildFilePath(FilePath,dfi), isDirectory);
+            return NativeMethods.DokanNotifyDelete(FilePath, isDirectory);
         }
 
         /// <summary>
         /// Notify Dokan that file or directory attributes have changed.
         /// </summary>
-        /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
-        /// <param name="dfi">The DokanFileInfo that refers to this file.</param>
+        /// <param name="FilePath">Full path to the file or directory.</param>
         /// <returns>true if notification succeeded.</returns>
-        public static bool DokanNotifyUpdate(string FilePath, DokanFileInfo dfi)
+        public static bool DokanNotifyUpdate(string FilePath)
         {
-            return NativeMethods.DokanNotifyUpdate(BuildFilePath(FilePath,dfi));
+            return NativeMethods.DokanNotifyUpdate(FilePath);
         }
 
         /// <summary>
         /// Notify Dokan that file or directory extended attributes have changed.
         /// </summary>
-        /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
-        /// <param name="dfi">The DokanFileInfo that refers to this file.</param>
+        /// <param name="FilePath">Full path to the file or directory.</param>
         /// <returns>true if notification succeeded.</returns>
-        public static bool DokanNotifyXAttrUpdate(string FilePath, DokanFileInfo dfi)
+        public static bool DokanNotifyXAttrUpdate(string FilePath)
         {
-            return NativeMethods.DokanNotifyXAttrUpdate(BuildFilePath(FilePath, dfi));
+            return NativeMethods.DokanNotifyXAttrUpdate(FilePath);
         }
 
         /// <summary>
-        /// Notify Dokan that a file or directory has been renamed.
+        /// Notify Dokan (and thus the kernel) that a file or directory has been renamed.
         /// </summary>
         /// <remarks>This method supports in-place rename for file/directory within the same parent.</remarks>
-        /// <param name="OldPath">Old path within the filesystem to the file or directory.</param>
-        /// <param name="NewPath">New path within the filesystem to the file or directory.</param>
+        /// <param name="OldPath">Full path to the old name of the file or directory.</param>
+        /// <param name="NewPath">Full path to the new name of the file or directory.</param>
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <param name="isInSameDirectory">Indicates if OldPath and NewPath have the same parent.</param>
-        /// <param name="dfi">The DokanFileInfo that refers to this file.</param>
         /// <returns>true if notification succeeded.</returns>
-        public static bool DokanNotifyRename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory,
-            DokanFileInfo dfi)
+        public static bool DokanNotifyRename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory)
         {
-            return NativeMethods.DokanNotifyRename(BuildFilePath(OldPath, dfi),
-                BuildFilePath(NewPath, dfi),
+            return NativeMethods.DokanNotifyRename(OldPath,
+                NewPath,
                 isDirectory,
                 isInSameDirectory);
         }
