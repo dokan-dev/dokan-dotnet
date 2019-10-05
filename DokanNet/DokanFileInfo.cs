@@ -172,11 +172,6 @@ namespace DokanNet
                 DokanFormat(
                     $"{{{Context}, {DeleteOnClose}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
         }
-
-        internal DOKAN_OPTIONS NativeDokanOptions
-        {
-            get => (DOKAN_OPTIONS)GCHandle.FromIntPtr(_dokanOptions).Target;
-        }
     }
 }
 
