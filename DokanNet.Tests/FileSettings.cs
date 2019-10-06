@@ -28,7 +28,7 @@ namespace DokanNet.Tests
 
         public const FileAccess MoveFromAccess = FileAccess.ReadAttributes | FileAccess.Delete | FileAccess.Synchronize;
 
-        public const FileAccess ReplaceAccess = ReadAccess | FileAccess.WriteData | FileAccess.Delete;
+        public const FileAccess ReplaceAccess = FileAccess.WriteData | FileAccess.ReadExtendedAttributes | FileAccess.ReadAttributes | FileAccess.Delete | FileAccess.ReadPermissions | FileAccess.Synchronize;
 
         public const FileAccess OpenDirectoryAccess = FileAccess.Synchronize;
 
