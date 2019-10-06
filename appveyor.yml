@@ -76,7 +76,7 @@ after_build:
          $app = Start-Process -passthru .\sample\DokanNetMirror\bin\$env:CONFIGURATION\$target\win\DokanNetMirror.exe
          Start-Sleep -s 5
          
-         & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP
+         & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP\
          Start-Sleep -s 5
       }
       #Stop the process from the last iteration, but do not wait for the driver to unmount.
