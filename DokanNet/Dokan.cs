@@ -235,9 +235,12 @@ namespace DokanNet
         /// <summary>
         /// Notify Dokan that a file or directory has been created.
         /// </summary>
-        /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
+        /// <param name="FilePath">Full path to the file or directory.</param>
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <returns>true if the notification succeeded.</returns>
+        /// <remarks>This is used from outside the standard filesystem flow, often from a 
+        /// <see cref="System.IO.FileSystemWatcher"/>, to notify the kernel
+        /// that a file or directory has been created at the given full path.</remarks>
         public static bool DokanNotifyCreate(string FilePath, bool isDirectory)
         {
             return NativeMethods.DokanNotifyCreate(FilePath, isDirectory);
@@ -249,6 +252,9 @@ namespace DokanNet
         /// <param name="FilePath">Full path to the file or directory.</param>
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <returns>true if notification succeeded.</returns>
+        /// <remarks>This is used from outside the standard filesystem flow, often from a 
+        /// <see cref="System.IO.FileSystemWatcher"/>, to notify the kernel
+        /// that a file or directory has been deleted from the given full path.</remarks>
         public static bool DokanNotifyDelete(string FilePath, bool isDirectory)
         {
             return NativeMethods.DokanNotifyDelete(FilePath, isDirectory);
@@ -259,6 +265,10 @@ namespace DokanNet
         /// </summary>
         /// <param name="FilePath">Full path to the file or directory.</param>
         /// <returns>true if notification succeeded.</returns>
+        /// <remarks>This is used from outside the standard filesystem flow, often from a 
+        /// <see cref="System.IO.FileSystemWatcher"/>, to notify the kernel
+        /// that a file or directory has had its attributes changed at the
+        /// given full path.</remarks>
         public static bool DokanNotifyUpdate(string FilePath)
         {
             return NativeMethods.DokanNotifyUpdate(FilePath);
@@ -269,6 +279,10 @@ namespace DokanNet
         /// </summary>
         /// <param name="FilePath">Full path to the file or directory.</param>
         /// <returns>true if notification succeeded.</returns>
+        /// /// <remarks>This is used from outside the standard filesystem flow, often from a 
+        /// <see cref="System.IO.FileSystemWatcher"/>, to notify the kernel
+        /// that a file or directory has had its extended attributes changed
+        /// at the given full path.</remarks>
         public static bool DokanNotifyXAttrUpdate(string FilePath)
         {
             return NativeMethods.DokanNotifyXAttrUpdate(FilePath);
@@ -283,6 +297,10 @@ namespace DokanNet
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <param name="isInSameDirectory">Indicates if OldPath and NewPath have the same parent.</param>
         /// <returns>true if notification succeeded.</returns>
+        /// <remarks>This is used from outside the standard filesystem flow, often from a 
+        /// <see cref="System.IO.FileSystemWatcher"/>, to notify the kernel
+        /// that a file or directory has been renamed from a given full path,
+        /// and can now be found at a second full path.</remarks>
         public static bool DokanNotifyRename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory)
         {
             return NativeMethods.DokanNotifyRename(OldPath,
