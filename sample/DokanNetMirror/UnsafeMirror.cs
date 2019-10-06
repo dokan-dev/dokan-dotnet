@@ -22,7 +22,7 @@ namespace DokanNetMirror
         /// <summary>
         /// Read from file using unmanaged buffers.
         /// </summary>
-        public NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, DokanFileInfo info)
+        public NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, IDokanFileInfo info)
         {
             if (info.Context == null) // memory mapped read
             {
@@ -53,7 +53,7 @@ namespace DokanNetMirror
         /// <summary>
         /// Write to file using unmanaged buffers.
         /// </summary>
-        public NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, DokanFileInfo info)
+        public NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, IDokanFileInfo info)
         {
             if (info.Context == null)
             {
