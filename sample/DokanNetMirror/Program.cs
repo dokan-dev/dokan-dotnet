@@ -28,11 +28,13 @@ namespace DokanNetMirror
 
                 var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
 
+                Notify.Start(mirrorPath, mountPath);
+
                 Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
                 var mirror = unsafeReadWrite 
                     ? new UnsafeMirror(mirrorPath) 
                     : new Mirror(mirrorPath);
-                mirror.Mount(mountPath, DokanOptions.DebugMode, 5);
+                mirror.Mount(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI, 5);
 
                 Console.WriteLine(@"Success");
             }
