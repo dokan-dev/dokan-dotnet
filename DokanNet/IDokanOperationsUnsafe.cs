@@ -25,10 +25,10 @@ namespace DokanNet
         /// The buffer size depends of the read size requested by the kernel.</param>
         /// <param name="bytesRead">Total number of bytes that has been read.</param>
         /// <param name="offset">Offset from where the read has to be proceed.</param>
-        /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
+        /// <param name="info">An <see cref="IDokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         /// <seealso cref="WriteFile"/>
-        NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, DokanFileInfo info);
+        NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, IDokanFileInfo info);
 
         /// <summary>
         /// WriteFile callback on the file previously opened in <see cref="CreateFile"/>
@@ -40,9 +40,9 @@ namespace DokanNet
         /// <param name="bufferLength">The size of 'buffer' in bytes.</param>
         /// <param name="bytesWritten">Total number of bytes that has been write.</param>
         /// <param name="offset">Offset from where the write has to be proceed.</param>
-        /// <param name="info">An <see cref="DokanFileInfo"/> with information about the file or directory.</param>
+        /// <param name="info">An <see cref="IDokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         /// <seealso cref="ReadFile"/>
-        NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, DokanFileInfo info);
+        NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, IDokanFileInfo info);
     }
 }
