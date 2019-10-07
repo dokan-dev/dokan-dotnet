@@ -26,11 +26,11 @@ namespace RegistryFS
             };
         }
 
-        public void Cleanup(string filename, DokanFileInfo info)
+        public void Cleanup(string filename, IDokanFileInfo info)
         {
         }
 
-        public void CloseFile(string filename, DokanFileInfo info)
+        public void CloseFile(string filename, IDokanFileInfo info)
         {
         }
 
@@ -41,19 +41,19 @@ namespace RegistryFS
             FileMode mode,
             FileOptions options,
             FileAttributes attributes,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             if (info.IsDirectory && mode == FileMode.CreateNew)
                 return DokanResult.AccessDenied;
             return DokanResult.Success;
         }
 
-        public NtStatus DeleteDirectory(string filename, DokanFileInfo info)
+        public NtStatus DeleteDirectory(string filename, IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
 
-        public NtStatus DeleteFile(string filename, DokanFileInfo info)
+        public NtStatus DeleteFile(string filename, IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
@@ -80,7 +80,7 @@ namespace RegistryFS
 
         public NtStatus FlushFileBuffers(
             string filename,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
@@ -88,7 +88,7 @@ namespace RegistryFS
         public NtStatus FindFiles(
             string filename,
             out IList<FileInformation> files,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             files = new List<FileInformation>();
             if (filename == "\\")
@@ -143,7 +143,7 @@ namespace RegistryFS
         public NtStatus GetFileInformation(
             string filename,
             out FileInformation fileinfo,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             fileinfo = new FileInformation {FileName = filename};
 
@@ -173,7 +173,7 @@ namespace RegistryFS
             string filename,
             long offset,
             long length,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Success;
         }
@@ -182,7 +182,7 @@ namespace RegistryFS
             string filename,
             string newname,
             bool replace,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
@@ -192,18 +192,18 @@ namespace RegistryFS
             byte[] buffer,
             out int readBytes,
             long offset,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             readBytes = 0;
             return DokanResult.Error;
         }
 
-        public NtStatus SetEndOfFile(string filename, long length, DokanFileInfo info)
+        public NtStatus SetEndOfFile(string filename, long length, IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
 
-        public NtStatus SetAllocationSize(string filename, long length, DokanFileInfo info)
+        public NtStatus SetAllocationSize(string filename, long length, IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
@@ -211,7 +211,7 @@ namespace RegistryFS
         public NtStatus SetFileAttributes(
             string filename,
             FileAttributes attr,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
@@ -221,22 +221,22 @@ namespace RegistryFS
             DateTime? ctime,
             DateTime? atime,
             DateTime? mtime,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
 
-        public NtStatus UnlockFile(string filename, long offset, long length, DokanFileInfo info)
+        public NtStatus UnlockFile(string filename, long offset, long length, IDokanFileInfo info)
         {
             return DokanResult.Success;
         }
 
-        public NtStatus Mounted(DokanFileInfo info)
+        public NtStatus Mounted(IDokanFileInfo info)
         {
             return DokanResult.Success;
         }
 
-        public NtStatus Unmounted(DokanFileInfo info)
+        public NtStatus Unmounted(IDokanFileInfo info)
         {
             return DokanResult.Success;
         }
@@ -245,7 +245,7 @@ namespace RegistryFS
             out long freeBytesAvailable,
             out long totalBytes,
             out long totalFreeBytes,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             freeBytesAvailable = 512*1024*1024;
             totalBytes = 1024*1024*1024;
@@ -258,14 +258,14 @@ namespace RegistryFS
             byte[] buffer,
             out int writtenBytes,
             long offset,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             writtenBytes = 0;
             return DokanResult.Error;
         }
 
         public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features,
-            out string fileSystemName, out uint maximumComponentLength, DokanFileInfo info)
+            out string fileSystemName, out uint maximumComponentLength, IDokanFileInfo info)
         {
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
@@ -275,34 +275,34 @@ namespace RegistryFS
         }
 
         public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             security = null;
             return DokanResult.Error;
         }
 
         public NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             return DokanResult.Error;
         }
 
         public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName,
-            out long streamSize, DokanFileInfo info)
+            out long streamSize, IDokanFileInfo info)
         {
             streamName = string.Empty;
             streamSize = 0;
             return DokanResult.NotImplemented;
         }
 
-        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, DokanFileInfo info)
+        public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, IDokanFileInfo info)
         {
             streams = new FileInformation[0];
             return DokanResult.NotImplemented;
         }
 
         public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
-            DokanFileInfo info)
+            IDokanFileInfo info)
         {
             files = new FileInformation[0];
             return DokanResult.NotImplemented;
