@@ -67,21 +67,21 @@ namespace DokanNetMirror
         {
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.DokanNotifyDelete(fullPath, false);
+            Dokan.Notify.Delete(fullPath, false);
         }
 
         private static void OnCommonFileSystemWatcherDirectoryDeleted(object sender, FileSystemEventArgs e)
         {
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.DokanNotifyDelete(fullPath, true);
+            Dokan.Notify.Delete(fullPath, true);
         }
 
         private static void OnCommonFileSystemWatcherChanged(object sender, FileSystemEventArgs e)
         {
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.DokanNotifyUpdate(fullPath);
+            Dokan.Notify.Update(fullPath);
         }
 
         private static void OnCommonFileSystemWatcherCreated(object sender, FileSystemEventArgs e)
@@ -89,7 +89,7 @@ namespace DokanNetMirror
             var fullPath = AlterPathToMountPath(e.FullPath);
             var isDirectory = Directory.Exists(fullPath);
 
-            Dokan.DokanNotifyCreate(fullPath, isDirectory);
+            Dokan.Notify.Create(fullPath, isDirectory);
         }
 
         private static void OnCommonFileSystemWatcherRenamed(object sender, RenamedEventArgs e)
@@ -103,7 +103,7 @@ namespace DokanNetMirror
             var isDirectory = Directory.Exists(e.FullPath);
             var isInSameDirectory = oldDirectoryName.Equals(directoryName);
 
-            Dokan.DokanNotifyRename(oldFullPath, fullPath, isDirectory, isInSameDirectory);
+            Dokan.Notify.Rename(oldFullPath, fullPath, isDirectory, isInSameDirectory);
         }
     }
 }
