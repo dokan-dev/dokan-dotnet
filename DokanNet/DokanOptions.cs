@@ -40,6 +40,13 @@ namespace DokanNet
         CurrentSession = 128,
 
         /// <summary>Enable Lockfile/Unlockfile operations.</summary>
-        UserModeLock = 256
+        UserModeLock = 256,
+
+        /// <summary>
+        /// Whether DokanNotifyXXX functions should be enabled, which requires this
+        /// library to maintain a special handle while the file system is mounted.
+        /// Without this flag, the functions always return FALSE if invoked.
+        /// </summary>
+        EnableNotificationAPI = 512,
     }
 }
