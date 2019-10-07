@@ -19,7 +19,7 @@ namespace DokanNet
         private const ushort DOKAN_VERSION = 130;
 
         #endregion Dokan Driver Options
-        
+
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
@@ -152,14 +152,14 @@ namespace DokanNet
 
             var dokanOptions = new DOKAN_OPTIONS
             {
-                Version = (ushort) version,
+                Version = (ushort)version,
                 MountPoint = mountPoint,
                 UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
-                ThreadCount = (ushort) threadCount,
-                Options = (uint) mountOptions,
-                Timeout = (uint) timeout.TotalMilliseconds,
-                AllocationUnitSize = (uint) allocationUnitSize,
-                SectorSize = (uint) sectorSize
+                ThreadCount = (ushort)threadCount,
+                Options = (uint)mountOptions,
+                Timeout = (uint)timeout.TotalMilliseconds,
+                AllocationUnitSize = (uint)allocationUnitSize,
+                SectorSize = (uint)sectorSize
             };
 
             var dokanOperations = new DOKAN_OPERATIONS
@@ -224,91 +224,90 @@ namespace DokanNet
         /// Retrieve native dokan dll version supported.
         /// </summary>
         /// <returns>Return native dokan dll version supported.</returns>
-        public static int Version => (int) NativeMethods.DokanVersion();
+        public static int Version => (int)NativeMethods.DokanVersion();
 
         /// <summary>
         /// Retrieve native dokan driver version supported.
         /// </summary>
         /// <returns>Return native dokan driver version supported.</returns>
-        public static int DriverVersion => (int) NativeMethods.DokanDriverVersion();
+        public static int DriverVersion => (int)NativeMethods.DokanDriverVersion();
 
         /// <summary>
-        /// Notify Dokan that a file or directory has been created.
+        /// Methods that notify the kernel of something filesystem-related without going
+        /// through the normal filesystem flow.
         /// </summary>
-        /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
-        /// <param name="isDirectory">Indicates if the path is a directory.</param>
-        /// <returns>true if the notification succeeded.</returns>
-		/// <remarks>Used to notify the kernel that a file or directory in a Dokan-managed path was
-		/// created outside of the normal filesystem flow.  FilePath must be the full mounted pathname
-		/// of the file or directory, not merely the path that dokan-dotnet passes to IDokanOperations
-		/// implementation members.</remarks>
-        public static bool DokanNotifyCreate(string FilePath, bool isDirectory)
+        /// <remarks>All methods in this class take full file paths, not filenames as
+        /// presented by Dokan-dotnet.  This means that you must prepend the mount
+        /// point of any affected file (after removing any trailing <see cref="System.IO.Path.PathSeparator"/>)
+        /// to the filename that dokan-dotnet hands your <see cref="IDokanOperations"/>
+        /// implementation.</remarks>
+        /// <example>When DotNetMirror runs, things can happen on the original filesystem that aren't immediately
+        /// displayed on the mirrored filesystem.  This is because Dokany doesn't know what the filesystem
+        /// implementation is actually doing, and doesn't understand that events that happen outside of the
+        /// mounted filesystem actually relate to what it should do.  DotNetMirror can set up a
+        /// <see cref="System.IO.FileSystemWatcher"/> to be told of what happens on the original filesystem,
+        /// which events can then notify the kernel so that the kernel can notify Explorer that it needs to
+        /// refresh the directory listing that it's showing for the mirrored drive.</example>
+        public class NotifyTheKernel
         {
-            return NativeMethods.DokanNotifyCreate(FilePath, isDirectory);
-        }
+            /// <summary>
+            /// Notify Dokan that a file or directory has been created outside the normal filesystem execution flow.
+            /// </summary>
+            /// <param name="FilePath">Path within the filesystem to the file or directory.</param>
+            /// <param name="isDirectory">Indicates if the path is a directory.</param>
+            /// <returns>true if the notification succeeded.</returns>
+            public static bool DokanNotifyCreate(string FilePath, bool isDirectory)
+            {
+                return NativeMethods.DokanNotifyCreate(FilePath, isDirectory);
+            }
 
-        /// <summary>
-        /// Notify Dokan that a file or directory has been deleted.
-        /// </summary>
-        /// <param name="FilePath">Full path to the file or directory.</param>
-        /// <param name="isDirectory">Indicates if the path is a directory.</param>
-        /// <returns>true if notification succeeded.</returns>
-		/// <remarks>Used to notify the kernel that a file or directory in a Dokan-managed path was
-		/// deleted outside of the normal filesystem flow.  FilePath must be the full mounted pathname
-		/// of the file or directory, not merely the path that dokan-dotnet passes to IDokanOperations
-		/// implementation members.</remarks>
-        public static bool DokanNotifyDelete(string FilePath, bool isDirectory)
-        {
-            return NativeMethods.DokanNotifyDelete(FilePath, isDirectory);
-        }
+            /// <summary>
+            /// Notify Dokan that a file or directory has been deleted outside the normal filesystem execution flow.
+            /// </summary>
+            /// <param name="FilePath">Full path to the file or directory.</param>
+            /// <param name="isDirectory">Indicates if the path is a directory.</param>
+            /// <returns>true if notification succeeded.</returns>
+            public static bool DokanNotifyDelete(string FilePath, bool isDirectory)
+            {
+                return NativeMethods.DokanNotifyDelete(FilePath, isDirectory);
+            }
 
-        /// <summary>
-        /// Notify Dokan that file or directory attributes have changed.
-        /// </summary>
-        /// <param name="FilePath">Full path to the file or directory.</param>
-        /// <returns>true if notification succeeded.</returns>
-		/// <remarks>Used to notify the kernel that a file or directory in a Dokan-managed path was
-		/// updated outside of the normal filesystem flow.  FilePath must be the full mounted pathname
-		/// of the file or directory, not merely the path that dokan-dotnet passes to IDokanOperations
-		/// implementation members.</remarks>
-        public static bool DokanNotifyUpdate(string FilePath)
-        {
-            return NativeMethods.DokanNotifyUpdate(FilePath);
-        }
+            /// <summary>
+            /// Notify Dokan that file or directory attributes have changed outside the normal filesystem execution flow.
+            /// </summary>
+            /// <param name="FilePath">Full path to the file or directory.</param>
+            /// <returns>true if notification succeeded.</returns>
+            public static bool DokanNotifyUpdate(string FilePath)
+            {
+                return NativeMethods.DokanNotifyUpdate(FilePath);
+            }
 
-        /// <summary>
-        /// Notify Dokan that file or directory extended attributes have changed.
-        /// </summary>
-        /// <param name="FilePath">Full path to the file or directory.</param>
-        /// <returns>true if notification succeeded.</returns>
-		/// <remarks>Used to notify the kernel that the extended attributes of a file or directory in 
-		/// a Dokan-managed path were created outside of the normal filesystem flow.  FilePath must be
-		/// the full mounted pathname of the file or directory, not merely the path that dokan-dotnet
-		///	passes to IDokanOperations implementation members.</remarks>
-        public static bool DokanNotifyXAttrUpdate(string FilePath)
-        {
-            return NativeMethods.DokanNotifyXAttrUpdate(FilePath);
-        }
+            /// <summary>
+            /// Notify Dokan that file or directory extended attributes have changed outside the normal filesystem execution flow.
+            /// </summary>
+            /// <param name="FilePath">Full path to the file or directory.</param>
+            /// <returns>true if notification succeeded.</returns>
+            public static bool DokanNotifyXAttrUpdate(string FilePath)
+            {
+                return NativeMethods.DokanNotifyXAttrUpdate(FilePath);
+            }
 
-        /// <summary>
-        /// Notify Dokan (and thus the kernel) that a file or directory has been renamed.
-        /// </summary>
-        /// <remarks>This method supports in-place rename for file/directory within the same parent.</remarks>
-        /// <param name="OldPath">Full path to the old name of the file or directory.</param>
-        /// <param name="NewPath">Full path to the new name of the file or directory.</param>
-        /// <param name="isDirectory">Indicates if the path is a directory.</param>
-        /// <param name="isInSameDirectory">Indicates if OldPath and NewPath live in the same directory.</param>
-        /// <returns>true if notification succeeded.</returns>
-		/// <remarks>Used to notify the kernel that a file or directory in a Dokan-managed path was
-		/// renamed outside of the normal filesystem flow.  The paths must be the full mounted pathnames
-		/// of the file or directory (old and new), not merely paths that dokan-dotnet passes to
-		/// IDokanOperations implementation members.</remarks>
-        public static bool DokanNotifyRename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory)
-        {
-            return NativeMethods.DokanNotifyRename(OldPath,
-                NewPath,
-                isDirectory,
-                isInSameDirectory);
+            /// <summary>
+            /// Notify Dokan that a file or directory has been renamed outside the normal filesystem execution flow.
+            /// </summary>
+            /// <remarks>This method supports in-place rename for file/directory within the same parent.</remarks>
+            /// <param name="OldPath">Full path to the old name of the file or directory.</param>
+            /// <param name="NewPath">Full path to the new name of the file or directory.</param>
+            /// <param name="isDirectory">Indicates if the path is a directory.</param>
+            /// <param name="isInSameDirectory">Indicates if OldPath and NewPath have the same parent.</param>
+            /// <returns>true if notification succeeded.</returns>
+            public static bool DokanNotifyRename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory)
+            {
+                return NativeMethods.DokanNotifyRename(OldPath,
+                    NewPath,
+                    isDirectory,
+                    isInSameDirectory);
+            }
         }
     }
 }
