@@ -43,9 +43,9 @@ namespace DokanNet
         UserModeLock = 256,
 
         /// <summary>
-        /// Whether DokanNotifyXXX functions should be enabled, which requires this
-        /// library to maintain a special handle while the file system is mounted.
-        /// Without this flag, the functions always return FALSE if invoked.
+        /// Enable methods in <see cref="Dokan.Notify"/>, which require this library to maintain a special
+        /// handle while the file system is mounted.
+        /// Without this flag, the methods in that inner class always return false if invoked.
         /// </summary>
         EnableNotificationAPI = 512,
 
