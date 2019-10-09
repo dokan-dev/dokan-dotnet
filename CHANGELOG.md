@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0.0] - 2019-10-09
+### Added
+- Support dokany 1.3.0 `DokanNotify` feature in `Dokan.Notify` class.
+- New `DokanOptions` of dokany 1.3.0 `DisableOplocks` and `OptimizeSingleNameSearch`.
+
+### Changed
+- Improve Buffer Handling to Reduce GC Pressure.
+- Improve `ConsoleLogger` speed.
+- `DokanFileInfo` inherit from `IDokanFileInfo`
+- `IDokanFileInfo` is now the final parameter for `IDokanOperations` for allowing self-forge of `DokanFileInfo` for testing purpose.
+
+### Fixed
+- Avoid `ConsoleLogger` to switch color and never go back to the original due to multi threading.
+
 ## [1.1.2.1] - 2018-12-20
 ### Changed
 - Improve Buffer Handling to Reduce GC Pressure.
