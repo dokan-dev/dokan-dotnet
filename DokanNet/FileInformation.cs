@@ -18,6 +18,8 @@ namespace DokanNet
     {
         /// <summary>
         /// Gets or sets the name of the file or directory.
+        /// <see cref="IDokanOperations.GetFileInformation"/> required the file path
+        /// when other operations only need the file name.
         /// </summary>
         public string FileName { get; set; }
 
