@@ -15,7 +15,7 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <Company>MaximeC</Company>
     <Authors>MaximeC</Authors>
     <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
-    <PackageLicense>license.mit.txt</PackageLicense>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>dokan_logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/dokan-dev/dokan-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -32,7 +32,6 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\license.mit.txt" Pack="true" PackagePath="\" />
     <None Include="..\dokan_logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
