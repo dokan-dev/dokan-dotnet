@@ -12,8 +12,8 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <AssemblyVersion>1.3.0.0</AssemblyVersion>
     <FileVersion>1.3.0.0</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Company>MaximeC</Company>
-    <Authors>MaximeC</Authors>
+    <Company>Dokan-dev</Company>
+    <Authors>AdrienJ, MaximeC, Hiroki Asakawa</Authors>
     <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>dokan_logo.png</PackageIcon>
