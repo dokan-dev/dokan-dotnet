@@ -5,7 +5,7 @@ environment:
       DOKAN_CI_CACHE: C:\dokan_ci_cache
       DOXYGEN_INST_DIR: '%DOKAN_CI_CACHE%\doxygen'
 
-version: 1.2.2-{build}
+version: 1.3.0-{build}
 configuration:
 - Release
 - Debug
@@ -134,9 +134,11 @@ on_success:
               if ($(git status --porcelain)) {
                 Write-Host "Update documentation..." -ForegroundColor Green
                 git add -A
+                Write-Host "All changes ready to commit" -ForegroundColor Green
                 git commit -m "Latest documentation on successful appveyor build $env:APPVEYOR_BUILD_VERSION auto-pushed to gh-pages"
+                Write-Host "Push changes..." -ForegroundColor Green
                 git push -fq origin gh-pages
-                Write-Host "Documentation updated!" -ForegroundColor Green
+                Write-Host "Pushed. Documentation updated!" -ForegroundColor Green
               } else {
                 Write-Host "No documentation changes detected." -ForegroundColor Green
               }
