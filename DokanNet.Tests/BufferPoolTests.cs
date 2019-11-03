@@ -17,7 +17,7 @@ namespace DokanNet.Tests
         public void BufferPoolBasicTest()
         {
             BufferPool pool = new BufferPool();
-            ILogger logger = new ConsoleLogger();
+            ILogger logger = new TraceLogger();
 
             // Verify buffer is pooled.
             const int MB = 1024 * 1024;
