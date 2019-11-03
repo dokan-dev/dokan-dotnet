@@ -1,6 +1,6 @@
 environment:
     AccessTokenDokanDoc:
-      secure: Z8Htovf0nHmWVj+JNOF4H7ozQ5+sS3TkgUu+nyVU414AUlog4kzBhxCSJxIl5t+I
+      secure: xKerxx4Zbzb0JXbs8vNm2c+29Lf4/z9UnmVDu0LPBhwDMPxPK3YEIVki35n25Pny
     global:
       DOKAN_CI_CACHE: C:\dokan_ci_cache
       DOXYGEN_INST_DIR: '%DOKAN_CI_CACHE%\doxygen'
@@ -128,7 +128,7 @@ on_success:
               cd $env:APPVEYOR_BUILD_FOLDER\DokanNet\documentations
               git config --global user.email "appveyor@appveyor.org"
               git config --global user.name "appveyor"
-              git.exe clone -b gh-pages --single-branch  https://$($env:AccessTokenDokanDoc)@github.com/dokan-dev/dokan-dotnet-doc.git doc
+              git.exe clone -b gh-pages --single-branch  https://lirynastark:$($env:AccessTokenDokanDoc)@github.com/dokan-dev/dokan-dotnet-doc.git doc
               Exec-External { & doxygen.exe Doxyfile }
               cd doc
               if ($(git status --porcelain)) {
