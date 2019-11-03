@@ -24,6 +24,16 @@ branches:
 
 install:
  - ps: |
+      function Exec-External {
+          param(
+             [Parameter(Position=0,Mandatory=1)][scriptblock] $command
+          )
+          & $command
+          if ($LASTEXITCODE -ne 0) {
+              throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
+          }
+      }
+ - ps: |
       Write-Host "Dokan download..." -ForegroundColor Green
       New-item -type directory -path C:\projects\dokan-dotnet\ -Force
       Start-FileDownload 'https://github.com/dokan-dev/dokany/releases/download/v1.3.0.1000/DokanSetup_redist.exe' -FileName 'C:\projects\dokan-dotnet\DokanSetup.exe'
@@ -65,7 +75,7 @@ after_build:
          "/l:C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll",
          "/p:Configuration=Debug",
          "/p:Platform=x64")
-      & $buildCmd $buildArgs
+      Exec-External { & $buildCmd $buildArgs }
       New-Item C:\TMP -type directory
       ls c:\TMP
       
@@ -78,7 +88,7 @@ after_build:
          $app = Start-Process -passthru .\sample\DokanNetMirror\bin\$env:CONFIGURATION\$target\win\DokanNetMirror.exe
          Start-Sleep -s 5
          
-         & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP\
+         Exec-External { & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP\ }
          Start-Sleep -s 5
       }
       #Stop the process from the last iteration, but do not wait for the driver to unmount.
@@ -112,14 +122,14 @@ on_success:
               if ($(Get-FileHash -Algorithm SHA256 $doxygen_zip).Hash -ne "6CE7C259975FB3DC449313913DE71B89665D15C49CF674DB6952F304BB3DFAAA") {
                 throw "Hash mismatch while downloading Doxygen"
               }
-              & 7z x -y "$doxygen_zip"
+              Exec-External { & 7z x -y "$doxygen_zip" }
               
               # Update documentation
               cd $env:APPVEYOR_BUILD_FOLDER\DokanNet\documentations
               git config --global user.email "appveyor@appveyor.org"
               git config --global user.name "appveyor"
               git.exe clone -b gh-pages --single-branch  https://$($env:AccessTokenDokanDoc)@github.com/dokan-dev/dokan-dotnet-doc.git doc
-              & doxygen.exe Doxyfile
+              Exec-External { & doxygen.exe Doxyfile }
               cd doc
               if ($(git status --porcelain)) {
                 Write-Host "Update documentation..." -ForegroundColor Green
