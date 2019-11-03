@@ -1554,7 +1554,8 @@ namespace DokanNet.Tests
 #endif
         }
 
-        [TestMethod, TestCategory(TestCategories.Success)]
+        // Enable at dokan 1.4.0 release https://github.com/dokan-dev/dokan-dotnet/issues/249
+        /*[TestMethod, TestCategory(TestCategories.Success)]
         public void SetAccessControl_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1610,6 +1611,6 @@ namespace DokanNet.Tests
 
             fixture.Verify();
 #endif
-        }
+        }*/
     }
 }
