@@ -81,6 +81,7 @@ namespace DokanNet.Logging
         /// <summary>
         /// Wait and dispose pending log resources.
         /// </summary>
+        /// <param name="disposing">Disposing resource.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
