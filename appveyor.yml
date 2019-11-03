@@ -1,6 +1,9 @@
 environment:
     AccessTokenDokanDoc:
       secure: Z8Htovf0nHmWVj+JNOF4H7ozQ5+sS3TkgUu+nyVU414AUlog4kzBhxCSJxIl5t+I
+    global:
+      DOKAN_CI_CACHE: C:\dokan_ci_cache
+      DOXYGEN_INST_DIR: '%DOKAN_CI_CACHE%\doxygen'
 
 version: 1.2.2-{build}
 configuration:
@@ -21,11 +24,10 @@ branches:
 
 install:
  - ps: |
+      Write-Host "Dokan download..." -ForegroundColor Green
       New-item -type directory -path C:\projects\dokan-dotnet\ -Force
       Start-FileDownload 'https://github.com/dokan-dev/dokany/releases/download/v1.3.0.1000/DokanSetup_redist.exe' -FileName 'C:\projects\dokan-dotnet\DokanSetup.exe'
       Write-Host "Dokan downloaded." -ForegroundColor Green
-      & choco install doxygen.portable
-      Write-Host "Doxygen installed." -ForegroundColor Green
  - cmd: |
      C:\projects\dokan-dotnet\DokanSetup.exe /quiet
 
@@ -94,11 +96,30 @@ on_success:
                 return;
               }
               
+              $env:PATH = "$env:DOXYGEN_INST_DIR;$env:PATH"
+              if (Test-Path $env:DOXYGEN_INST_DIR) {
+                Write-Host "Doxygen in cache, skipping."
+                return
+              }
+              New-Item -Force -Type Directory $env:DOXYGEN_INST_DIR | Out-Null
+              cd $env:DOXYGEN_INST_DIR
+              $doxygen_zip = "$env:TEMP\doxygen.zip"
+              # Version has to be < 1.8.12 because doxyboot theme is incompatible with later versions
+              # https://github.com/Velron/doxygen-bootstrapped/issues/20
+              # https://github.com/Velron/doxygen-bootstrapped/issues/27
+              Write-Host "Downloading Doxygen..."
+              Invoke-WebRequest https://netcologne.dl.sourceforge.net/project/doxygen/rel-1.8.11/doxygen-1.8.11.windows.x64.bin.zip -OutFile $doxygen_zip -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox
+              if ($(Get-FileHash -Algorithm SHA256 $doxygen_zip).Hash -ne "6CE7C259975FB3DC449313913DE71B89665D15C49CF674DB6952F304BB3DFAAA") {
+                throw "Hash mismatch while downloading Doxygen"
+              }
+              & 7z x -y "$doxygen_zip"
+              
+              # Update documentation
               cd $env:APPVEYOR_BUILD_FOLDER\DokanNet\documentations
               git config --global user.email "appveyor@appveyor.org"
               git config --global user.name "appveyor"
               git.exe clone -b gh-pages --single-branch  https://$($env:AccessTokenDokanDoc)@github.com/dokan-dev/dokan-dotnet-doc.git doc
-              doxygen.exe Doxyfile
+              & doxygen.exe Doxyfile
               cd doc
               if ($(git status --porcelain)) {
                 Write-Host "Update documentation..." -ForegroundColor Green
