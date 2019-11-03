@@ -32,7 +32,7 @@ namespace DokanNet
         private DOKAN_OPTIONS _dokanOptions = new DOKAN_OPTIONS();
 
         /// <summary>
-        /// This must be set to a potentially valid path.  Examples might be @"M:\" or @"C:\JunctionPoint".
+        /// This must be set to a potentially valid path. Examples might be @"M:\\" or @"C:\\JunctionPoint".
         /// </summary>
         /// <remarks>The trailing backslash is not optional for drive letters, and must be omitted for paths.</remarks>
         public string MountPoint

@@ -2,6 +2,9 @@
 
 namespace DokanNet
 {
+    /// <summary>
+    /// %Dokan functions helpers for user <see cref="IDokanOperations"/> implementation.
+    /// </summary>
     public static class DokanHelper
     {
         /// <summary>

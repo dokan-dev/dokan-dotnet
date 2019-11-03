@@ -2,6 +2,12 @@
 
 namespace DokanNet
 {
+    /// <summary>
+    /// %Dokan file information interface.
+    /// </summary>
+    /// <remarks>
+    /// This interface can be inherited in order to testunit user <see cref="IDokanOperations"/> implementation.
+    /// </remarks>
     public interface IDokanFileInfo
     {
         /// <summary>

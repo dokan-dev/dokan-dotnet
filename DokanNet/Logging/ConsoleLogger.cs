@@ -78,6 +78,9 @@ namespace DokanNet.Logging
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        /// <summary>
+        /// Wait and dispose pending log resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -103,7 +106,10 @@ namespace DokanNet.Logging
         //   Dispose(false);
         // }
 
-        // This code added to correctly implement the disposable pattern.
+        /// <summary>
+        /// Dispose resources.
+        /// </summary>
+        /// <remarks>This code added to correctly implement the disposable pattern.</remarks>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.

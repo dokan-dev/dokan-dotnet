@@ -57,6 +57,9 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Dokan error status <see cref="DokanStatus"/>.
+        /// </summary>
         public DokanStatus ErrorStatus { get; private set; }
     }
 }
