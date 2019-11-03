@@ -137,7 +137,7 @@ on_success:
                 Write-Host "All changes ready to commit" -ForegroundColor Green
                 git commit -m "Latest documentation on successful appveyor build $env:APPVEYOR_BUILD_VERSION auto-pushed to gh-pages"
                 Write-Host "Push changes..." -ForegroundColor Green
-                git push -fq origin gh-pages
+                git push -f origin gh-pages
                 Write-Host "Pushed. Documentation updated!" -ForegroundColor Green
               } else {
                 Write-Host "No documentation changes detected." -ForegroundColor Green
