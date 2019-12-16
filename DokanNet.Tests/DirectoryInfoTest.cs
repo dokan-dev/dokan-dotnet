@@ -1031,8 +1031,7 @@ namespace DokanNet.Tests
 #endif
         }
 
-        // Enable at dokan 1.4.0 release https://github.com/dokan-dev/dokan-dotnet/issues/249
-        /*[DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
+        [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
         public void SetAccessControl_CallsApiCorrectly(bool supportsPatternSearch)
         {
             var fixture = DokanOperationsFixture.Instance;
@@ -1070,6 +1069,6 @@ namespace DokanNet.Tests
 #if !LOGONLY
             fixture.Verify();
 #endif
-        }*/
+        }
     }
 }
