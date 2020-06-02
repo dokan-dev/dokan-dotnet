@@ -54,12 +54,11 @@ namespace DokanNet
         DisableOplocks = 1024,
 
         /// <summary>
-        /// Whether Dokan should satisfy a single-entry, name-only directory search
-        /// without dispatching to <see cref="IDokanOperations.FindFiles(string, out System.Collections.Generic.IList{FileInformation}, IDokanFileInfo)"/>,
-        /// if there is already an open file from which the driver can just copy the
-        /// normalized name.  These searches are frequently done inside of CreateFile
-        /// calls on Windows 7.
+        /// Enable Fcb Garbage collection
+        /// The advantage of the GC approach is that it prevents filter drivers from exponentially
+        /// slowing down procedures like zip file extraction due to
+        /// repeatedly rebuilding state that they attach to the FCB header.
         /// </summary>
-        OptimizeSingleNameSearch = 2048,
+        EnableFCBGC = 2048,
     }
 }

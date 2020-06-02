@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.4.0.0] - 2020-06-02
+### Added
+- Replace `DokanOptions` of dokany 1.4.0 `OptimizeSingleNameSearch` to `EnableFCBGC`.
+- Support for .NET Standard 2.0
+
 ## [1.3.0.0] - 2019-10-09
 ### Added
 - Support dokany 1.3.0 `DokanNotify` feature in `Dokan.Notify` class.
