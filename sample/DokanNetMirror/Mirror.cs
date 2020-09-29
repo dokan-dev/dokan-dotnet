@@ -197,14 +197,12 @@ namespace DokanNetMirror
                         result = DokanResult.AlreadyExists;
 
                     bool fileCreated = mode == FileMode.CreateNew || mode == FileMode.Create || (!pathExists && mode == FileMode.OpenOrCreate);
-                    if (attributes != 0 && fileCreated)
+                    if (fileCreated)
                     {
                         FileAttributes new_attributes = attributes;
                         new_attributes |= FileAttributes.Archive; // Files are always created as Archive
                         // FILE_ATTRIBUTE_NORMAL is override if any other attribute is set.
-                        if (((new_attributes & FileAttributes.Normal) != 0) &&
-                            (new_attributes & (new_attributes - 1)) != 0)
-                            new_attributes &= ~FileAttributes.Normal;
+                        new_attributes &= ~FileAttributes.Normal;
                         File.SetAttributes(filePath, new_attributes);
                     }
                 }
