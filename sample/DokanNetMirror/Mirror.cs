@@ -302,11 +302,15 @@ namespace DokanNetMirror
 
         public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, IDokanFileInfo info)
         {
+            var append = offset == -1;
             if (info.Context == null)
             {
-                using (var stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Write))
+                using (var stream = new FileStream(GetPath(fileName), append ? FileMode.Append : FileMode.Open, System.IO.FileAccess.Write))
                 {
-                    stream.Position = offset;
+                    if (!append) // Offset of -1 is an APPEND: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile
+                    {
+                        stream.Position = offset;
+                    }
                     stream.Write(buffer, 0, buffer.Length);
                     bytesWritten = buffer.Length;
                 }
@@ -316,7 +320,23 @@ namespace DokanNetMirror
                 var stream = info.Context as FileStream;
                 lock (stream) //Protect from overlapped write
                 {
-                    stream.Position = offset;
+                    if (append)
+                    {
+                        if (stream.CanSeek)
+                        {
+                            stream.Seek(0, SeekOrigin.End);
+                        }
+                        else
+                        {
+                            bytesWritten = 0;
+                            return Trace(nameof(WriteFile), fileName, info, DokanResult.Error, "out " + bytesWritten,
+                                offset.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                    else
+                    {
+                        stream.Position = offset;
+                    }
                     stream.Write(buffer, 0, buffer.Length);
                 }
                 bytesWritten = buffer.Length;
