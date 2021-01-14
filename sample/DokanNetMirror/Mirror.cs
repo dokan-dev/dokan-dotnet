@@ -161,7 +161,7 @@ namespace DokanNetMirror
 
                                 info.IsDirectory = pathIsDirectory;
                                 info.Context = new object();
-                                // must set it to someting if you return DokanError.Success
+                                // must set it to something if you return DokanError.Success
 
                                 return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
                                     attributes, DokanResult.Success);
