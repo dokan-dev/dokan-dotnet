@@ -23,6 +23,9 @@ namespace DokanNet.Logging
         }
 
         /// <inheritdoc />
+        public bool DebugEnabled => true;
+
+        /// <inheritdoc />
         public void Debug(string message, params object[] args)
         {
             WriteMessageToDebugView("debug", message, args);
