@@ -9,6 +9,11 @@ namespace DokanNet.Logging
    public interface ILogger
    {
        /// <summary>
+       /// Gets a value indicating whether the logger wishes to receive debug messages.
+       /// </summary>
+       bool DebugEnabled { get; }
+
+       /// <summary>
        /// Log a debug message
        /// </summary>
        /// <param name="message">The message to write to the log</param>

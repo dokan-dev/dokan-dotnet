@@ -95,7 +95,7 @@ namespace DokanNet
             int poolIndex = GetPoolIndex(bufferSize);
             if (poolIndex == -1 || poolIndex >= _pools.Length)
             {
-                logger.Debug($"Buffer size {bufferSize} not power of 2 or too large, returning unpooled buffer.");
+                if (logger.DebugEnabled) logger.Debug($"Buffer size {bufferSize} not power of 2 or too large, returning unpooled buffer.");
                 return new byte[bufferSize];
             }
 
@@ -103,11 +103,11 @@ namespace DokanNet
             ConcurrentBag<byte[]> pool = _pools[poolIndex];
             if (pool.TryTake(out byte[] buffer))
             {
-                logger.Debug($"Using pooled buffer from pool {poolIndex}.");
+                if (logger.DebugEnabled) logger.Debug($"Using pooled buffer from pool {poolIndex}.");
             }
             else
             {
-                logger.Debug($"Pool {poolIndex} empty, creating new buffer.");
+                if (logger.DebugEnabled) logger.Debug($"Pool {poolIndex} empty, creating new buffer.");
                 buffer = new byte[bufferSize];
             }
 
@@ -138,16 +138,16 @@ namespace DokanNet
                 {
                     Array.Clear(buffer, 0, buffer.Length);
                     pool.Add(buffer);
-                    logger.Debug($"Returned buffer to pool {poolIndex}.");
+                    if (logger.DebugEnabled) logger.Debug($"Returned buffer to pool {poolIndex}.");
                 }
                 else
                 {
-                    logger.Debug($"Pool {poolIndex} is full, discarding buffer.");
+                    if (logger.DebugEnabled) logger.Debug($"Pool {poolIndex} is full, discarding buffer.");
                 }
             }
             else
             {
-                logger.Debug($"{poolIndex} (size {buffer.Length}) outside pool range, discarding buffer.");
+                if (logger.DebugEnabled) logger.Debug($"{poolIndex} (size {buffer.Length}) outside pool range, discarding buffer.");
             }
         }
 

@@ -8,6 +8,9 @@ namespace DokanNet.Logging
     public class TraceLogger : ILogger
     {
         /// <inheritdoc />
+        public bool DebugEnabled => true;
+
+        /// <inheritdoc />
         public void Debug(string message, params object[] args)
         {
             Trace.TraceInformation(message, args);
