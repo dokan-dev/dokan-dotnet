@@ -64,7 +64,7 @@ namespace DokanNet
         /// <summary>
         /// Enable Case sensitive path.
         /// By default all path are case insensitive.
-        /// For case sensitive: \dir\File & \diR\file are different files
+        /// For case sensitive: \\dir\\File and \\diR\\file are different files
         /// but for case insensitive they are the same.
         /// </summary>
         CaseSensitive = 4096,
