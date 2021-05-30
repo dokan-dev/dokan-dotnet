@@ -36,7 +36,7 @@ install:
  - ps: |
       Write-Host "Dokan download..." -ForegroundColor Green
       New-item -type directory -path C:\projects\dokan-dotnet\ -Force
-      Start-FileDownload 'https://github.com/dokan-dev/dokany/releases/download/v1.4.0.1000/DokanSetup_redist.exe' -FileName 'C:\projects\dokan-dotnet\DokanSetup.exe'
+      Start-FileDownload 'https://github.com/dokan-dev/dokany/releases/download/v1.5.0.2000/DokanSetup_redist.exe' -FileName 'C:\projects\dokan-dotnet\DokanSetup.exe'
       Write-Host "Dokan downloaded." -ForegroundColor Green
  - cmd: |
      C:\projects\dokan-dotnet\DokanSetup.exe /quiet
