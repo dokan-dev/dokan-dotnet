@@ -34,7 +34,7 @@ namespace DokanNetMirror
                 var mirror = unsafeReadWrite 
                     ? new UnsafeMirror(mirrorPath) 
                     : new Mirror(mirrorPath);
-                mirror.Mount(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI, 5);
+                mirror.Mount(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI, /*threadCount=*/5);
 
                 Console.WriteLine(@"Success");
             }
