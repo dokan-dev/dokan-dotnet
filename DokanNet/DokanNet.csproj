@@ -12,6 +12,7 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <FileVersion>1.5.0.0</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Company>Dokan-dev</Company>
     <Authors>AdrienJ, MaximeC, Hiroki Asakawa</Authors>
     <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
