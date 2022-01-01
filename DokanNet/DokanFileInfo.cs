@@ -14,7 +14,7 @@ namespace DokanNet
     /// </summary>
     /// <remarks>
     /// This class cannot be instantiated in C#, it is created by the kernel %Dokan driver.
-    /// This is the same structure as <c>_DOKAN_FILE_INFO</c> (dokan.h) in the C++ version of Dokan.
+    /// This is the same structure as <c>_DOKAN_FILE_INFO</c> (dokan.h) in the C version of Dokan.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public sealed class DokanFileInfo : IDokanFileInfo
@@ -30,6 +30,13 @@ namespace DokanNet
         /// A pointer to the <see cref="DOKAN_OPTIONS"/> which was passed to <see cref="DokanNet.Native.NativeMethods.DokanMain"/>.
         /// </summary>
         private readonly IntPtr _dokanOptions;
+
+        /// <summary>
+        /// Reserved. Used internally by Dokan library. Never modify.
+        /// If the processing for the event requires extra data to be associated with it
+        /// then a pointer to that data can be placed here
+        /// </summary>
+        private readonly IntPtr _processingContext;
 
         private readonly uint _processId;
 

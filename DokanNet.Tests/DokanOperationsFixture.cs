@@ -458,11 +458,11 @@ namespace DokanNet.Tests
                 return TryExecute(fileName, offset, length, (IDokanFileInfo)info, (f, o, l, i) => Target.UnlockFile(f, o, l, i), nameof(UnlockFile));
             }
 
-            public NtStatus Mounted(IDokanFileInfo info)
+            public NtStatus Mounted(string mountPoint, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute((IDokanFileInfo)info, i => Target.Mounted(i), nameof(Mounted));
+                return TryExecute(mountPoint, (IDokanFileInfo)info, (m, i) => Target.Mounted(m, i), nameof(Mounted));
             }
 
             public NtStatus Unmounted(IDokanFileInfo info)
@@ -1042,7 +1042,7 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.UnlockFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {offset}, {length}, {info.Log()})"));
 
             operations
-                .Setup(d => d.Mounted(It.IsAny<IDokanFileInfo>()))
+                .Setup(d => d.Mounted(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((IDokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.Mounted)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
@@ -1065,7 +1065,7 @@ namespace DokanNet.Tests
         private void PermitMount()
         {
             operations
-                .Setup(d => d.Mounted(It.IsAny<IDokanFileInfo>()))
+                .Setup(d => d.Mounted(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((IDokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.Mounted)} {info.Log()}"));

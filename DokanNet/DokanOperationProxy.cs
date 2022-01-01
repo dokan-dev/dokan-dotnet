@@ -168,9 +168,11 @@ namespace DokanNet
         public delegate NtStatus FindStreamsDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             IntPtr rawFillFindData,
+            IntPtr findStreamContext,
             [MarshalAs(UnmanagedType.LPStruct), In /*, Out*/] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus MountedDelegate(
+            [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
         public delegate NtStatus UnmountedDelegate(
@@ -726,7 +728,7 @@ namespace DokanNet
             fill(ref data, rawFileInfo);
         }
 
-        public NtStatus FindStreamsProxy(string rawFileName, IntPtr rawFillFindData, DokanFileInfo rawFileInfo)
+        public NtStatus FindStreamsProxy(string rawFileName, IntPtr rawFillFindData, IntPtr findStreamContext, DokanFileInfo rawFileInfo)
         {
             try
             {
@@ -753,9 +755,15 @@ namespace DokanNet
                     var fill = GetDataFromPointer<FILL_FIND_STREAM_DATA>(rawFillFindData);
 
                     // used a single entry call to speed up the "enumeration" of the list
+                    bool bufferFull = false;
                     foreach (var t in files)
                     {
-                        AddTo(fill, rawFileInfo, t);
+                        if (bufferFull)
+                        {
+                            result = NtStatus.BufferOverflow;
+                            break;
+                        }
+                        bufferFull = !AddTo(fill, findStreamContext, t);
                     }
                 }
 
@@ -790,7 +798,8 @@ namespace DokanNet
         /// <param name="fill">The delegate of type <see cref="FILL_FIND_STREAM_DATA"/> to be called.</param>
         /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/> to be used when calling <paramref name="fill"/>.</param>
         /// <param name="fi">A <see cref="FileInformation"/> with information to be used when calling <paramref name="fill"/>.</param>
-        private static void AddTo(FILL_FIND_STREAM_DATA fill, DokanFileInfo rawFileInfo, FileInformation fi)
+        /// <returns>Whether the buffer is full or not.</returns>
+        private static bool AddTo(FILL_FIND_STREAM_DATA fill, IntPtr findStreamContext, FileInformation fi)
         {
             Debug.Assert(!string.IsNullOrEmpty(fi.FileName), "FileName must not be empty or null");
             var data = new WIN32_FIND_STREAM_DATA
@@ -800,7 +809,7 @@ namespace DokanNet
             };
             //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
 
-            fill(ref data, rawFileInfo);
+            return fill(ref data, findStreamContext);
         }
 
         ////
@@ -1146,17 +1155,18 @@ namespace DokanNet
             }
         }
 
-        public NtStatus MountedProxy(DokanFileInfo rawFileInfo)
+        public NtStatus MountedProxy(string mountPoint, DokanFileInfo rawFileInfo)
         {
             try
             {
                 if (logger.DebugEnabled)
                 {
                     logger.Debug("MountedProxy:");
+                    logger.Debug("\tMountPoint\t{0}", mountPoint);
                     logger.Debug("\tContext\t{0}", rawFileInfo);
                 }
 
-                var result = operations.Mounted(rawFileInfo);
+                var result = operations.Mounted(mountPoint, rawFileInfo);
 
                 if (logger.DebugEnabled) logger.Debug("MountedProxy Return : {0}", result);
                 return result;
@@ -1334,7 +1344,7 @@ namespace DokanNet
         /// <param name="rawFindData">A <see cref="WIN32_FIND_DATA"/>.</param>
         /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
         /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
-        /// <remarks>This is the same delegate as <c>PFillFindData</c> (dokan.h) in the C++ version of Dokan.</remarks>
+        /// <remarks>This is the same delegate as <c>PFillFindData</c> (dokan.h) in the C version of Dokan.</remarks>
         private delegate long FILL_FIND_FILE_DATA(
             ref WIN32_FIND_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
 
@@ -1346,11 +1356,11 @@ namespace DokanNet
         /// Used to add an entry in <see cref="DokanOperationProxy.FindStreamsProxy"/>.
         /// </summary>
         /// <param name="rawFindData">A <see cref="WIN32_FIND_STREAM_DATA"/>.</param>
-        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
-        /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
-        /// <remarks>This is the same delegate as <c>PFillFindStreamData</c> (dokan.h) in the C++ version of Dokan.</remarks>
-        private delegate long FILL_FIND_STREAM_DATA(
-            ref WIN32_FIND_STREAM_DATA rawFindData, [MarshalAs(UnmanagedType.LPStruct), In] DokanFileInfo rawFileInfo);
+        /// <param name="findStreamContext">The context received by <see cref="DOKAN_OPERATIONS.FindStreams"/>.</param>
+        /// <returns><c>FALSE</c> if the buffer is full, otherwise <c>TRUE</c></returns>
+        /// <remarks>This is the same delegate as <c>PFillFindStreamData</c> (dokan.h) in the C version of Dokan.</remarks>
+        private delegate bool FILL_FIND_STREAM_DATA(
+            ref WIN32_FIND_STREAM_DATA rawFindData, IntPtr findStreamContext);
 
 #endregion Nested type: FILL_FIND_STREAM_DATA
     }

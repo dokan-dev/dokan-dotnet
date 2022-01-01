@@ -669,7 +669,7 @@ namespace DokanNetMirror
 #endif
         }
 
-        public NtStatus Mounted(IDokanFileInfo info)
+        public NtStatus Mounted(string mountPoint, IDokanFileInfo info)
         {
             return Trace(nameof(Mounted), null, info, DokanResult.Success);
         }

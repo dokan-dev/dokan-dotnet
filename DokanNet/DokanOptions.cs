@@ -49,29 +49,22 @@ namespace DokanNet
         /// </summary>
         EnableNotificationAPI = 512,
 
-        /// <summary>Whether to disable any oplock support on the volume.</summary>
-        /// <remarks>Regular range locks are enabled regardless.</remarks>
-        DisableOplocks = 1024,
-
-        /// <summary>
-        /// Enable Fcb Garbage collection
-        /// The advantage of the GC approach is that it prevents filter drivers from exponentially
-        /// slowing down procedures like zip file extraction due to
-        /// repeatedly rebuilding state that they attach to the FCB header.
-        /// </summary>
-        EnableFCBGC = 2048,
-
         /// <summary>
         /// Enable Case sensitive path.
         /// By default all path are case insensitive.
         /// For case sensitive: \\dir\\File and \\diR\\file are different files
         /// but for case insensitive they are the same.
         /// </summary>
-        CaseSensitive = 4096,
+        CaseSensitive = 1024,
 
         /// <summary>
         /// Enables unmounting of network drives via file explorer
         /// </summary>
-        EnableNetworkUnmount = 8192,
+        EnableNetworkUnmount = 2048,
+
+        /// <summary>
+        /// Forward the kernel driver global and volume logs to the userland
+        /// </summary>
+        DispatchDriverLogs = 4096,
     }
 }
