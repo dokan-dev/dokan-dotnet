@@ -16,13 +16,36 @@ namespace DokanNet
         /// The %Dokan version that DokanNet is compatible with. Currently it is version 1.0.0.
         /// </summary>
         /// <see cref="DOKAN_OPTIONS.Version"/>
-        private const ushort DOKAN_VERSION = 130;
+        private const ushort DOKAN_VERSION = 200;
 
         #endregion Dokan Driver Options
 
         /// <summary>
+        /// Initialize all required Dokan internal resources.
+        /// 
+        /// This needs to be called only once before trying to use <see cref="Mount"/> or <see cref="CreateFileSystem"/> for the first time.
+        /// Otherwise both will fail and raise an exception.
+        /// </summary>
+        public static void Init(this IDokanOperations operations)
+        {
+            NativeMethods.DokanInit();
+        }
+
+        /// <summary>
+        /// Release all allocated resources by <see cref="Init"/> when they are no longer needed.
+        ///
+        /// This should be called when the application no longer expects to create a new FileSystem with
+        /// <see cref="Mount"/> or <see cref="CreateFileSystem"/> and after all devices are unmount.
+        /// </summary>
+        public static void Shutdown(this IDokanOperations operations)
+        {
+            NativeMethods.DokanShutdown();
+        }
+
+        /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
@@ -36,6 +59,7 @@ namespace DokanNet
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
@@ -45,89 +69,93 @@ namespace DokanNet
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
             ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, 0, logger);
+            Mount(operations, mountPoint, mountOptions, false, logger);
         }
 
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="threadCount">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
-            int threadCount, ILogger logger = null)
+            bool singleThread, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, DOKAN_VERSION, logger);
+            Mount(operations, mountPoint, mountOptions, singleThread, DOKAN_VERSION, logger);
         }
 
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="threadCount">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
-            int threadCount, int version, ILogger logger = null)
+            bool singleThread, int version, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, TimeSpan.FromSeconds(20), string.Empty,
+            Mount(operations, mountPoint, mountOptions, singleThread, version, TimeSpan.FromSeconds(20), string.Empty,
                 512, 512, logger);
         }
 
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="threadCount">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
-            int threadCount, int version, TimeSpan timeout, ILogger logger = null)
+            bool singleThread, int version, TimeSpan timeout, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, string.Empty, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, singleThread, version, timeout, string.Empty, 512, 512, logger);
         }
 
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="threadCount">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="uncName">UNC name used for network volume.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
-            int threadCount, int version, TimeSpan timeout, string uncName, ILogger logger = null)
+            bool singleThread, int version, TimeSpan timeout, string uncName, ILogger logger = null)
         {
-            Mount(operations, mountPoint, mountOptions, threadCount, version, timeout, uncName, 512, 512, logger);
+            Mount(operations, mountPoint, mountOptions, singleThread, version, timeout, uncName, 512, 512, logger);
         }
-
 
         /// <summary>
         /// Mount a new %Dokan Volume.
         /// This function block until the device is unmount.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
         /// </summary>
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="threadCount">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="uncName">UNC name used for network volume.</param>
@@ -136,7 +164,7 @@ namespace DokanNet
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
-            int threadCount, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
+            bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)
         {
             if (logger == null)
@@ -155,11 +183,12 @@ namespace DokanNet
                 Version = (ushort)version,
                 MountPoint = mountPoint,
                 UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
-                ThreadCount = (ushort)threadCount,
+                SingleThread = singleThread,
                 Options = (uint)mountOptions,
                 Timeout = (uint)timeout.TotalMilliseconds,
                 AllocationUnitSize = (uint)allocationUnitSize,
-                SectorSize = (uint)sectorSize
+                SectorSize = (uint)sectorSize,
+                VolumeSecurityDescriptorLength = 0
             };
 
             var dokanOperations = new DOKAN_OPERATIONS
@@ -196,6 +225,239 @@ namespace DokanNet
             {
                 throw new DokanException(status);
             }
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, DokanOptions.FixedDrive, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, mountOptions, false, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            bool singleThread, ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, mountOptions, singleThread, DOKAN_VERSION, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            bool singleThread, int version, ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, mountOptions, singleThread, version, TimeSpan.FromSeconds(20), string.Empty,
+                512, 512, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
+        /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            bool singleThread, int version, TimeSpan timeout, ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, mountOptions, singleThread, version, timeout, string.Empty, 512, 512, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
+        /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
+        /// <param name="uncName">UNC name used for network volume.</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            bool singleThread, int version, TimeSpan timeout, string uncName, ILogger logger = null)
+        {
+            return CreateFileSystem(operations, mountPoint, mountOptions, singleThread, version, timeout, uncName, 512, 512, logger);
+        }
+
+        /// <summary>
+        /// Mount a new %Dokan Volume.
+        /// It is mandatory to have called <see cref="DokanInit"/> previously to use this API.
+        /// This function returns directly on device mount or on failure.
+        /// <see cref="WaitForFileSystemClosed"/> can be used to wait until the device is unmount.
+        /// </summary>
+        /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
+        /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
+        /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
+        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
+        /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
+        /// <param name="uncName">UNC name used for network volume.</param>
+        /// <param name="allocationUnitSize">Allocation Unit Size of the volume. This will behave on the file size.</param>
+        /// <param name="sectorSize">Sector Size of the volume. This will behave on the file size.</param>
+        /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
+        /// <exception cref="DokanException">If the mount fails.</exception>
+        /// <returns>Dokan mount instance context that can be used for related instance calls like <see cref="IsFileSystemRunning"/></returns>
+        public static DokanInstance CreateFileSystem(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
+            bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
+            int sectorSize = 512, ILogger logger = null)
+        {
+            if (logger == null)
+            {
+#if TRACE
+                logger = new ConsoleLogger("[DokanNet] ");
+#else
+                logger = new NullLogger();
+#endif
+            }
+
+            DokanInstance instance = new DokanInstance();
+
+            instance.DokanOperationProxy = new DokanOperationProxy(operations, logger);
+
+            instance.DokanOptions = new DOKAN_OPTIONS
+            {
+                Version = (ushort)version,
+                MountPoint = mountPoint,
+                UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
+                SingleThread = singleThread,
+                Options = (uint)mountOptions,
+                Timeout = (uint)timeout.TotalMilliseconds,
+                AllocationUnitSize = (uint)allocationUnitSize,
+                SectorSize = (uint)sectorSize,
+                VolumeSecurityDescriptorLength = 0
+            };
+
+            instance.DokanOperations = new DOKAN_OPERATIONS
+            {
+                ZwCreateFile = instance.DokanOperationProxy.ZwCreateFileProxy,
+                Cleanup = instance.DokanOperationProxy.CleanupProxy,
+                CloseFile = instance.DokanOperationProxy.CloseFileProxy,
+                ReadFile = instance.DokanOperationProxy.ReadFileProxy,
+                WriteFile = instance.DokanOperationProxy.WriteFileProxy,
+                FlushFileBuffers = instance.DokanOperationProxy.FlushFileBuffersProxy,
+                GetFileInformation = instance.DokanOperationProxy.GetFileInformationProxy,
+                FindFiles = instance.DokanOperationProxy.FindFilesProxy,
+                FindFilesWithPattern = instance.DokanOperationProxy.FindFilesWithPatternProxy,
+                SetFileAttributes = instance.DokanOperationProxy.SetFileAttributesProxy,
+                SetFileTime = instance.DokanOperationProxy.SetFileTimeProxy,
+                DeleteFile = instance.DokanOperationProxy.DeleteFileProxy,
+                DeleteDirectory = instance.DokanOperationProxy.DeleteDirectoryProxy,
+                MoveFile = instance.DokanOperationProxy.MoveFileProxy,
+                SetEndOfFile = instance.DokanOperationProxy.SetEndOfFileProxy,
+                SetAllocationSize = instance.DokanOperationProxy.SetAllocationSizeProxy,
+                LockFile = instance.DokanOperationProxy.LockFileProxy,
+                UnlockFile = instance.DokanOperationProxy.UnlockFileProxy,
+                GetDiskFreeSpace = instance.DokanOperationProxy.GetDiskFreeSpaceProxy,
+                GetVolumeInformation = instance.DokanOperationProxy.GetVolumeInformationProxy,
+                Mounted = instance.DokanOperationProxy.MountedProxy,
+                Unmounted = instance.DokanOperationProxy.UnmountedProxy,
+                GetFileSecurity = instance.DokanOperationProxy.GetFileSecurityProxy,
+                SetFileSecurity = instance.DokanOperationProxy.SetFileSecurityProxy,
+                FindStreams = instance.DokanOperationProxy.FindStreamsProxy
+            };
+
+            DokanStatus status = (DokanStatus)NativeMethods.DokanCreateFileSystem(ref instance.DokanOptions, ref instance.DokanOperations, ref instance.DokanHandle);
+            if (status != DokanStatus.Success)
+            {
+                throw new DokanException(status);
+            }
+            return instance;
+        }
+
+        /// <summary>
+        /// Check if the FileSystem is still running or not.
+        /// </summary>
+        /// <param name="dokanInstance">The dokan mount context created by <see cref="CreateFileSystem"/>.</param>
+        /// <returns>Whether the FileSystem is still running or not.</returns>
+        public static bool IsFileSystemRunning(this IDokanOperations operations, DokanInstance dokanInstance)
+        {
+            return NativeMethods.DokanIsFileSystemRunning(dokanInstance.DokanHandle);
+        }
+
+        /// <summary>
+        /// Wait until the FileSystem is unmount.
+        /// </summary>
+        /// <param name="dokanInstance">The dokan mount context created by <see cref="CreateFileSystem"/>.</param>
+        /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If <param name="milliSeconds"> is zero,
+        /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <param name="milliSeconds"> is INFINITE, the function will return only when the object is signaled.</param>
+        /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
+        public static uint WaitForFileSystemClosed(this IDokanOperations operations, DokanInstance dokanInstance, uint milliSeconds)
+        {
+            return NativeMethods.DokanWaitForFileSystemClosed(dokanInstance.DokanHandle, milliSeconds);
+        }
+
+        /// <summary>
+        /// Unmount and wait until all resources of the \c DokanInstance are released.
+        /// </summary>
+        /// <param name="dokanInstance">The dokan mount context created by <see cref="CreateFileSystem"/>.</param>
+        public static void CloseFileSystem(this IDokanOperations operations, DokanInstance dokanInstance)
+        {
+            NativeMethods.DokanCloseHandle(dokanInstance.DokanHandle);
         }
 
         /// <summary>
@@ -243,7 +505,7 @@ namespace DokanNet
         /// changes made in the mirrored directory so that those changes will
         /// be automatically reflected in the implemented mirror file system.
         /// 
-        /// This requires the FilePath passed to the respective methods
+        /// This requires the filePath passed to the respective methods
         /// to include the absolute path of the changed file including the drive-letter
         /// and the path to the mount point, e.g. "C:\Dokan\ChangedFile.txt".
         /// 
@@ -255,62 +517,67 @@ namespace DokanNet
             /// <summary>
             /// Notify Dokan that a file or directory has been created.
             /// </summary>
-            /// <param name="FilePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <returns>true if the notification succeeded.</returns>
-            public static bool Create(string FilePath, bool isDirectory)
+            public static bool Create(DokanInstance dokanInstance, string filePath, bool isDirectory)
             {
-                return NativeMethods.DokanNotifyCreate(FilePath, isDirectory);
+                return NativeMethods.DokanNotifyCreate(dokanInstance.DokanHandle, filePath, isDirectory);
             }
 
             /// <summary>
             /// Notify Dokan that a file or directory has been deleted.
             /// </summary>
-            /// <param name="FilePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
-            public static bool Delete(string FilePath, bool isDirectory)
+            public static bool Delete(DokanInstance dokanInstance, string filePath, bool isDirectory)
             {
-                return NativeMethods.DokanNotifyDelete(FilePath, isDirectory);
+                return NativeMethods.DokanNotifyDelete(dokanInstance.DokanHandle, filePath, isDirectory);
             }
 
             /// <summary>
             /// Notify Dokan that file or directory attributes have changed.
             /// </summary>
-            /// <param name="FilePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
-            public static bool Update(string FilePath)
+            public static bool Update(DokanInstance dokanInstance, string filePath)
             {
-                return NativeMethods.DokanNotifyUpdate(FilePath);
+                return NativeMethods.DokanNotifyUpdate(dokanInstance.DokanHandle, filePath);
             }
 
             /// <summary>
             /// Notify Dokan that file or directory extended attributes have changed.
             /// </summary>
-            /// <param name="FilePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
-            public static bool XAttrUpdate(string FilePath)
+            public static bool XAttrUpdate(DokanInstance dokanInstance, string filePath)
             {
-                return NativeMethods.DokanNotifyXAttrUpdate(FilePath);
+                return NativeMethods.DokanNotifyXAttrUpdate(dokanInstance.DokanHandle, filePath);
             }
 
             /// <summary>
             /// Notify Dokan that a file or directory has been renamed.
             /// This method supports in-place rename for file/directory within the same parent.
             /// </summary>
-            /// <param name="OldPath">Old, absolute path to the file or directory, including the mount-point of the file system.</param>
-            /// <param name="NewPath">New, absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="oldPath">Old, absolute path to the file or directory, including the mount-point of the file system.</param>
+            /// <param name="newPath">New, absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <param name="isInSameDirectory">Indicates if the file or directory have the same parent directory.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
-            public static bool Rename(string OldPath, string NewPath, bool isDirectory, bool isInSameDirectory)
+            public static bool Rename(DokanInstance dokanInstance, string oldPath, string newPath, bool isDirectory, bool isInSameDirectory)
             {
-                return NativeMethods.DokanNotifyRename(OldPath,
-                    NewPath,
+                return NativeMethods.DokanNotifyRename(dokanInstance.DokanHandle, oldPath,
+                    newPath,
                     isDirectory,
                     isInSameDirectory);
             }

@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.0.0] - 2022-01-01
+- Support dokany 2.0.0.
+
 ## [1.5.0.0] - 2021-05-30
 ### Added
 - Add `ILogger.DebugEnabled` to reduce memory allocation produce by logs like `BufferPool`. 

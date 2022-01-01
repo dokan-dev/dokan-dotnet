@@ -231,7 +231,7 @@ namespace RegistryFS
             return DokanResult.Success;
         }
 
-        public NtStatus Mounted(IDokanFileInfo info)
+        public NtStatus Mounted(string mountPoint, IDokanFileInfo info)
         {
             return DokanResult.Success;
         }
@@ -318,7 +318,9 @@ namespace RegistryFS
             try
             {
                 var rfs = new RFS();
+                rfs.Init();
                 rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
+                rfs.Shutdown();
                 Console.WriteLine(@"Success");
             }
             catch (DokanException ex)

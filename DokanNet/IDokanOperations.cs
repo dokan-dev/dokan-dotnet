@@ -18,7 +18,7 @@ namespace DokanNet
     /// if you dont want to support one of them. Be aware that returning such value to important callbacks
     /// such <see cref="CreateFile"/>/<see cref="ReadFile"/>/... would make the filesystem not working or unstable.
     /// </summary>
-    /// <remarks>This is the same struct as <c>DOKAN_OPERATIONS</c> (dokan.h) in the C++ version of Dokan.</remarks>
+    /// <remarks>This is the same struct as <c>DOKAN_OPERATIONS</c> (dokan.h) in the C version of Dokan.</remarks>
     public interface IDokanOperations
     {
         /// <summary>
@@ -389,11 +389,15 @@ namespace DokanNet
 
         /// <summary>
         /// Is called when %Dokan succeed to mount the volume.
+        /// 
+        /// If <see cref="DokanOptions.MountManager"/> is enabled and the drive letter requested is busy,
+        /// the <paramref name="mountPoint"/> can contain a different drive letter that the mount manager assigned us.
         /// </summary>
+        /// <param name="mountPoint">The mount point assign to the instance.</param>
         /// <param name="info">An <see cref="IDokanFileInfo"/> with information about the file or directory.</param>
         /// <returns><see cref="NtStatus"/> or <see cref="DokanResult"/> appropriate to the request result.</returns>
         /// <see cref="Unmounted"/>
-        NtStatus Mounted(IDokanFileInfo info);
+        NtStatus Mounted(string mountPoint, IDokanFileInfo info);
 
         /// <summary>
         /// Is called when %Dokan is unmounting the volume.

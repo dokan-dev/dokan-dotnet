@@ -16,7 +16,7 @@ namespace DokanNet.Native
     /// 
     /// Se <see cref="IDokanOperations"/> for more information about the fields.
     /// </summary>
-    /// <remarks>This is the same struct as <c>_DOKAN_OPERATIONS</c> (dokan.h) in the C++ version of Dokan.</remarks>
+    /// <remarks>This is the same struct as <c>_DOKAN_OPERATIONS</c> (dokan.h) in the C version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal struct DOKAN_OPERATIONS
     {
