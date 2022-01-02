@@ -16,7 +16,7 @@ namespace DokanNet.Native
         public ushort Version;
 
         /// <summary>
-        /// Number of threads to be used internally by Dokan library. More thread will handle more event at the same time.
+        /// Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.
         /// </summary>
         [MarshalAs(UnmanagedType.U1)]
         public bool SingleThread;
