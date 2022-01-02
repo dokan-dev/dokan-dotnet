@@ -60,7 +60,7 @@ namespace DokanNet.Tests
             var value = $"TestValue for test {nameof(Create_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None, context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
@@ -89,7 +89,7 @@ namespace DokanNet.Tests
             var value = $"TestValue for test {nameof(OpenRead_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
@@ -116,7 +116,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
@@ -148,7 +148,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: context);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
@@ -187,7 +187,7 @@ namespace DokanNet.Tests
             var value = $"TestValue for test {nameof(OpenWrite_PassesContextCorrectly)}";
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length, context: context);
@@ -215,7 +215,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);
@@ -251,7 +251,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             var context = new object();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: context);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: context);

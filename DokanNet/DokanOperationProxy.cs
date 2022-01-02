@@ -652,6 +652,7 @@ namespace DokanNet
                     logger.Debug("\tContext\t{0}", rawFileInfo);
                 }
 
+                // TODO(someone): Allow userland FS to set FindFiles preference at mount time and nullify the callback not used.
                 var result = operations.FindFilesWithPattern(rawFileName, rawSearchPattern, out IList<FileInformation> files, rawFileInfo);
 
                 Debug.Assert(files != null, "Files must not be null");

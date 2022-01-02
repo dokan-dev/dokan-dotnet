@@ -60,7 +60,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             var attributes = FileAttributes.Normal;
             var creationTime = new DateTime(2015, 6, 1, 12, 0, 0);
@@ -97,7 +97,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName;
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #endif
 
             var sut = new FileInfo(path.AsDriveBasedPath());
@@ -117,7 +117,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -139,7 +139,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
@@ -160,7 +160,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #endif
 
             var sut = new FileInfo(fixture.FileName.AsDriveBasedPath());
@@ -179,7 +179,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.ReadOnly);
@@ -201,7 +201,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -224,7 +224,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(AppendText_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, ReadOnlyShare, FileMode.OpenOrCreate, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -253,7 +253,7 @@ namespace DokanNet.Tests
             string path = fixture.FileName.AsRootedPath(),
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -284,7 +284,7 @@ namespace DokanNet.Tests
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
             string value = $"TestValue for test {nameof(CopyTo_WhereSourceIsNonEmpty_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: value.Length);
@@ -323,7 +323,7 @@ namespace DokanNet.Tests
             string path = fixture.FileName.AsRootedPath(),
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal, length: largeData.Length);
@@ -363,7 +363,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
@@ -382,7 +382,7 @@ namespace DokanNet.Tests
             string path = fixture.FileName.AsRootedPath(),
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -404,7 +404,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(Create_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadWriteAccess, WriteShare, FileMode.Create, FileOptions.None);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -432,7 +432,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(CreateText_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, ReadOnlyShare, FileMode.Create, FileOptions.SequentialScan);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -459,7 +459,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, DeleteAccess, ReadWriteShare, FileMode.Open, deleteOnClose: true);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -482,7 +482,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
@@ -503,7 +503,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAttributesPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -534,7 +534,7 @@ namespace DokanNet.Tests
             string path = fixture.FileName.AsRootedPath(),
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -566,7 +566,7 @@ namespace DokanNet.Tests
                 path = origin.AsRootedPath(),
                 destinationPath = destination.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileWithoutCleanup(path, MoveFromAccess, ReadWriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -595,7 +595,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
@@ -614,7 +614,7 @@ namespace DokanNet.Tests
             string path = fixture.FileName.AsRootedPath(),
                 destinationPath = fixture.DestinationFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, MoveFromAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -675,7 +675,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
@@ -701,7 +701,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Create, FileOptions.None);
@@ -726,7 +726,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.CreateNew, FileOptions.None);
@@ -752,7 +752,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileExists);
 #endif
@@ -770,7 +770,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Open, FileOptions.None);
@@ -796,7 +796,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFileToFail(path, DokanResult.FileNotFound);
 #endif
@@ -814,7 +814,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
@@ -842,7 +842,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, FileOptions.None);
             fixture.ExpectSetAllocationSize(path, 0);
@@ -869,7 +869,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -902,7 +902,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFileWithDelay(path, Encoding.UTF8.GetBytes(value), value.Length, DokanOperationsFixture.IODelay);
@@ -934,7 +934,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
@@ -972,7 +972,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
@@ -1012,7 +1012,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE);
@@ -1058,7 +1058,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None, context: largeData);
             fixture.ExpectReadFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
@@ -1106,7 +1106,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenRead_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.None);
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -1142,7 +1142,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenText_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadOnlyShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectReadFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -1174,7 +1174,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -1207,7 +1207,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithDelay_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFileWithDelay(path, Encoding.UTF8.GetBytes(value), value.Length, DokanOperationsFixture.IODelay);
@@ -1239,7 +1239,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
@@ -1278,7 +1278,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
@@ -1318,7 +1318,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE);
@@ -1363,7 +1363,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None, context: largeData);
             fixture.ExpectWriteFileInChunks(path, largeData, FILE_BUFFER_SIZE, context: largeData);
@@ -1408,7 +1408,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithFlush_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -1445,7 +1445,7 @@ namespace DokanNet.Tests
             var path = fixture.FileName.AsRootedPath();
             string value = $"TestValue for test {nameof(OpenWrite_WithLockingAndUnlocking_CallsApiCorrectly)}";
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             fixture.ExpectWriteFile(path, Encoding.UTF8.GetBytes(value), value.Length);
@@ -1483,7 +1483,7 @@ namespace DokanNet.Tests
                 destinationPath = fixture.DestinationFileName.AsRootedPath(),
                 destinationBackupPath = fixture.DestinationBackupFileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.AccessSystemSecurity, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
@@ -1525,7 +1525,7 @@ namespace DokanNet.Tests
                 destinationPath = destination.AsRootedPath(),
                 destinationBackupPath = destinationBackup.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(destinationPath, ReplaceAccess | FileAccess.AccessSystemSecurity, ReadWriteShare, FileMode.Open);
             fixture.ExpectCreateFileWithoutCleanup(destinationPath, ReplaceAccess, ReadWriteShare, FileMode.Open);
@@ -1564,7 +1564,7 @@ namespace DokanNet.Tests
             var security = new FileSecurity();
             security.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null), FileSystemRights.FullControl, AccessControlType.Allow));
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path.AsRootedPath(), ChangePermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
@@ -1590,7 +1590,7 @@ namespace DokanNet.Tests
 
             var path = fixture.FileName.AsRootedPath();
 #if LOGONLY
-            fixture.SetupAny();
+            fixture.PermitAny();
 #else
             var attributes = FileAttributes.Normal;
             fixture.ExpectCreateFile(path, ReadAttributesAccess, ReadWriteShare, FileMode.Open);

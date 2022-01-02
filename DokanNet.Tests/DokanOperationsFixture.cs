@@ -1044,7 +1044,7 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.Mounted(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
-                .Callback((IDokanFileInfo info)
+                .Callback((string mountPoint, IDokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.Mounted)}[{Interlocked.Read(ref pendingFiles)}] ({info.Log()})"));
 
             operations
@@ -1067,7 +1067,7 @@ namespace DokanNet.Tests
             operations
                 .Setup(d => d.Mounted(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
-                .Callback((IDokanFileInfo info)
+                .Callback((string mountPoint, IDokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.Mounted)} {info.Log()}"));
             operations
                 .Setup(d => d.CreateFile(RootName, FileAccess.ReadAttributes, ReadWriteShare, FileMode.Open, FileOptions.None, EmptyFileAttributes, It.Is<IDokanFileInfo>(i => !i.IsDirectory)))
@@ -1103,7 +1103,7 @@ namespace DokanNet.Tests
             ExpectOpenDirectory(RootName, OpenDirectoryAccess, OpenDirectoryShare);
 
             operations
-                .Setup(d => d.GetDiskFreeSpace(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, It.Is<IDokanFileInfo>(i => !i.IsDirectory)))
+                .Setup(d => d.GetDiskFreeSpace(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((long _freeBytesAvailable, long _totalNumberOfBytes, long _totalNumberOfFreeBytes, IDokanFileInfo info)
                     => Trace($"{nameof(IDokanOperations.GetDiskFreeSpace)}[{Interlocked.Read(ref pendingFiles)}] (out {_freeBytesAvailable}, out {_totalNumberOfBytes}, out {_totalNumberOfFreeBytes}, {info.Log()})"))
