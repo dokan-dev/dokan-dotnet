@@ -434,7 +434,7 @@ namespace DokanNet.Tests
         }
 
         [TestMethod, TestCategory(TestCategories.Success)]
-        private void GetDirectories_OnRootDirectory_WithPatternSearch_CallsApiCorrectly()
+        public void GetDirectories_OnRootDirectory_WithPatternSearch_CallsApiCorrectly()
         {
             var fixture = DokanOperationsFixture.Instance;
 
