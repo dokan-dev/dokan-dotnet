@@ -24,15 +24,15 @@ namespace DokanNet
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects)
-                    DokanOptions?.Dispose();
+                    // Dispose managed state (managed objects)
+                    DokanHandle?.Dispose();     // This calls DokanCloseHandle and waits for dismount
+                    DokanOptions?.Dispose();    // After that, it is safe to free unmanaged memory
                     DokanOperations?.Dispose();
-                    DokanHandle?.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // Free unmanaged resources (unmanaged objects) and override finalizer
 
-                // TODO: set large fields to null
+                // Set fields to null
                 DokanOptions = null;
                 DokanOperations = null;
                 DokanHandle = null;
@@ -41,7 +41,6 @@ namespace DokanNet
             }
         }
 
-        // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
         ~DokanInstance()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
