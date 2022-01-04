@@ -318,9 +318,9 @@ namespace RegistryFS
             try
             {
                 var rfs = new RFS();
-                rfs.Init();
+                Dokan.Init();
                 rfs.Mount("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
-                rfs.Shutdown();
+                Dokan.Shutdown();
                 Console.WriteLine(@"Success");
             }
             catch (DokanException ex)

@@ -24,7 +24,7 @@ namespace DokanNet.Tests
             dokanOptions |= DokanOptions.UserModeLock;
 #endif
 
-            DokanOperationsFixture.Operations.Init();
+            Dokan.Init();
             (mounterThread = new Thread(() => DokanOperationsFixture.Operations.Mount(DokanOperationsFixture.NormalMountPoint, dokanOptions))).Start();
             (mounterThread2 = new Thread(() => DokanOperationsFixture.UnsafeOperations.Mount(DokanOperationsFixture.UnsafeMountPoint, dokanOptions))).Start();
             var drive = new DriveInfo(DokanOperationsFixture.NormalMountPoint);
@@ -44,7 +44,7 @@ namespace DokanNet.Tests
             Dokan.Unmount(DokanOperationsFixture.UnsafeMountPoint[0]);
             Dokan.RemoveMountPoint(DokanOperationsFixture.NormalMountPoint);
             Dokan.RemoveMountPoint(DokanOperationsFixture.UnsafeMountPoint);
-            DokanOperationsFixture.Operations.Shutdown();
+            Dokan.Shutdown();
         }
     }
 }

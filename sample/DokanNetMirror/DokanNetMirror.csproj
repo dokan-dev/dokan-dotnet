@@ -14,6 +14,10 @@
     <PackageReference Include="StringInterpolationBridgeStrong" Version="0.9.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <!--Set to True to run Code Analysis-->

@@ -33,12 +33,16 @@ namespace DokanNetMirror
                     ? new UnsafeMirror(mirrorPath) 
                     : new Mirror(mirrorPath);
 
-                mirror.Init();
-                DokanInstance dokanInstance = mirror.CreateFileSystem(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI);
-                var notify = new Notify();
-                notify.Start(mirrorPath, mountPath, dokanInstance);
-                mirror.WaitForFileSystemClosed(dokanInstance, uint.MaxValue);
-                mirror.Shutdown();
+                Dokan.Init();
+
+                using (DokanInstance dokanInstance = mirror.CreateFileSystem(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI))
+                {
+                    var notify = new Notify();
+                    notify.Start(mirrorPath, mountPath, dokanInstance);
+                    dokanInstance.WaitForFileSystemClosed(uint.MaxValue);
+                }
+
+                Dokan.Shutdown();
 
                 Console.WriteLine(@"Success");
             }

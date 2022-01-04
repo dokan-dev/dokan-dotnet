@@ -8,7 +8,7 @@ namespace DokanNet.Native
     /// <see cref="NativeMethods.DokanMain"/>
     /// <remarks>This is the same structure as <c>PDOKAN_OPTIONS</c> (dokan.h) in the C version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 4)]
-    internal struct DOKAN_OPTIONS
+    internal sealed class DOKAN_OPTIONS
     {
         /// <summary>
         /// Version of the dokan features requested (version "123" is equal to Dokan version 1.2.3).
