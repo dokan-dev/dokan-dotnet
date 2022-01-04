@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DokanNetMirror": {
-      "commandName": "Project",
-      "commandLineArgs": "-what=\"S:\\RAM files\""
-    }
-  }
-}

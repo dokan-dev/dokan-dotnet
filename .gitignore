@@ -11,3 +11,4 @@ TestResults
 *.opendb
 .vs
 *.DotSettings
+**/launchSettings.json
