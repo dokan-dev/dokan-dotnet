@@ -176,9 +176,8 @@ namespace DokanNet.Tests
                             waitHandles[i].Set();
                         }
                     }
+                    awaiterThread.Join();
                 }
-
-                awaiterThread.Join();
 
                 Array.ForEach(completions, c => GC.KeepAlive(c));
 
@@ -227,9 +226,8 @@ namespace DokanNet.Tests
                         if (!WriteFileEx(handle, buffer, buffer.Length, ref overlapped, completions[i]))
                             chunks[i].Win32Error = Marshal.GetLastWin32Error();
                     }
+                    awaiterThread.Join();
                 }
-
-                awaiterThread.Join();
 
                 Array.ForEach(completions, c => GC.KeepAlive(c));
             }
