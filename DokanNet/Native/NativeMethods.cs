@@ -40,7 +40,7 @@ namespace DokanNet.Native
         /// <param name="operations">Instance of <see cref="DOKAN_OPERATIONS"/> that will be called for each request made by the kernel.</param>
         /// <returns><see cref="DokanStatus"/></returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern int DokanMain(ref DOKAN_OPTIONS options, ref DOKAN_OPERATIONS operations);
+        public static extern DokanStatus DokanMain([In] DOKAN_OPTIONS options, [In] DOKAN_OPERATIONS operations);
 
         /// <summary>
         /// Mount a new Dokan Volume.
@@ -49,12 +49,12 @@ namespace DokanNet.Native
         /// This function returns directly on device mount or on failure.
         /// <see cref="DokanWaitForFileSystemClosed"/> can be used to wait until the device is unmount.
         /// </summary>
-        /// <param name="options">A <see cref="DOKAN_OPTIONS"/> that describe the mount.</param>
-        /// <param name="operations">Instance of <see cref="DOKAN_OPERATIONS"/> that will be called for each request made by the kernel.</param>
+        /// <param name="options">A <see cref="NativeStructWrapper&lt;DOKAN_OPTIONS&gt;"/> that describe the mount.</param>
+        /// <param name="operations">Instance of <see cref="NativeStructWrapper&lt;DOKAN_OPERATIONS&gt;"/> that will be called for each request made by the kernel.</param>
         /// <param name="dokanInstance">Dokan mount instance context that can be used for related instance calls like <see cref="DokanIsFileSystemRunning"/>.</param>
         /// <returns><see cref="DokanStatus"/></returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern int DokanCreateFileSystem(ref DOKAN_OPTIONS options, ref DOKAN_OPERATIONS operations, ref IntPtr dokanInstance);
+        public static extern DokanStatus DokanCreateFileSystem(SafeBuffer options, SafeBuffer operations, out DokanHandle dokanInstance);
 
         /// <summary>
         /// Check if the FileSystem is still running or not.
@@ -62,7 +62,7 @@ namespace DokanNet.Native
         /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/>.</param>
         /// <returns>Whether the FileSystem is still running or not.</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern bool DokanIsFileSystemRunning(IntPtr dokanInstance);
+        public static extern bool DokanIsFileSystemRunning(DokanHandle dokanInstance);
 
         /// <summary>
         /// Wait until the FileSystem is unmount.
@@ -72,7 +72,7 @@ namespace DokanNet.Native
         /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <param name="milliSeconds"> is INFINITE, the function will return only when the object is signaled.</param>
         /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern uint DokanWaitForFileSystemClosed(IntPtr dokanInstance, uint milliSeconds);
+        public static extern uint DokanWaitForFileSystemClosed(DokanHandle dokanInstance, uint milliSeconds);
 
         /// <summary>
         /// Unmount and wait until all resources of the \c DokanInstance are released.
@@ -174,7 +174,7 @@ namespace DokanNet.Native
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <returns>true if the notification succeeded.</returns>
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
-        public static extern bool DokanNotifyCreate(IntPtr dokanInstance,
+        public static extern bool DokanNotifyCreate(DokanHandle dokanInstance,
                                                     [MarshalAs(UnmanagedType.LPWStr)] string filePath,
                                                     [MarshalAs(UnmanagedType.Bool)] bool isDirectory);
 
@@ -186,7 +186,7 @@ namespace DokanNet.Native
         /// <param name="isDirectory">Indicates if the path is a directory.</param>
         /// <returns>true if notification succeeded.</returns>
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
-        public static extern bool DokanNotifyDelete(IntPtr dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath,
+        public static extern bool DokanNotifyDelete(DokanHandle dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath,
                                                     [MarshalAs(UnmanagedType.Bool)] bool isDirectory);
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace DokanNet.Native
         /// <param name="filePath">Full path to the file or directory, including mount point.</param>
         /// <returns>true if notification succeeded.</returns>
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
-        public static extern bool DokanNotifyUpdate(IntPtr dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath);
+        public static extern bool DokanNotifyUpdate(DokanHandle dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath);
 
         /// <summary>
         /// Notify Dokan that file or directory extended attributes have changed.
@@ -205,7 +205,7 @@ namespace DokanNet.Native
         /// <param name="filePath">Full path to the file or directory, including mount point.</param>
         /// <returns>true if notification succeeded.</returns>
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
-        public static extern bool DokanNotifyXAttrUpdate(IntPtr dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath);
+        public static extern bool DokanNotifyXAttrUpdate(DokanHandle dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string filePath);
 
         /// <summary>
         /// Notify Dokan that a file or directory has been renamed.
@@ -218,7 +218,7 @@ namespace DokanNet.Native
         /// <param name="isInSameDirectory">Indicates if OldPath and NewPath have the same parent.</param>
         /// <returns>true if notification succeeded.</returns>
         [DllImport(DOKAN_DLL, CharSet = CharSet.Unicode)]
-        public static extern bool DokanNotifyRename(IntPtr dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string OldPath,
+        public static extern bool DokanNotifyRename(DokanHandle dokanInstance, [MarshalAs(UnmanagedType.LPWStr)] string OldPath,
                                                     [MarshalAs(UnmanagedType.LPWStr)] string newPath,
                                                     [MarshalAs(UnmanagedType.Bool)] bool isDirectory,
                                                     [MarshalAs(UnmanagedType.Bool)] bool isInSameDirectory);

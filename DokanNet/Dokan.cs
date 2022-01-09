@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Text;
 using DokanNet.Logging;
 using DokanNet.Native;
@@ -26,7 +27,7 @@ namespace DokanNet
         /// This needs to be called only once before trying to use <see cref="Mount"/> or <see cref="CreateFileSystem"/> for the first time.
         /// Otherwise both will fail and raise an exception.
         /// </summary>
-        public static void Init(this IDokanOperations operations)
+        public static void Init()
         {
             NativeMethods.DokanInit();
         }
@@ -37,7 +38,7 @@ namespace DokanNet
         /// This should be called when the application no longer expects to create a new FileSystem with
         /// <see cref="Mount"/> or <see cref="CreateFileSystem"/> and after all devices are unmount.
         /// </summary>
-        public static void Shutdown(this IDokanOperations operations)
+        public static void Shutdown()
         {
             NativeMethods.DokanShutdown();
         }
@@ -220,7 +221,7 @@ namespace DokanNet
                 FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
-            DokanStatus status = (DokanStatus)NativeMethods.DokanMain(ref dokanOptions, ref dokanOperations);
+            DokanStatus status = NativeMethods.DokanMain(dokanOptions, dokanOperations);
             if (status != DokanStatus.Success)
             {
                 throw new DokanException(status);
@@ -377,9 +378,9 @@ namespace DokanNet
 
             DokanInstance instance = new DokanInstance();
 
-            instance.DokanOperationProxy = new DokanOperationProxy(operations, logger);
+            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
 
-            instance.DokanOptions = new DOKAN_OPTIONS
+            var dokanOptions = new DOKAN_OPTIONS
             {
                 Version = (ushort)version,
                 MountPoint = mountPoint,
@@ -392,40 +393,45 @@ namespace DokanNet
                 VolumeSecurityDescriptorLength = 0
             };
 
-            instance.DokanOperations = new DOKAN_OPERATIONS
+            instance.DokanOptions = new NativeStructWrapper<DOKAN_OPTIONS>(dokanOptions);
+
+            var dokanOperations = new DOKAN_OPERATIONS
             {
-                ZwCreateFile = instance.DokanOperationProxy.ZwCreateFileProxy,
-                Cleanup = instance.DokanOperationProxy.CleanupProxy,
-                CloseFile = instance.DokanOperationProxy.CloseFileProxy,
-                ReadFile = instance.DokanOperationProxy.ReadFileProxy,
-                WriteFile = instance.DokanOperationProxy.WriteFileProxy,
-                FlushFileBuffers = instance.DokanOperationProxy.FlushFileBuffersProxy,
-                GetFileInformation = instance.DokanOperationProxy.GetFileInformationProxy,
-                FindFiles = instance.DokanOperationProxy.FindFilesProxy,
-                FindFilesWithPattern = instance.DokanOperationProxy.FindFilesWithPatternProxy,
-                SetFileAttributes = instance.DokanOperationProxy.SetFileAttributesProxy,
-                SetFileTime = instance.DokanOperationProxy.SetFileTimeProxy,
-                DeleteFile = instance.DokanOperationProxy.DeleteFileProxy,
-                DeleteDirectory = instance.DokanOperationProxy.DeleteDirectoryProxy,
-                MoveFile = instance.DokanOperationProxy.MoveFileProxy,
-                SetEndOfFile = instance.DokanOperationProxy.SetEndOfFileProxy,
-                SetAllocationSize = instance.DokanOperationProxy.SetAllocationSizeProxy,
-                LockFile = instance.DokanOperationProxy.LockFileProxy,
-                UnlockFile = instance.DokanOperationProxy.UnlockFileProxy,
-                GetDiskFreeSpace = instance.DokanOperationProxy.GetDiskFreeSpaceProxy,
-                GetVolumeInformation = instance.DokanOperationProxy.GetVolumeInformationProxy,
-                Mounted = instance.DokanOperationProxy.MountedProxy,
-                Unmounted = instance.DokanOperationProxy.UnmountedProxy,
-                GetFileSecurity = instance.DokanOperationProxy.GetFileSecurityProxy,
-                SetFileSecurity = instance.DokanOperationProxy.SetFileSecurityProxy,
-                FindStreams = instance.DokanOperationProxy.FindStreamsProxy
+                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
+                Cleanup = dokanOperationProxy.CleanupProxy,
+                CloseFile = dokanOperationProxy.CloseFileProxy,
+                ReadFile = dokanOperationProxy.ReadFileProxy,
+                WriteFile = dokanOperationProxy.WriteFileProxy,
+                FlushFileBuffers = dokanOperationProxy.FlushFileBuffersProxy,
+                GetFileInformation = dokanOperationProxy.GetFileInformationProxy,
+                FindFiles = dokanOperationProxy.FindFilesProxy,
+                FindFilesWithPattern = dokanOperationProxy.FindFilesWithPatternProxy,
+                SetFileAttributes = dokanOperationProxy.SetFileAttributesProxy,
+                SetFileTime = dokanOperationProxy.SetFileTimeProxy,
+                DeleteFile = dokanOperationProxy.DeleteFileProxy,
+                DeleteDirectory = dokanOperationProxy.DeleteDirectoryProxy,
+                MoveFile = dokanOperationProxy.MoveFileProxy,
+                SetEndOfFile = dokanOperationProxy.SetEndOfFileProxy,
+                SetAllocationSize = dokanOperationProxy.SetAllocationSizeProxy,
+                LockFile = dokanOperationProxy.LockFileProxy,
+                UnlockFile = dokanOperationProxy.UnlockFileProxy,
+                GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
+                GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
+                Mounted = dokanOperationProxy.MountedProxy,
+                Unmounted = dokanOperationProxy.UnmountedProxy,
+                GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
+                SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
+                FindStreams = dokanOperationProxy.FindStreamsProxy
             };
 
-            DokanStatus status = (DokanStatus)NativeMethods.DokanCreateFileSystem(ref instance.DokanOptions, ref instance.DokanOperations, ref instance.DokanHandle);
+            instance.DokanOperations = new NativeStructWrapper<DOKAN_OPERATIONS>(dokanOperations);
+
+            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
             if (status != DokanStatus.Success)
             {
                 throw new DokanException(status);
             }
+
             return instance;
         }
 
@@ -434,7 +440,7 @@ namespace DokanNet
         /// </summary>
         /// <param name="dokanInstance">The dokan mount context created by <see cref="CreateFileSystem"/>.</param>
         /// <returns>Whether the FileSystem is still running or not.</returns>
-        public static bool IsFileSystemRunning(this IDokanOperations operations, DokanInstance dokanInstance)
+        public static bool IsFileSystemRunning(this DokanInstance dokanInstance)
         {
             return NativeMethods.DokanIsFileSystemRunning(dokanInstance.DokanHandle);
         }
@@ -446,18 +452,9 @@ namespace DokanNet
         /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If <param name="milliSeconds"> is zero,
         /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <param name="milliSeconds"> is INFINITE, the function will return only when the object is signaled.</param>
         /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
-        public static uint WaitForFileSystemClosed(this IDokanOperations operations, DokanInstance dokanInstance, uint milliSeconds)
+        public static uint WaitForFileSystemClosed(this DokanInstance dokanInstance, uint milliSeconds)
         {
             return NativeMethods.DokanWaitForFileSystemClosed(dokanInstance.DokanHandle, milliSeconds);
-        }
-
-        /// <summary>
-        /// Unmount and wait until all resources of the \c DokanInstance are released.
-        /// </summary>
-        /// <param name="dokanInstance">The dokan mount context created by <see cref="CreateFileSystem"/>.</param>
-        public static void CloseFileSystem(this IDokanOperations operations, DokanInstance dokanInstance)
-        {
-            NativeMethods.DokanCloseHandle(dokanInstance.DokanHandle);
         }
 
         /// <summary>

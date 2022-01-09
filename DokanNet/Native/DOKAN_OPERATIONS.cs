@@ -18,7 +18,7 @@ namespace DokanNet.Native
     /// </summary>
     /// <remarks>This is the same struct as <c>_DOKAN_OPERATIONS</c> (dokan.h) in the C version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct DOKAN_OPERATIONS
+    internal sealed class DOKAN_OPERATIONS
     {
         public DokanOperationProxy.ZwCreateFileDelegate ZwCreateFile;
         public DokanOperationProxy.CleanupDelegate Cleanup;

@@ -323,6 +323,7 @@ namespace DokanNet.Tests
 #endif
         }
 
+#if NETFRAMEWORK
         [TestMethod, TestCategory(TestCategories.Manual)]
         [DeploymentItem("OverlappedTests.Configuration.xml")]
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTests.Configuration.xml", "ConfigRead", DataAccessMethod.Sequential)]
@@ -397,5 +398,6 @@ namespace DokanNet.Tests
             fixture.Verify();
 #endif
         }
+#endif
     }
 }
