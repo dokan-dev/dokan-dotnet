@@ -6,19 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.0.0.0] - 2022-01-01
-- Support dokany 2.0.0.
+## [2.0.1.0] - 2022-01-01
+
+### Added
+- Support dokany 2.1.0 and the new async mount API.
 
 ## [1.5.0.0] - 2021-05-30
+
 ### Added
 - Add `ILogger.DebugEnabled` to reduce memory allocation produce by logs like `BufferPool`. 
 
 ## [1.4.0.0] - 2020-06-02
+
 ### Added
 - Replace `DokanOptions` of dokany 1.4.0 `OptimizeSingleNameSearch` to `EnableFCBGC`.
 - Support for .NET Standard 2.0
 
 ## [1.3.0.0] - 2019-10-09
+
 ### Added
 - Support dokany 1.3.0 `DokanNotify` feature in `Dokan.Notify` class.
 - New `DokanOptions` of dokany 1.3.0 `DisableOplocks` and `OptimizeSingleNameSearch`.
@@ -33,10 +38,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Avoid `ConsoleLogger` to switch color and never go back to the original due to multi threading.
 
 ## [1.1.2.1] - 2018-12-20
+
 ### Changed
 - Improve Buffer Handling to Reduce GC Pressure.
 
 ## [1.1.2.0] - 2018-08-10
+
 ### Added
 - Included a strongly typed error code in ``DokanException`` to better communicate the reason why mounting failed.
 - [``NotADirectory``][1.1.2.0-NotADirectory] enum value to ``DokanResult``.
@@ -53,6 +60,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - ``DokanMain`` throw wrongly when success
 
 ## [1.1.1.1] - 2018-04-25
+
 ### Added
 - Enum value [``FileAccess.None``][1.1.1.1-FileAccess.None].
 - Handle unknown errors from Dokan.
@@ -63,6 +71,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Make ``MaximumComponentLength`` param available for ``GetVolumeInformation``.
 
 ## [1.1.1.0] - 2017-12-01
+
 ### Added
 - Support for .NET Standard 1.3
 
@@ -78,6 +87,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Test - Appveyor is now Green !
 
 ## [1.1.0.3] - 2017-03-29
+
 ### Added
 - [``DokanHelper.DokanIsNameInExpression``][1.1.0.3-DokanIsNameInExpression] to help [``IDokanOperations.FindFilesWithPatter``][1.1.0.3-FindFilesWithPatter] filter the list of possible files.
 
@@ -85,6 +95,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [1.1.0.3-FindFilesWithPatter]:     https://github.com/dokan-dev/dokan-dotnet/blob/master/DokanNet/IDokanOperations.cs#L163
 
 ## [1.1.0.1] - 2016-11-01
+
 ### Added
 - Update documentation for Delete functions according to Dokany changes.
 
@@ -92,6 +103,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - ``SetFileTimeProxy`` could throw without return a proper error.
 
 ## [1.1.0.0] - 2016-09-21
+
 ### Added
 - This CHANGELOG.md.
 - Support for .NET Framework 4.6
@@ -127,6 +139,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [1.1.0-AccessSystemSecurity]: https://github.com/dokan-dev/dokan-dotnet/blob/v1.1.0.0/DokanNet/FileAccess.cs#L189
 
 ## [1.0.8] - 2015-12-09
+
 ### Added
 - Support for timeout using [``Dokan.Mount``][1.0.8-Mount].
 - [``IDokanOperations.FindStreams``][1.0.8-FindStreams].
@@ -163,8 +176,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.0.0...HEAD
-[2.0.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.5.0.0...v2.0.0.0
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.0...HEAD
+[2.0.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.5.0.0...v2.0.1.0
 [1.5.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.4.0.0...v1.5.0.0
 [1.4.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.3.0.0...v1.4.0.0
 [1.3.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.1.2.1...v1.3.0.0
