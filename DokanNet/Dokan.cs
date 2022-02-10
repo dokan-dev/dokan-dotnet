@@ -168,58 +168,9 @@ namespace DokanNet
             bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)
         {
-            if (logger == null)
-            {
-#if TRACE
-                logger = new ConsoleLogger("[DokanNet] ");
-#else
-                logger = new NullLogger();
-#endif
-            }
-
-            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
-
-            var dokanOptions = new DOKAN_OPTIONS
-            {
-                Version = (ushort)version,
-                MountPoint = mountPoint,
-                UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
-                SingleThread = singleThread,
-                Options = (uint)mountOptions,
-                Timeout = (uint)timeout.TotalMilliseconds,
-                AllocationUnitSize = (uint)allocationUnitSize,
-                SectorSize = (uint)sectorSize,
-                VolumeSecurityDescriptorLength = 0
-            };
-
-            var dokanOperations = new DOKAN_OPERATIONS
-            {
-                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
-                Cleanup = dokanOperationProxy.CleanupProxy,
-                CloseFile = dokanOperationProxy.CloseFileProxy,
-                ReadFile = dokanOperationProxy.ReadFileProxy,
-                WriteFile = dokanOperationProxy.WriteFileProxy,
-                FlushFileBuffers = dokanOperationProxy.FlushFileBuffersProxy,
-                GetFileInformation = dokanOperationProxy.GetFileInformationProxy,
-                FindFiles = dokanOperationProxy.FindFilesProxy,
-                FindFilesWithPattern = dokanOperationProxy.FindFilesWithPatternProxy,
-                SetFileAttributes = dokanOperationProxy.SetFileAttributesProxy,
-                SetFileTime = dokanOperationProxy.SetFileTimeProxy,
-                DeleteFile = dokanOperationProxy.DeleteFileProxy,
-                DeleteDirectory = dokanOperationProxy.DeleteDirectoryProxy,
-                MoveFile = dokanOperationProxy.MoveFileProxy,
-                SetEndOfFile = dokanOperationProxy.SetEndOfFileProxy,
-                SetAllocationSize = dokanOperationProxy.SetAllocationSizeProxy,
-                LockFile = dokanOperationProxy.LockFileProxy,
-                UnlockFile = dokanOperationProxy.UnlockFileProxy,
-                GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
-                GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
-                Mounted = dokanOperationProxy.MountedProxy,
-                Unmounted = dokanOperationProxy.UnmountedProxy,
-                GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
-                SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
-                FindStreams = dokanOperationProxy.FindStreamsProxy
-            };
+            var dokanOptions = PrepareOptions(mountPoint, mountOptions, singleThread, version, timeout, uncName,
+                allocationUnitSize, sectorSize);
+            var dokanOperations = PrepareOperations(operations, logger);
 
             DokanStatus status = NativeMethods.DokanMain(dokanOptions, dokanOperations);
             if (status != DokanStatus.Success)
@@ -369,20 +320,27 @@ namespace DokanNet
             bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)
         {
-            if (logger == null)
-            {
-#if TRACE
-                logger = new ConsoleLogger("[DokanNet] ");
-#else
-                logger = new NullLogger();
-#endif
-            }
+            var dokanOptions = PrepareOptions(mountPoint, mountOptions, singleThread, version, timeout, uncName,
+                allocationUnitSize, sectorSize);
+            var dokanOperations = PrepareOperations(operations, logger);
 
             DokanInstance instance = new DokanInstance();
+            instance.DokanOptions = new NativeStructWrapper<DOKAN_OPTIONS>(dokanOptions);
+            instance.DokanOperations = new NativeStructWrapper<DOKAN_OPERATIONS>(dokanOperations);
 
-            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
+            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
+            if (status != DokanStatus.Success)
+            {
+                throw new DokanException(status);
+            }
 
-            var dokanOptions = new DOKAN_OPTIONS
+            return instance;
+        }
+
+        private static DOKAN_OPTIONS PrepareOptions(string mountPoint, DokanOptions mountOptions, bool singleThread,
+            int version, TimeSpan timeout, string uncName, int allocationUnitSize, int sectorSize)
+        {
+            return new DOKAN_OPTIONS
             {
                 Version = (ushort)version,
                 MountPoint = mountPoint,
@@ -394,10 +352,22 @@ namespace DokanNet
                 SectorSize = (uint)sectorSize,
                 VolumeSecurityDescriptorLength = 0
             };
+        }
 
-            instance.DokanOptions = new NativeStructWrapper<DOKAN_OPTIONS>(dokanOptions);
+        private static DOKAN_OPERATIONS PrepareOperations(IDokanOperations operations, ILogger logger)
+        {
+            if (logger == null)
+            {
+#if TRACE
+                logger = new ConsoleLogger("[DokanNet] ");
+#else
+                logger = new NullLogger();
+#endif
+            }
 
-            var dokanOperations = new DOKAN_OPERATIONS
+            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
+
+            return new DOKAN_OPERATIONS
             {
                 ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
                 Cleanup = dokanOperationProxy.CleanupProxy,
@@ -425,16 +395,6 @@ namespace DokanNet
                 SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
                 FindStreams = dokanOperationProxy.FindStreamsProxy
             };
-
-            instance.DokanOperations = new NativeStructWrapper<DOKAN_OPERATIONS>(dokanOperations);
-
-            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
-            if (status != DokanStatus.Success)
-            {
-                throw new DokanException(status);
-            }
-
-            return instance;
         }
 
         /// <summary>
