@@ -36,11 +36,11 @@ namespace DokanNet.Native
         /// This function block until the device is unmount.
         /// If the mount fail, it will directly return an error.
         /// </summary>
-        /// <param name="options">A <see cref="DOKAN_OPTIONS"/> that describe the mount.</param>
-        /// <param name="operations">Instance of <see cref="DOKAN_OPERATIONS"/> that will be called for each request made by the kernel.</param>
+        /// <param name="options">A <see cref="NativeStructWrapper&lt;DOKAN_OPTIONS&gt;"/> that describe the mount.</param>
+        /// <param name="operations">Instance of <see cref="NativeStructWrapper&lt;DOKAN_OPERATIONS&gt;"/> that will be called for each request made by the kernel.</param>
         /// <returns><see cref="DokanStatus"/></returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
-        public static extern DokanStatus DokanMain([In] DOKAN_OPTIONS options, [In] DOKAN_OPERATIONS operations);
+        public static extern DokanStatus DokanMain(SafeBuffer options, SafeBuffer operations);
 
         /// <summary>
         /// Mount a new Dokan Volume.

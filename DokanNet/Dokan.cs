@@ -168,60 +168,17 @@ namespace DokanNet
             bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)
         {
-            if (logger == null)
-            {
-#if TRACE
-                logger = new ConsoleLogger("[DokanNet] ");
-#else
-                logger = new NullLogger();
-#endif
-            }
+            DokanInstance instance = ConfigureInstance(operations, mountPoint, mountOptions,
+                singleThread, version, timeout, uncName, allocationUnitSize,
+                sectorSize, logger);
 
-            var dokanOperationProxy = new DokanOperationProxy(operations, logger);
+            DokanStatus status = NativeMethods.DokanMain(instance.DokanOptions, instance.DokanOperations);
 
-            var dokanOptions = new DOKAN_OPTIONS
-            {
-                Version = (ushort)version,
-                MountPoint = mountPoint,
-                UNCName = string.IsNullOrEmpty(uncName) ? null : uncName,
-                SingleThread = singleThread,
-                Options = (uint)mountOptions,
-                Timeout = (uint)timeout.TotalMilliseconds,
-                AllocationUnitSize = (uint)allocationUnitSize,
-                SectorSize = (uint)sectorSize,
-                VolumeSecurityDescriptorLength = 0
-            };
+            // Prevent the garbage collector from freeing the instance before or
+            // during the call to DokanMain, which would lead to Dokan calling
+            // garbage-collected delegates.
+            GC.KeepAlive(instance);
 
-            var dokanOperations = new DOKAN_OPERATIONS
-            {
-                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
-                Cleanup = dokanOperationProxy.CleanupProxy,
-                CloseFile = dokanOperationProxy.CloseFileProxy,
-                ReadFile = dokanOperationProxy.ReadFileProxy,
-                WriteFile = dokanOperationProxy.WriteFileProxy,
-                FlushFileBuffers = dokanOperationProxy.FlushFileBuffersProxy,
-                GetFileInformation = dokanOperationProxy.GetFileInformationProxy,
-                FindFiles = dokanOperationProxy.FindFilesProxy,
-                FindFilesWithPattern = dokanOperationProxy.FindFilesWithPatternProxy,
-                SetFileAttributes = dokanOperationProxy.SetFileAttributesProxy,
-                SetFileTime = dokanOperationProxy.SetFileTimeProxy,
-                DeleteFile = dokanOperationProxy.DeleteFileProxy,
-                DeleteDirectory = dokanOperationProxy.DeleteDirectoryProxy,
-                MoveFile = dokanOperationProxy.MoveFileProxy,
-                SetEndOfFile = dokanOperationProxy.SetEndOfFileProxy,
-                SetAllocationSize = dokanOperationProxy.SetAllocationSizeProxy,
-                LockFile = dokanOperationProxy.LockFileProxy,
-                UnlockFile = dokanOperationProxy.UnlockFileProxy,
-                GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
-                GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
-                Mounted = dokanOperationProxy.MountedProxy,
-                Unmounted = dokanOperationProxy.UnmountedProxy,
-                GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
-                SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
-                FindStreams = dokanOperationProxy.FindStreamsProxy
-            };
-
-            DokanStatus status = NativeMethods.DokanMain(dokanOptions, dokanOperations);
             if (status != DokanStatus.Success)
             {
                 throw new DokanException(status);
@@ -367,6 +324,23 @@ namespace DokanNet
             bool singleThread, int version, TimeSpan timeout, string uncName = null, int allocationUnitSize = 512,
             int sectorSize = 512, ILogger logger = null)
         {
+            DokanInstance instance = ConfigureInstance(operations, mountPoint, mountOptions,
+                singleThread, version, timeout, uncName, allocationUnitSize,
+                sectorSize, logger);
+
+            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
+            if (status != DokanStatus.Success)
+            {
+                throw new DokanException(status);
+            }
+
+            return instance;
+        }
+
+        private static DokanInstance ConfigureInstance(IDokanOperations operations, string mountPoint,
+            DokanOptions mountOptions, bool singleThread, int version, TimeSpan timeout, string uncName,
+            int allocationUnitSize, int sectorSize, ILogger logger)
+        {
             if (logger == null)
             {
 #if TRACE
@@ -425,12 +399,6 @@ namespace DokanNet
             };
 
             instance.DokanOperations = new NativeStructWrapper<DOKAN_OPERATIONS>(dokanOperations);
-
-            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
-            if (status != DokanStatus.Success)
-            {
-                throw new DokanException(status);
-            }
 
             return instance;
         }
