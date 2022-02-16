@@ -126,6 +126,11 @@ namespace RegistryFS
                 }
                 foreach (var name in key.GetValueNames())
                 {
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        continue;
+                    }
+
                     var finfo = new FileInformation
                     {
                         FileName = name,
