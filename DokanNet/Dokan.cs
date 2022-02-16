@@ -81,7 +81,7 @@ namespace DokanNet
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
         public static void Mount(this IDokanOperations operations, string mountPoint, DokanOptions mountOptions,
@@ -98,7 +98,7 @@ namespace DokanNet
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
         /// <exception cref="DokanException">If the mount fails.</exception>
@@ -117,7 +117,7 @@ namespace DokanNet
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
@@ -136,7 +136,7 @@ namespace DokanNet
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="uncName">UNC name used for network volume.</param>
@@ -156,7 +156,7 @@ namespace DokanNet
         /// <param name="operations">Instance of <see cref="IDokanOperations"/> that will be called for each request made by the kernel.</param>
         /// <param name="mountPoint">Mount point. Can be <c>M:\\</c> (drive letter) or <c>C:\\mount\\dokan</c> (path in NTFS).</param>
         /// <param name="mountOptions"><see cref="DokanOptions"/> features enable for the mount.</param>
-        /// <param name="singleThread">Number of threads to be used internally by %Dokan library. More thread will handle more event at the same time.</param>
+        /// <param name="singleThread">Only use a single thread to process events. This is highly not recommended as can easily create a bottleneck.</param>
         /// <param name="version">Version of the dokan features requested (Version "123" is equal to %Dokan version 1.2.3).</param>
         /// <param name="timeout">Max timeout in ms of each request before dokan give up.</param>
         /// <param name="uncName">UNC name used for network volume.</param>
