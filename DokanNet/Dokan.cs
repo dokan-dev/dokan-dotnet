@@ -226,6 +226,8 @@ namespace DokanNet
             {
                 throw new DokanException(status);
             }
+            GC.KeepAlive(dokanOptions);
+            GC.KeepAlive(dokanOperations);
         }
 
         /// <summary>
