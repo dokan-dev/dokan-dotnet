@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.1.1] - 2022-02-20
+
+### Fixed
+- Library - Avoid GC of delegates in optimized builds
+- RegistryFS - Skip empty name keys
+
 ## [2.0.1.0] - 2022-01-01
 
 ### Added
