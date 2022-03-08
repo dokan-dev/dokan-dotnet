@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46;net40</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;netstandard2.0;net461;net40</TargetFrameworks>
     <AssemblyName>DokanNet</AssemblyName>
     <RootNamespace>DokanNet</RootNamespace>
     <Description>A user mode file system for windows. 
@@ -20,9 +20,12 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <RepositoryUrl>https://github.com/dokan-dev/dokan-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dokan file files disk directory storage filesystem io filestore FAT NTFS FUSE</PackageTags>
-    <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
     <CLSCompliant>True</CLSCompliant>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,29 +36,6 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
 
   <ItemGroup>
     <None Include="..\dokan_logo.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
-    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

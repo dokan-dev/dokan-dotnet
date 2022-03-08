@@ -2,10 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net46;net40</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;net461;net40</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net6.0-windows'">
     <RuntimeIdentifier>win</RuntimeIdentifier>
   </PropertyGroup>
- 
+
   <ItemGroup>
     <ProjectReference Include="..\..\DokanNet\DokanNet.csproj" />
   </ItemGroup>

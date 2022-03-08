@@ -15,14 +15,11 @@
     net4.6              net4.6
     netstandard1.3      <missing>
     -->
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net461</TargetFrameworks>
     
     <!--Add the Target Framework to the output file names. -->
     <AssemblyName>$(MSBuildProjectName).$(TargetFramework)</AssemblyName>
     <CLSCompliant>True</CLSCompliant>
-    <!-- We need to sign the test assembly to use it in InternalsVisibleTo for DokanNet.dll. -->
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\DokanNet\Dokan.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   
   <ItemGroup>
