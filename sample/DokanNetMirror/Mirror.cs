@@ -622,12 +622,17 @@ namespace DokanNetMirror
         public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
             IDokanFileInfo info)
         {
-#if !NETCOREAPP1_0
             try
             {
+#if NET5_0_OR_GREATER
+                security = info.IsDirectory
+                    ? (FileSystemSecurity)new DirectoryInfo(GetPath(fileName)).GetAccessControl()
+                    : new FileInfo(GetPath(fileName)).GetAccessControl();
+#else
                 security = info.IsDirectory
                     ? (FileSystemSecurity)Directory.GetAccessControl(GetPath(fileName))
                     : File.GetAccessControl(GetPath(fileName));
+#endif
                 return Trace(nameof(GetFileSecurity), fileName, info, DokanResult.Success, sections.ToString());
             }
             catch (UnauthorizedAccessException)
@@ -635,19 +640,23 @@ namespace DokanNetMirror
                 security = null;
                 return Trace(nameof(GetFileSecurity), fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
-#else
-// .NET Core 1.0 do not have support for Directory.GetAccessControl
-            security = null;
-            return DokanResult.NotImplemented;
-#endif
         }
 
         public NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections,
             IDokanFileInfo info)
         {
-#if !NETCOREAPP1_0
             try
             {
+#if NET5_0_OR_GREATER
+                if (info.IsDirectory)
+                {
+                    new DirectoryInfo(GetPath(fileName)).SetAccessControl((DirectorySecurity)security);
+                }
+                else
+                {
+                    new FileInfo(GetPath(fileName)).SetAccessControl((FileSecurity)security);
+                }
+#else
                 if (info.IsDirectory)
                 {
                     Directory.SetAccessControl(GetPath(fileName), (DirectorySecurity)security);
@@ -656,16 +665,13 @@ namespace DokanNetMirror
                 {
                     File.SetAccessControl(GetPath(fileName), (FileSecurity)security);
                 }
+#endif
                 return Trace(nameof(SetFileSecurity), fileName, info, DokanResult.Success, sections.ToString());
             }
             catch (UnauthorizedAccessException)
             {
                 return Trace(nameof(SetFileSecurity), fileName, info, DokanResult.AccessDenied, sections.ToString());
             }
-#else
-// .NET Core 1.0 do not have support for Directory.SetAccessControl
-            return DokanResult.NotImplemented;
-#endif
         }
 
         public NtStatus Mounted(string mountPoint, IDokanFileInfo info)

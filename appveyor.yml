@@ -9,7 +9,7 @@ version: 2.0.1-{build}
 configuration:
 - Release
 - Debug
-os: Visual Studio 2019
+os: Visual Studio 2022
 branches:
   only:
     - master
@@ -79,7 +79,7 @@ after_build:
       New-Item C:\TMP -type directory
       ls c:\TMP
       
-      foreach ($target in @("net46", "net40")) {
+      foreach ($target in @("net462", "net40")) {
          if ($app) {
             Write-Host "Waiting for the driver to unmount..."
             Stop-Mirror($app)
