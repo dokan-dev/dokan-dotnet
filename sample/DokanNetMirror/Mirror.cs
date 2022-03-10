@@ -66,6 +66,20 @@ namespace DokanNetMirror
             return result;
         }
 
+        protected static Int32 GetNumOfBytesToCopy(Int32 bufferLength, long offset, IDokanFileInfo info, FileStream stream)
+        {
+            if (info.PagingIo)
+            {
+                var longDistanceToEnd = stream.Length - offset;
+                var isDistanceToEndMoreThanInt = longDistanceToEnd > Int32.MaxValue;
+                if (isDistanceToEndMoreThanInt) return bufferLength;
+                var distanceToEnd = (Int32)longDistanceToEnd;
+                if (distanceToEnd < bufferLength) return distanceToEnd;
+                return bufferLength;
+            }
+            return bufferLength;
+        }
+
         #region Implementation of IDokanOperations
 
         public NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode,
@@ -311,8 +325,9 @@ namespace DokanNetMirror
                     {
                         stream.Position = offset;
                     }
-                    stream.Write(buffer, 0, buffer.Length);
-                    bytesWritten = buffer.Length;
+                    var bytesToCopy = GetNumOfBytesToCopy(buffer.Length, offset, info, stream);
+                    stream.Write(buffer, 0, bytesToCopy);
+                    bytesWritten = bytesToCopy;
                 }
             }
             else
@@ -337,9 +352,10 @@ namespace DokanNetMirror
                     {
                         stream.Position = offset;
                     }
-                    stream.Write(buffer, 0, buffer.Length);
+                    var bytesToCopy = GetNumOfBytesToCopy(buffer.Length, offset, info, stream);
+                    stream.Write(buffer, 0, bytesToCopy);
+                    bytesWritten = bytesToCopy;
                 }
-                bytesWritten = buffer.Length;
             }
             return Trace(nameof(WriteFile), fileName, info, DokanResult.Success, "out " + bytesWritten.ToString(),
                 offset.ToString(CultureInfo.InvariantCulture));

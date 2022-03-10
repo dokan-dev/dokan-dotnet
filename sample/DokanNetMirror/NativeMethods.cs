@@ -1,9 +1,11 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
 namespace DokanNetMirror
 {
-    public static class NativeMethods
+    internal static class NativeMethods
     {
         /// <summary>
         /// Sets the date and time that the specified file or directory was created, last accessed, or last modified.
@@ -25,5 +27,14 @@ namespace DokanNetMirror
         [DllImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetFileTime(SafeFileHandle hFile, ref long lpCreationTime, ref long lpLastAccessTime, ref long lpLastWriteTime);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool SetFilePointerEx(SafeFileHandle hFile, long liDistanceToMove, IntPtr lpNewFilePointer, uint dwMoveMethod);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool ReadFile(SafeFileHandle hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead, out int lpNumberOfBytesRead, IntPtr lpOverlapped);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool WriteFile(SafeFileHandle hFile, IntPtr lpBuffer, uint nNumberOfBytesToWrite, out int lpNumberOfBytesWritten, IntPtr lpOverlapped);
+
     }
 }
