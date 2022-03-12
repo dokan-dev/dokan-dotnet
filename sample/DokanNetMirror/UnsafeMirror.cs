@@ -1,8 +1,14 @@
-﻿using System;
-using System.ComponentModel;
+﻿/*
+There is various way we could have implemented this, for example we could have used the Filestream.Seek to move the 
+filesystem pointer, but for didactic reasons we want to use as much pInvoke as possible.
+Also in .NET6 any call through the stream seems to move the pointer back to the position memorized by the stream
+https://github.com/dotnet/docs/blob/12473973716efbf21470ecbc96de0bd5e1f65e3b/docs/core/compatibility/core-libraries/6.0/filestream-doesnt-sync-offset-with-os.md
+hence we want to avoid touching the filestream once obtained the safefilehandle
+*/
+
+using System;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using DokanNet;
 using Microsoft.Win32.SafeHandles;
 
@@ -13,6 +19,17 @@ namespace DokanNetMirror
     /// </summary>
     internal class UnsafeMirror : Mirror, IDokanOperationsUnsafe
     {
+        static void DoRead(SafeFileHandle handle, IntPtr buffer, uint bufferLength, out int bytesRead, long offset)
+        {
+            handle.SetFilePointer(offset);
+            handle.ReadFile(buffer, bufferLength, out bytesRead);
+        }
+
+        static void DoWrite(SafeFileHandle handle, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset)
+        {
+            var newpos = Extensions.SetFilePointer(handle, offset);
+            handle.WriteFile(buffer, bufferLength, out bytesWritten);
+        }
         /// <summary>
         /// Constructs a new unsafe mirror for the specified root path.
         /// </summary>
@@ -28,7 +45,7 @@ namespace DokanNetMirror
             {
                 using (var stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Read))
                 {
-                    DoRead(stream, buffer, bufferLength, out bytesRead, offset);
+                    DoRead(stream.SafeFileHandle, buffer, bufferLength, out bytesRead, offset);
                 }
             }
             else // normal read
@@ -36,18 +53,12 @@ namespace DokanNetMirror
                 var stream = info.Context as FileStream;
                 lock (stream) //Protect from overlapped read
                 {
-                    DoRead(stream, buffer, bufferLength, out bytesRead, offset);
+                    DoRead(stream.SafeFileHandle, buffer, bufferLength, out bytesRead, offset);
                 }
             }
 
             return Trace($"Unsafe{nameof(ReadFile)}", fileName, info, DokanResult.Success, "out " + bytesRead.ToString(),
                 offset.ToString(CultureInfo.InvariantCulture));
-
-            void DoRead(FileStream stream, IntPtr innerBuffer, uint innerBufferLength, out int innerBytesRead, long innerOffset)
-            {
-                stream.SafeFileHandle.SetFilePointer(innerOffset);
-                stream.SafeFileHandle.ReadFile(innerBuffer, innerBufferLength, out innerBytesRead);
-            }
         }
 
         /// <summary>
@@ -60,7 +71,7 @@ namespace DokanNetMirror
                 using (var stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Write))
                 {
                     var bytesToCopy = (uint)GetNumOfBytesToCopy((int)bufferLength, offset, info, stream);
-                    DoWrite(stream, buffer, bytesToCopy, out bytesWritten, offset);
+                    DoWrite(stream.SafeFileHandle, buffer, bytesToCopy, out bytesWritten, offset);
                 }
             }
             else
@@ -69,18 +80,12 @@ namespace DokanNetMirror
                 lock (stream) //Protect from overlapped write
                 {
                     var bytesToCopy = (uint)GetNumOfBytesToCopy((int)bufferLength, offset, info, stream);
-                    DoWrite(stream, buffer, bytesToCopy, out bytesWritten, offset);
+                    DoWrite(stream.SafeFileHandle, buffer, bytesToCopy, out bytesWritten, offset);
                 }
             }
 
             return Trace($"Unsafe{nameof(WriteFile)}", fileName, info, DokanResult.Success, "out " + bytesWritten.ToString(),
                 offset.ToString(CultureInfo.InvariantCulture));
-
-            void DoWrite(FileStream stream, IntPtr innerBuffer, uint innerBufferLength, out int innerBytesWritten, long innerOffset)
-            {
-                stream.SafeFileHandle.SetFilePointer(innerOffset);
-                stream.SafeFileHandle.WriteFile(innerBuffer, innerBufferLength, out innerBytesWritten);
-            }
         }
     }
 }

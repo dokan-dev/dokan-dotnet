@@ -20,5 +20,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <!--Set to True to run Code Analysis-->
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>

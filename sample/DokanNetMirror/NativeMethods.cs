@@ -25,16 +25,15 @@ namespace DokanNetMirror
         /// <returns>If the function succeeds, the return value is <c>true</c>.</returns>
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms724933">SetFileTime function (MSDN)</a>
         [DllImport("kernel32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetFileTime(SafeFileHandle hFile, ref long lpCreationTime, ref long lpLastAccessTime, ref long lpLastWriteTime);
+
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool SetFilePointerEx(SafeFileHandle hFile, long liDistanceToMove, IntPtr lpNewFilePointer, uint dwMoveMethod);
+        public static extern bool SetFilePointerEx(SafeFileHandle hFile, long liDistanceToMove, out long lpNewFilePointer, [MarshalAs(UnmanagedType.U4)]System.IO.SeekOrigin dwMoveMethod);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool ReadFile(SafeFileHandle hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead, out int lpNumberOfBytesRead, IntPtr lpOverlapped);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool WriteFile(SafeFileHandle hFile, IntPtr lpBuffer, uint nNumberOfBytesToWrite, out int lpNumberOfBytesWritten, IntPtr lpOverlapped);
-
     }
 }
