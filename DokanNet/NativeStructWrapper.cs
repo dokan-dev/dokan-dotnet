@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 
 namespace DokanNet
 {
+    internal static class NativeStructWrapper
+    {
+        public static NativeStructWrapper<T> Wrap<T>(T obj) where T : class
+        {
+            return new NativeStructWrapper<T>(obj);
+        }
+    }
     /// <summary>
     /// This class allocates unmanaged memory for a native structure and initializes
     /// that memory by marshalling a managed object. It gurantees that the managed
@@ -40,9 +44,7 @@ namespace DokanNet
         /// Initializes an empty instance. Used internally by native marshaller and
         /// not intended to be used directly from user code.
         /// </summary>
-        public NativeStructWrapper() : base(ownsHandle: true)
-        {
-        }
+        internal NativeStructWrapper() : base(ownsHandle: true) { }
 
         /// <summary>
         /// Managed object that was originally marshalled to unmanaged memory.

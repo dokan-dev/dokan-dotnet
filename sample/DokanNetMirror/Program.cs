@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using DokanNet;
+using DokanNet.Logging;
 
 namespace DokanNetMirror
 {
@@ -28,21 +29,30 @@ namespace DokanNetMirror
 
                 var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
 
-                Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
-                var mirror = unsafeReadWrite 
-                    ? new UnsafeMirror(mirrorPath) 
-                    : new Mirror(mirrorPath);
-
-                Dokan.Init();
-
-                using (DokanInstance dokanInstance = mirror.CreateFileSystem(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI))
+                using (var mre = new System.Threading.ManualResetEvent(false))
+                using (var dokanNetLogger = new ConsoleLogger("[Mirror] "))
                 {
-                    var notify = new Notify();
-                    notify.Start(mirrorPath, mountPath, dokanInstance);
-                    dokanInstance.WaitForFileSystemClosed(uint.MaxValue);
-                }
+                    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
+                    {
+                        e.Cancel = true;
+                        mre.Set();
+                    };
 
-                Dokan.Shutdown();
+                    Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
+                    var mirror = unsafeReadWrite
+                        ? new UnsafeMirror(dokanNetLogger, mirrorPath)
+                        : new Mirror(dokanNetLogger, mirrorPath);
+
+                    Dokan.Init();
+
+                    using (var dokanInstance = mirror.CreateFileSystem(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI))
+                    using (var notify = new Notify(mirrorPath, mountPath, dokanInstance))
+                    {
+                        mre.WaitOne();
+                    }
+
+                    Dokan.Shutdown();
+                }
 
                 Console.WriteLine(@"Success");
             }

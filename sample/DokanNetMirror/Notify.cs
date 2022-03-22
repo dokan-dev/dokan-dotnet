@@ -4,22 +4,23 @@ using DokanNet;
 
 namespace DokanNetMirror
 {
-    internal class Notify
+    internal class Notify : IDisposable
     {
-        private string sourcePath;
-        private string targetPath;
-        private DokanInstance dokanCurrentInstance;
-        private FileSystemWatcher commonFsWatcher;
-        private FileSystemWatcher fileFsWatcher;
-        private FileSystemWatcher dirFsWatcher;
+        private readonly string _sourcePath;
+        private readonly string _targetPath;
+        private readonly DokanInstance _dokanCurrentInstance;
+        private readonly FileSystemWatcher _commonFsWatcher;
+        private readonly FileSystemWatcher _fileFsWatcher;
+        private readonly FileSystemWatcher _dirFsWatcher;
+        private bool _disposed;
 
-        public void Start(string mirrorPath, string mountPath, DokanInstance dokanInstance)
+        public Notify(string mirrorPath, string mountPath, DokanInstance dokanInstance)
         {
-            sourcePath = mirrorPath;
-            targetPath = mountPath;
-            dokanCurrentInstance = dokanInstance;
+            _sourcePath = mirrorPath;
+            _targetPath = mountPath;
+            _dokanCurrentInstance = dokanInstance;
 
-            commonFsWatcher = new FileSystemWatcher(mirrorPath)
+            _commonFsWatcher = new FileSystemWatcher(mirrorPath)
             {
                 IncludeSubdirectories = true,
                 NotifyFilter = NotifyFilters.Attributes |
@@ -32,71 +33,76 @@ namespace DokanNetMirror
                     NotifyFilters.Size
             };
 
-            commonFsWatcher.Changed += OnCommonFileSystemWatcherChanged;
-            commonFsWatcher.Created += OnCommonFileSystemWatcherCreated;
-            commonFsWatcher.Renamed += OnCommonFileSystemWatcherRenamed;
+            _commonFsWatcher.Changed += OnCommonFileSystemWatcherChanged;
+            _commonFsWatcher.Created += OnCommonFileSystemWatcherCreated;
+            _commonFsWatcher.Renamed += OnCommonFileSystemWatcherRenamed;
 
-            commonFsWatcher.EnableRaisingEvents = true;
+            _commonFsWatcher.EnableRaisingEvents = true;
 
-            fileFsWatcher = new FileSystemWatcher(mirrorPath)
+            _fileFsWatcher = new FileSystemWatcher(mirrorPath)
             {
                 IncludeSubdirectories = true,
                 NotifyFilter = NotifyFilters.FileName
             };
 
-            fileFsWatcher.Deleted += OnCommonFileSystemWatcherFileDeleted;
+            _fileFsWatcher.Deleted += OnCommonFileSystemWatcherFileDeleted;
 
-            fileFsWatcher.EnableRaisingEvents = true;
+            _fileFsWatcher.EnableRaisingEvents = true;
 
-            dirFsWatcher = new FileSystemWatcher(mirrorPath)
+            _dirFsWatcher = new FileSystemWatcher(mirrorPath)
             {
                 IncludeSubdirectories = true,
                 NotifyFilter = NotifyFilters.DirectoryName
             };
 
-            dirFsWatcher.Deleted += OnCommonFileSystemWatcherDirectoryDeleted;
+            _dirFsWatcher.Deleted += OnCommonFileSystemWatcherDirectoryDeleted;
 
-            dirFsWatcher.EnableRaisingEvents = true;
+            _dirFsWatcher.EnableRaisingEvents = true;
         }
 
         private string AlterPathToMountPath(string path)
         {
-            var relativeMirrorPath = path.Substring(sourcePath.Length).TrimStart('\\');
+            var relativeMirrorPath = path.Substring(_sourcePath.Length).TrimStart('\\');
 
-            return Path.Combine(targetPath, relativeMirrorPath);
+            return Path.Combine(_targetPath, relativeMirrorPath);
         }
 
         private void OnCommonFileSystemWatcherFileDeleted(object sender, FileSystemEventArgs e)
         {
+            if (_dokanCurrentInstance.IsDisposed) return;
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.Notify.Delete(dokanCurrentInstance, fullPath, false);
+            Dokan.Notify.Delete(_dokanCurrentInstance, fullPath, false);
         }
 
         private void OnCommonFileSystemWatcherDirectoryDeleted(object sender, FileSystemEventArgs e)
         {
+            if (_dokanCurrentInstance.IsDisposed) return;
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.Notify.Delete(dokanCurrentInstance, fullPath, true);
+            Dokan.Notify.Delete(_dokanCurrentInstance, fullPath, true);
         }
 
         private void OnCommonFileSystemWatcherChanged(object sender, FileSystemEventArgs e)
         {
+            if (_dokanCurrentInstance.IsDisposed) return;
             var fullPath = AlterPathToMountPath(e.FullPath);
 
-            Dokan.Notify.Update(dokanCurrentInstance, fullPath);
+            Dokan.Notify.Update(_dokanCurrentInstance, fullPath);
         }
 
         private void OnCommonFileSystemWatcherCreated(object sender, FileSystemEventArgs e)
         {
+            if (_dokanCurrentInstance.IsDisposed) return;
             var fullPath = AlterPathToMountPath(e.FullPath);
             var isDirectory = Directory.Exists(fullPath);
 
-            Dokan.Notify.Create(dokanCurrentInstance, fullPath, isDirectory);
+            Dokan.Notify.Create(_dokanCurrentInstance, fullPath, isDirectory);
         }
 
         private void OnCommonFileSystemWatcherRenamed(object sender, RenamedEventArgs e)
         {
+            if (_dokanCurrentInstance.IsDisposed) return;
             var oldFullPath = AlterPathToMountPath(e.OldFullPath);
             var oldDirectoryName = Path.GetDirectoryName(e.OldFullPath);
 
@@ -104,9 +110,39 @@ namespace DokanNetMirror
             var directoryName = Path.GetDirectoryName(e.FullPath);
 
             var isDirectory = Directory.Exists(e.FullPath);
-            var isInSameDirectory = oldDirectoryName.Equals(directoryName);
+            var isInSameDirectory = String.Equals(oldDirectoryName, directoryName);
 
-            Dokan.Notify.Rename(dokanCurrentInstance, oldFullPath, fullPath, isDirectory, isInSameDirectory);
+            Dokan.Notify.Rename(_dokanCurrentInstance, oldFullPath, fullPath, isDirectory, isInSameDirectory);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // dispose managed state (managed objects)
+                    _commonFsWatcher.Changed -= OnCommonFileSystemWatcherChanged;
+                    _commonFsWatcher.Created -= OnCommonFileSystemWatcherCreated;
+                    _commonFsWatcher.Renamed -= OnCommonFileSystemWatcherRenamed;
+
+                    _commonFsWatcher.Dispose();
+                    _fileFsWatcher.Dispose();
+                    _dirFsWatcher.Dispose();
+
+                }
+
+                // free unmanaged resources (unmanaged objects) and override finalizer
+                // set large fields to null
+                _disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
