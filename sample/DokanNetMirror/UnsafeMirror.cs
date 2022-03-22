@@ -10,6 +10,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using DokanNet;
+using DokanNet.Logging;
 using Microsoft.Win32.SafeHandles;
 
 namespace DokanNetMirror
@@ -34,7 +35,7 @@ namespace DokanNetMirror
         /// Constructs a new unsafe mirror for the specified root path.
         /// </summary>
         /// <param name="path">Root path of mirror.</param>
-        public UnsafeMirror(string path) : base(path) { }
+        public UnsafeMirror(ILogger logger, string path) : base(logger, path) { }
 
         /// <summary>
         /// Read from file using unmanaged buffers.

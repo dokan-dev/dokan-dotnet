@@ -67,20 +67,23 @@ namespace DokanNet
         /// </summary>
         public object Context
         {
-            get => _context != 0 
-                ? ((GCHandle)(IntPtr)_context).Target 
-                : null;
+            get
+            {
+                return _context != 0 
+                    ? GCHandle.FromIntPtr(new IntPtr((long)_context)).Target 
+                    : null;
+            }
             set
             {
                 if (_context != 0)
                 {
-                    ((GCHandle)(IntPtr)_context).Free();
+                    GCHandle.FromIntPtr(new IntPtr((long)_context)).Free();
                     _context = 0;
                 }
 
                 if (value != null)
                 {
-                    _context = (ulong)(IntPtr)GCHandle.Alloc(value);
+                    _context = (ulong)GCHandle.ToIntPtr(GCHandle.Alloc(value));
                 }
             }
         }
@@ -140,10 +143,9 @@ namespace DokanNet
         /// -or- <c>null</c> if the operation was not successful.</returns>
         public WindowsIdentity GetRequestor()
         {
-            SafeFileHandle sfh = null;
             try
             {
-                using (sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
+                using (var sfh = new SafeFileHandle(NativeMethods.DokanOpenRequestorToken(this), true))
                 {
                     return new WindowsIdentity(sfh.DangerousGetHandle());
                 }
@@ -151,13 +153,6 @@ namespace DokanNet
             catch
             {
                 return null;
-            }
-            finally
-            {
-                if (sfh != null)
-                {
-                    sfh.Dispose();
-                }
             }
         }
 

@@ -25,12 +25,13 @@ namespace DokanNetMirror
                                                    FileAccess.Delete |
                                                    FileAccess.GenericWrite;
 
-        private ConsoleLogger logger = new ConsoleLogger("[Mirror] ");
+        private readonly ILogger _logger;
 
-        public Mirror(string path)
+        public Mirror(ILogger logger, string path)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException(nameof(path));
+            _logger = logger;
             this.path = path;
         }
 
@@ -47,7 +48,7 @@ namespace DokanNetMirror
                 ? ", " + string.Join(", ", parameters.Select(x => string.Format(DefaultFormatProvider, "{0}", x)))
                 : string.Empty;
 
-            logger.Debug(DokanFormat($"{method}('{fileName}', {info}{extraParameters}) -> {result}"));
+            _logger.Debug(DokanFormat($"{method}('{fileName}', {info}{extraParameters}) -> {result}"));
 #endif
 
             return result;
@@ -58,7 +59,7 @@ namespace DokanNetMirror
             NtStatus result)
         {
 #if TRACE
-            logger.Debug(
+            _logger.Debug(
                 DokanFormat(
                     $"{method}('{fileName}', {info}, [{access}], [{share}], [{mode}], [{options}], [{attributes}]) -> {result}"));
 #endif

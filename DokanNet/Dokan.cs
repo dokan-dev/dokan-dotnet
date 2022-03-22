@@ -324,16 +324,7 @@ namespace DokanNet
                 allocationUnitSize, sectorSize);
             var dokanOperations = PrepareOperations(operations, logger);
 
-            DokanInstance instance = new DokanInstance();
-            instance.DokanOptions = new NativeStructWrapper<DOKAN_OPTIONS>(dokanOptions);
-            instance.DokanOperations = new NativeStructWrapper<DOKAN_OPERATIONS>(dokanOperations);
-
-            DokanStatus status = NativeMethods.DokanCreateFileSystem(instance.DokanOptions, instance.DokanOperations, out instance.DokanHandle);
-            if (status != DokanStatus.Success)
-            {
-                throw new DokanException(status);
-            }
-
+            var instance = new DokanInstance(dokanOptions, dokanOperations);
             return instance;
         }
 
