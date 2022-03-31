@@ -8,7 +8,7 @@ namespace DokanNet.Native
     /// <see cref="NativeMethods.DokanMain"/>
     /// <remarks>This is the same structure as <c>PDOKAN_OPTIONS</c> (dokan.h) in the C version of Dokan.</remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 4)]
-    internal sealed class DOKAN_OPTIONS
+    public sealed class DOKAN_OPTIONS
     {
         /// <summary>
         /// Version of the dokan features requested (version "123" is equal to Dokan version 1.2.3).
@@ -24,7 +24,8 @@ namespace DokanNet.Native
         /// <summary>
         /// Features enable for the mount. See <see cref="DokanOptions"/>.
         /// </summary>
-        public uint Options;
+        [MarshalAs(UnmanagedType.U4)]
+        public DokanOptions Options;
 
         /// <summary>
         /// FileSystem can store anything here.
@@ -47,7 +48,12 @@ namespace DokanNet.Native
         /// <summary>
         /// Max timeout in milliseconds of each request before Dokan give up.
         /// </summary>
-        public uint Timeout;
+        private uint Timeout;
+        public System.TimeSpan TimeOut
+        {
+            get => System.TimeSpan.FromMilliseconds(Timeout);
+            set => Timeout = (uint)value.TotalMilliseconds;
+        }
 
         /// <summary>
         /// Allocation Unit Size of the volume. This will behave on the file size.

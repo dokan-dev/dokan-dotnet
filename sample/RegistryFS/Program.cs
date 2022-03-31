@@ -23,10 +23,16 @@ namespace RegistryFS
                     };
 
                     var rfs = new RFS();
-                    Dokan.Init();
-                    rfs.CreateFileSystem("r:\\", DokanOptions.DebugMode | DokanOptions.StderrOutput);
-                    mre.WaitOne();
-                    Dokan.Shutdown();
+                    var dokanBuilder = new DokanBuilder()
+                        .ConfigureOptions(options =>
+                        {
+                            options.Options = DokanOptions.DebugMode | DokanOptions.StderrOutput;
+                            options.MountPoint = "r:\\";
+                        });
+                    using (var dokan = dokanBuilder.Build(rfs))
+                    {
+                        mre.WaitOne();
+                    }
                     Console.WriteLine(@"Success");
                 }
             }

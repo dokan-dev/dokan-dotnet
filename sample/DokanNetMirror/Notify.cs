@@ -8,13 +8,13 @@ namespace DokanNetMirror
     {
         private readonly string _sourcePath;
         private readonly string _targetPath;
-        private readonly DokanInstance _dokanCurrentInstance;
+        private readonly Dokan _dokanCurrentInstance;
         private readonly FileSystemWatcher _commonFsWatcher;
         private readonly FileSystemWatcher _fileFsWatcher;
         private readonly FileSystemWatcher _dirFsWatcher;
         private bool _disposed;
 
-        public Notify(string mirrorPath, string mountPath, DokanInstance dokanInstance)
+        public Notify(string mirrorPath, string mountPath, Dokan dokanInstance)
         {
             _sourcePath = mirrorPath;
             _targetPath = mountPath;

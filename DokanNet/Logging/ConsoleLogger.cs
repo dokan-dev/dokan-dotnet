@@ -13,6 +13,8 @@ namespace DokanNet.Logging
             = new System.Collections.Concurrent.BlockingCollection<Tuple<String, ConsoleColor>>();
 
         private readonly Task _WriterTask = null;
+        private bool _disposed;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleLogger"/> class.
         /// </summary>
@@ -72,55 +74,44 @@ namespace DokanNet.Logging
 
         private void WriteMessage(string message, ConsoleColor newColor)
         {
-            var origForegroundColor = Console.ForegroundColor;
-            Console.ForegroundColor = newColor;
-            Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
-            Console.ForegroundColor = origForegroundColor;
+            lock (Console.Out) // we only need this lock because we want to have more than one logger in this version
+            {
+                var origForegroundColor = Console.ForegroundColor;
+                Console.ForegroundColor = newColor;
+                Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
+                Console.ForegroundColor = origForegroundColor;
+            }
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        /// <summary>
-        /// Wait and dispose pending log resources.
-        /// </summary>
-        /// <param name="disposing">Disposing resource.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposed)
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    // dispose managed state (managed objects)
                     _PendingLogs.CompleteAdding();
                     _WriterTask.Wait();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
+                // free unmanaged resources (unmanaged objects) and override finalizer
+                // set large fields to null
+                _disposed = true;
             }
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
         // ~ConsoleLogger()
         // {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
         // }
 
-        /// <summary>
-        /// Dispose resources.
-        /// </summary>
-        /// <remarks>This code added to correctly implement the disposable pattern.</remarks>
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
-        #endregion
     }
 }

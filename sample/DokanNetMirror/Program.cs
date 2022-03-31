@@ -30,7 +30,8 @@ namespace DokanNetMirror
                 var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
 
                 using (var mre = new System.Threading.ManualResetEvent(false))
-                using (var dokanNetLogger = new ConsoleLogger("[Mirror] "))
+                using (var mirrorLogger = new ConsoleLogger("[Mirror] "))
+                using (var dokanLogger = new ConsoleLogger("[Dokan] "))
                 {
                     Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
                     {
@@ -40,18 +41,20 @@ namespace DokanNetMirror
 
                     Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
                     var mirror = unsafeReadWrite
-                        ? new UnsafeMirror(dokanNetLogger, mirrorPath)
-                        : new Mirror(dokanNetLogger, mirrorPath);
+                        ? new UnsafeMirror(mirrorLogger, mirrorPath)
+                        : new Mirror(mirrorLogger, mirrorPath);
 
-                    Dokan.Init();
-
-                    using (var dokanInstance = mirror.CreateFileSystem(mountPath, DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI))
-                    using (var notify = new Notify(mirrorPath, mountPath, dokanInstance))
+                    var dokanBuilder = new DokanBuilder()
+                        .ConfigureLogger(() => dokanLogger)
+                        .ConfigureOptions(options => {
+                            options.Options = DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI;
+                            options.MountPoint = mountPath;
+                        });
+                    using (var dokan = dokanBuilder.Build(mirror))
+                    using (var notify = new Notify(mirrorPath, mountPath, dokan))
                     {
                         mre.WaitOne();
                     }
-
-                    Dokan.Shutdown();
                 }
 
                 Console.WriteLine(@"Success");

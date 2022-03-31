@@ -8,8 +8,8 @@ namespace DokanNet.Tests
     [TestClass]
     public static class Mounter
     {
-        private static DokanInstance safeMount;
-        private static DokanInstance unsafeMount;
+        private static Dokan safeMount;
+        private static Dokan unsafeMount;
 
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext context)
@@ -24,9 +24,19 @@ namespace DokanNet.Tests
             dokanOptions |= DokanOptions.UserModeLock;
 #endif
 
-            Dokan.Init();
-            safeMount = DokanOperationsFixture.Operations.CreateFileSystem(DokanOperationsFixture.NormalMountPoint, dokanOptions);
-            unsafeMount = DokanOperationsFixture.UnsafeOperations.CreateFileSystem(DokanOperationsFixture.UnsafeMountPoint, dokanOptions);
+            var safeDokanBuilder = new DokanBuilder()
+                .ConfigureOptions(options => { options.Options = dokanOptions;
+                    options.MountPoint = DokanOperationsFixture.NormalMountPoint;
+                });
+
+            safeMount = safeDokanBuilder.Build(DokanOperationsFixture.Operations);
+            
+            var unsafeDokanBuilder = new DokanBuilder()
+               .ConfigureOptions(options => {
+                   options.Options = dokanOptions;
+                   options.MountPoint = DokanOperationsFixture.UnsafeMountPoint;
+               });
+            unsafeMount = unsafeDokanBuilder.Build(DokanOperationsFixture.UnsafeOperations);
             var drive = new DriveInfo(DokanOperationsFixture.NormalMountPoint);
             var drive2 = new DriveInfo(DokanOperationsFixture.UnsafeMountPoint);
             while (!drive.IsReady || !drive2.IsReady)
@@ -40,7 +50,6 @@ namespace DokanNet.Tests
         {
             safeMount.Dispose();
             unsafeMount.Dispose();
-            Dokan.Shutdown();
         }
     }
 }
