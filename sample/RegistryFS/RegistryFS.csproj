@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0-windows;net462;net40</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;net462</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'net6.0-windows'">
     <RuntimeIdentifier>win</RuntimeIdentifier>

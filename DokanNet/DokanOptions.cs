@@ -10,7 +10,7 @@ namespace DokanNet
     /// <seealso cref="DOKAN_OPTIONS.Options"/>
     /// \endif
     [Flags]
-    public enum DokanOptions : long
+    public enum DokanOptions : uint
     {
         /// <summary>Fixed Drive.</summary>
         FixedDrive = 0,

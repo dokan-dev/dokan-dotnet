@@ -1,4 +1,5 @@
 ﻿using System;
+using DokanNet.Logging;
 using DokanNet.Native;
 
 namespace DokanNet
@@ -9,6 +10,40 @@ namespace DokanNet
     /// </summary>
     public class DokanInstance : IDisposable
     {
+        private static DOKAN_OPERATIONS PrepareOperations(ILogger logger, IDokanOperations operations)
+        {
+            var dokanOperationProxy = new DokanOperationProxy(logger, operations);
+
+            return new DOKAN_OPERATIONS
+            {
+                ZwCreateFile = dokanOperationProxy.ZwCreateFileProxy,
+                Cleanup = dokanOperationProxy.CleanupProxy,
+                CloseFile = dokanOperationProxy.CloseFileProxy,
+                ReadFile = dokanOperationProxy.ReadFileProxy,
+                WriteFile = dokanOperationProxy.WriteFileProxy,
+                FlushFileBuffers = dokanOperationProxy.FlushFileBuffersProxy,
+                GetFileInformation = dokanOperationProxy.GetFileInformationProxy,
+                FindFiles = dokanOperationProxy.FindFilesProxy,
+                FindFilesWithPattern = dokanOperationProxy.FindFilesWithPatternProxy,
+                SetFileAttributes = dokanOperationProxy.SetFileAttributesProxy,
+                SetFileTime = dokanOperationProxy.SetFileTimeProxy,
+                DeleteFile = dokanOperationProxy.DeleteFileProxy,
+                DeleteDirectory = dokanOperationProxy.DeleteDirectoryProxy,
+                MoveFile = dokanOperationProxy.MoveFileProxy,
+                SetEndOfFile = dokanOperationProxy.SetEndOfFileProxy,
+                SetAllocationSize = dokanOperationProxy.SetAllocationSizeProxy,
+                LockFile = dokanOperationProxy.LockFileProxy,
+                UnlockFile = dokanOperationProxy.UnlockFileProxy,
+                GetDiskFreeSpace = dokanOperationProxy.GetDiskFreeSpaceProxy,
+                GetVolumeInformation = dokanOperationProxy.GetVolumeInformationProxy,
+                Mounted = dokanOperationProxy.MountedProxy,
+                Unmounted = dokanOperationProxy.UnmountedProxy,
+                GetFileSecurity = dokanOperationProxy.GetFileSecurityProxy,
+                SetFileSecurity = dokanOperationProxy.SetFileSecurityProxy,
+                FindStreams = dokanOperationProxy.FindStreamsProxy
+            };
+        }
+
         internal NativeStructWrapper<DOKAN_OPTIONS> DokanOptions { get; private set; }
         internal NativeStructWrapper<DOKAN_OPERATIONS> DokanOperations { get; private set; }
         internal DokanHandle DokanHandle { get; private set; }
@@ -19,10 +54,11 @@ namespace DokanNet
             get { lock (_disposeLock) return _disposed; }
         }
 
-        internal DokanInstance(DOKAN_OPTIONS options, DOKAN_OPERATIONS operations)
+        internal DokanInstance(ILogger logger, DOKAN_OPTIONS options, IDokanOperations operations)
         {
             DokanOptions = NativeStructWrapper.Wrap(options);
-            DokanOperations = NativeStructWrapper.Wrap(operations);
+            var preparedOperations = PrepareOperations(logger, operations);
+            DokanOperations = NativeStructWrapper.Wrap(preparedOperations);
             _disposeLock = new object();
             var status = NativeMethods.DokanCreateFileSystem(DokanOptions, DokanOperations, out var handle);
             if (status != DokanStatus.Success)
