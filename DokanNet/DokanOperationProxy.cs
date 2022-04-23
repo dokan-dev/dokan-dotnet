@@ -245,10 +245,10 @@ namespace DokanNet
         /// <param name="logger">
         /// A <see cref="ILogger"/> that handle all logging.
         /// </param>
-        public DokanOperationProxy(IDokanOperations operations, ILogger logger)
+        public DokanOperationProxy(ILogger logger, IDokanOperations operations)
         {
-            this.operations = operations;
             this.logger = logger;
+            this.operations = operations;
             serialNumber = (uint)operations.GetHashCode();
         }
 
