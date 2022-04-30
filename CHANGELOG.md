@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.4.1] - 2022-04-30
+
+### Changed
+- Moved .net46 to .net 462 and added .net6.0-window in the TFM.
+- Use fluent API to configure how dokan should behave and avoid blocking apis.
+- Deduplicate code of `Mount` and `CreateFileSystem`.
+
+### Fixed
+- Support pagingIo in mirror.net
+- Unsafe mirror yields wrong file content using .net6
+
 ## [2.0.1.1] - 2022-02-20
 
 ### Fixed
