@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.5.1] - 2022-07-04
+
+### Changed
+- It is now again possible to return `NotImplemented` for `FindFilesWithPattern` to force `FindFiles` usage instead. See [here](https://github.com/dokan-dev/dokany/wiki/Update-Dokan-1.1.0-application-to-Dokany-2.0.0#moving-from-dokan-2xx-to-205)
+
 ## [2.0.4.1] - 2022-04-30
 
 ### Changed
