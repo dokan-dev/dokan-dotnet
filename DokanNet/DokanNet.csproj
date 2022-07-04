@@ -8,9 +8,9 @@
 
 This is a .NET wrapper over Dokan, and allows you to create your own file systems in Windows.</Description>
     <Copyright>Copyright (C) 2022</Copyright>
-    <Version>2.0.4.1</Version>
-    <AssemblyVersion>2.0.4.1</AssemblyVersion>
-    <FileVersion>2.0.4.1</FileVersion>
+    <Version>2.0.5.1</Version>
+    <AssemblyVersion>2.0.5.1</AssemblyVersion>
+    <FileVersion>2.0.5.1</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Company>Dokan-dev</Company>
     <Authors>AdrienJ, MaximeC, Hiroki Asakawa</Authors>

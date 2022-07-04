@@ -398,6 +398,7 @@ namespace DokanNetMirror
         public NtStatus FindFiles(string fileName, out IList<FileInformation> files, IDokanFileInfo info)
         {
             // This function is not called because FindFilesWithPattern is implemented
+            // Return DokanResult.NotImplemented in FindFilesWithPattern to make FindFiles called
             files = FindFilesHelper(fileName, "*");
 
             return Trace(nameof(FindFiles), fileName, info, DokanResult.Success);
