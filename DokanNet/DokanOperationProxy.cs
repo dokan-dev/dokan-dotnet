@@ -398,10 +398,10 @@ namespace DokanNet
             {
                 if (logger.DebugEnabled)
                 {
-                    logger.Debug("ReadFileProxy : " + rawFileName);
-                    logger.Debug("\tBufferLength\t" + rawBufferLength);
-                    logger.Debug("\tOffset\t" + rawOffset);
-                    logger.Debug("\tContext\t" + rawFileInfo);
+                    logger.Debug("ReadFileProxy : {0}", rawFileName);
+                    logger.Debug("\tBufferLength\t{0}", rawBufferLength);
+                    logger.Debug("\tOffset\t{0}", rawOffset);
+                    logger.Debug("\tContext\t{0}", rawFileInfo);
                 }
 
                 // Check if the file system has implemented the unsafe Dokan interface.
@@ -426,7 +426,7 @@ namespace DokanNet
                     }
                 }
 
-                if (logger.DebugEnabled) logger.Debug("ReadFileProxy : " + rawFileName + " Return : " + result + " ReadLength : " + rawReadLength);
+                if (logger.DebugEnabled) logger.Debug("ReadFileProxy : {0} Return : {1} ReadLength : {2}", rawFileName, result, rawReadLength);
                 return result;
             }
             catch (Exception ex)
