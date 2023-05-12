@@ -204,8 +204,12 @@ namespace DokanNetMirror
 
                 try
                 {
+                    System.IO.FileAccess streamAccess = readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite;
+
+                    if (mode == System.IO.FileMode.CreateNew && readAccess) streamAccess = System.IO.FileAccess.ReadWrite;
+
                     info.Context = new FileStream(filePath, mode,
-                        readAccess ? System.IO.FileAccess.Read : System.IO.FileAccess.ReadWrite, share, 4096, options);
+                        streamAccess, share, 4096, options);
 
                     if (pathExists && (mode == FileMode.OpenOrCreate
                                        || mode == FileMode.Create))
