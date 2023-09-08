@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DokanNet;
 using DokanNet.Logging;
 
@@ -11,7 +12,7 @@ namespace DokanNetMirror
         private const string MountKey = "-where";
         private const string UseUnsafeKey = "-unsafe";
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             try
             {
@@ -29,17 +30,10 @@ namespace DokanNetMirror
 
                 var unsafeReadWrite = arguments.ContainsKey(UseUnsafeKey);
 
-                using (var mre = new System.Threading.ManualResetEvent(false))
                 using (var mirrorLogger = new ConsoleLogger("[Mirror] "))
                 using (var dokanLogger = new ConsoleLogger("[Dokan] "))
                 using (var dokan = new Dokan(dokanLogger))
                 {
-                    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
-                    {
-                        e.Cancel = true;
-                        mre.Set();
-                    };
-
                     Console.WriteLine($"Using unsafe methods: {unsafeReadWrite}");
                     var mirror = unsafeReadWrite
                         ? new UnsafeMirror(mirrorLogger, mirrorPath)
@@ -55,7 +49,13 @@ namespace DokanNetMirror
                     using (var dokanInstance = dokanBuilder.Build(mirror))
                     using (var notify = new Notify(mirrorPath, mountPath, dokanInstance))
                     {
-                        mre.WaitOne();
+                        Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
+                        {
+                            e.Cancel = true;
+                            dokan.RemoveMountPoint(mountPath);
+                        };
+
+                        await dokanInstance.WaitForFileSystemClosedAsync(uint.MaxValue);
                     }
                 }
 

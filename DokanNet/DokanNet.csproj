@@ -23,6 +23,7 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <CLSCompliant>True</CLSCompliant>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

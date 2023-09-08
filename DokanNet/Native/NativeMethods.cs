@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 /// </summary>
 namespace DokanNet.Native
 {
+    public delegate void NativeWaitOrTimerCallback(nint state, bool timedOut);
+
     /// <summary>
     /// Native API to the kernel Dokan driver.
     /// </summary>
@@ -73,6 +75,28 @@ namespace DokanNet.Native
         /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern uint DokanWaitForFileSystemClosed(DokanHandle dokanInstance, uint milliSeconds);
+
+        /// <summary>
+        /// Register a callback for when the FileSystem is unmounted.
+        /// </summary>
+        /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/>.</param>
+        /// <param name="handle">Wait handle representing the registered wait. Needs to be freed by calling <see cref="DokanUnregisterWaitForFileSystemClosed"/>.</param>
+        /// <param name="callback">Callback function to be called when file system is unmounted or timeout occurs.</param>
+        /// <param name="context">Parameter to send to callback function.</param>
+        /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If <param name="milliSeconds"> is zero,
+        /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <param name="milliSeconds"> is INFINITE, the function will return only when the object is signaled.</param>
+        /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
+        [DllImport(DOKAN_DLL, ExactSpelling = true)]
+        public static extern bool DokanRegisterWaitForFileSystemClosed(DokanHandle dokanInstance, out nint handle, NativeWaitOrTimerCallback callback, nint context, uint milliSeconds);
+
+        /// <summary>
+        /// Unregister a callback for when the FileSystem is unmounted.
+        /// </summary>
+        /// <param name="handle">Handle returned in handle parameter in previous call to <see cref="DokanRegisterWaitForFileSystemClosed"</param>.
+        /// <param name="waitForCallbacks">Indicates whether to wait for callbacks to complete before returning. Normally true unless called from same thread as callback function.</param>
+        /// <returns></returns>
+        [DllImport(DOKAN_DLL, ExactSpelling = true)]
+        public static extern bool DokanUnregisterWaitForFileSystemClosed(nint handle, bool waitForCallbacks);
 
         /// <summary>
         /// Unmount and wait until all resources of the \c DokanInstance are released.
