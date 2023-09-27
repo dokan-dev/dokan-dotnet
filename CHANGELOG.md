@@ -6,10 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- Library - Add `GenerateDocumentationFile` to project file to make it generate documentation XML file in the Nuget package.
+
+### Fixed
+- Library - Crash in `ReadFileProxy` when debug logging is enabled.
+- Mirror - Fixes a bug where certain pieces of software (Libre office/Free office) try to open a filestream with `FileMode.CreateNew` and `FileShare.Read` which throws an IO exception.
+
 ## [2.0.5.1] - 2022-07-04
 
 ### Changed
-- It is now again possible to return `NotImplemented` for `FindFilesWithPattern` to force `FindFiles` usage instead. See [here](https://github.com/dokan-dev/dokany/wiki/Update-Dokan-1.1.0-application-to-Dokany-2.0.0#moving-from-dokan-2xx-to-205)
+- Library - It is now again possible to return `NotImplemented` for `FindFilesWithPattern` to force `FindFiles` usage instead. See [here](https://github.com/dokan-dev/dokany/wiki/Update-Dokan-1.1.0-application-to-Dokany-2.0.0#moving-from-dokan-2xx-to-205)
 
 ## [2.0.4.1] - 2022-04-30
 
@@ -198,7 +205,10 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.0...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...HEAD
+[2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.4.1...v2.0.5.1
+[2.0.4.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.1...v2.0.4.1
+[2.0.1.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.0...v2.0.1.1
 [2.0.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.5.0.0...v2.0.1.0
 [1.5.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.4.0.0...v1.5.0.0
 [1.4.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v1.3.0.0...v1.4.0.0
