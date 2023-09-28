@@ -27,7 +27,7 @@ namespace DokanNet
         /// </summary>
         /// \native
         /// \table
-        /// \nativeconst{FILE_READ_DATA,0x00000001,File & pipe}
+        /// \nativeconst{FILE_READ_DATA,0x00000001,File &amp; pipe}
         /// \nativeconst{FILE_LIST_DIRECTORY,0x00000001,Directory}
         /// \endtable
         /// \endnative
@@ -38,7 +38,7 @@ namespace DokanNet
         /// </summary>
         /// \native
         /// \table
-        /// \nativeconst{FILE_WRITE_DATA,0x00000002,File & pipe}
+        /// \nativeconst{FILE_WRITE_DATA,0x00000002,File &amp; pipe}
         /// \nativeconst{FILE_ADD_FILE,0x00000002,Directory}
         /// \endtable
         /// \endnative
@@ -61,7 +61,7 @@ namespace DokanNet
         /// </summary>
         /// \native
         /// \table
-        /// \nativeconst{FILE_READ_EA,0x00000008,File & directory}
+        /// \nativeconst{FILE_READ_EA,0x00000008,File &amp; directory}
         /// \endtable
         /// \endnative
         ReadExtendedAttributes = 1L << 3,
@@ -71,7 +71,7 @@ namespace DokanNet
         /// </summary>
         /// \native
         /// \table
-        /// \nativeconst{FILE_WRITE_EA,0x00000010,File & directory}
+        /// \nativeconst{FILE_WRITE_EA,0x00000010,File &amp; directory}
         /// \endtable
         /// \endnative
         WriteExtendedAttributes = 1L << 4,

@@ -15,7 +15,7 @@ namespace DokanNet
     public interface IDokanOperationsUnsafe : IDokanOperations
     {
         /// <summary>
-        /// ReadFile callback on the file previously opened in <see cref="CreateFile"/>.
+        /// ReadFile callback on the file previously opened in <see cref="IDokanOperations.CreateFile"/>.
         /// It can be called by different thread at the same time,
         /// therefore the read has to be thread safe.
         /// </summary>
@@ -31,7 +31,7 @@ namespace DokanNet
         NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, IDokanFileInfo info);
 
         /// <summary>
-        /// WriteFile callback on the file previously opened in <see cref="CreateFile"/>
+        /// WriteFile callback on the file previously opened in <see cref="IDokanOperations.CreateFile"/>
         /// It can be called by different thread at the same time,
         /// therefore the write/context has to be thread safe.
         /// </summary>

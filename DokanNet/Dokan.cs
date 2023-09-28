@@ -17,7 +17,7 @@ namespace DokanNet
         /// <summary>
         /// Initialize all required Dokan internal resources.
         /// 
-        /// This needs to be called only once before trying to use <see cref="Mount"/> or <see cref="CreateFileSystem"/> for the first time.
+        /// This needs to be called only once before trying to use <see cref="DokanInstance.DokanInstance"/> for the first time.
         /// Otherwise both will fail and raise an exception.
         /// </summary>
         /// <param name="logger"><see cref="ILogger"/> that will log all DokanNet debug informations.</param>
@@ -64,7 +64,7 @@ namespace DokanNet
         /// <summary>
         /// Dokan User FS file-change notifications
         /// </summary>
-        /// <remarks> If <see cref="DokanOptions.EnableNotificationAPI"/> is passed to <see cref="Dokan.Mount"/>,
+        /// <remarks> If <see cref="DokanOptions.EnableNotificationAPI"/> is passed to <see cref="DOKAN_OPTIONS.Options"/>,
         /// the application implementing the user file system can notify
         /// the Dokan kernel driver of external file- and directory-changes.
         /// 
@@ -84,7 +84,7 @@ namespace DokanNet
             /// <summary>
             /// Notify Dokan that a file or directory has been created.
             /// </summary>
-            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <returns>true if the notification succeeded.</returns>
@@ -96,7 +96,7 @@ namespace DokanNet
             /// <summary>
             /// Notify Dokan that a file or directory has been deleted.
             /// </summary>
-            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <returns>true if notification succeeded.</returns>
@@ -109,7 +109,7 @@ namespace DokanNet
             /// <summary>
             /// Notify Dokan that file or directory attributes have changed.
             /// </summary>
-            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
@@ -121,7 +121,7 @@ namespace DokanNet
             /// <summary>
             /// Notify Dokan that file or directory extended attributes have changed.
             /// </summary>
-            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
@@ -134,7 +134,7 @@ namespace DokanNet
             /// Notify Dokan that a file or directory has been renamed.
             /// This method supports in-place rename for file/directory within the same parent.
             /// </summary>
-            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/></param>
+            /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="oldPath">Old, absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="newPath">New, absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
@@ -150,6 +150,10 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Dispose the native Dokan Library resources
+        /// </summary>
+        /// <param name="disposing">Whether this was called from <see cref="Dispose()"/></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -165,6 +169,9 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Dispose the native Dokan Library resources
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -172,7 +179,9 @@ namespace DokanNet
             GC.SuppressFinalize(this);
         }
 
-        // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        /// <summary>
+        /// Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        /// </summary>
         ~Dokan()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

@@ -155,16 +155,6 @@ namespace DokanNet
             uint rawSecurityDescriptorLength,
             [MarshalAs(UnmanagedType.LPStruct), In /*, Out*/] DokanFileInfo rawFileInfo);
 
-        /// <summary>
-        /// Retrieve all FileStreams informations on the file.
-        /// This is only called if <see cref="DokanOptions.AltStream"/> is enabled.
-        /// </summary>
-        /// <remarks>Supported since 0.8.0. 
-        /// You must specify the version at <see cref="DOKAN_OPTIONS.Version"/>.</remarks>
-        /// <param name="rawFileName">Filename</param>
-        /// <param name="rawFillFindData">A <see cref="IntPtr"/> to a <see cref="FILL_FIND_STREAM_DATA"/>.</param>
-        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
-        /// <returns></returns>
         public delegate NtStatus FindStreamsDelegate(
             [MarshalAs(UnmanagedType.LPWStr)] string rawFileName,
             IntPtr rawFillFindData,
@@ -781,7 +771,7 @@ namespace DokanNet
         /// <returns>A instance of the specified delegate type.</returns>
         /// <param name="rawDelegate">The unmanaged function pointer to convert. </param>
         /// <typeparam name="TDelegate">The type of the delegate to return. </typeparam>
-        /// <exception cref="T:System.ArgumentException">The <typeparam name="TDelegate" /> generic parameter is not a delegate, or it is an open generic type.</exception>
+        /// <exception cref="T:System.ArgumentException">The <typeparamref name="TDelegate" /> generic parameter is not a delegate, or it is an open generic type.</exception>
         /// <exception cref="T:System.ArgumentNullException">The <paramref name="rawDelegate" /> parameter is null.</exception>
         private static TDelegate GetDataFromPointer<TDelegate>(IntPtr rawDelegate) where TDelegate : class 
         {
@@ -793,10 +783,10 @@ namespace DokanNet
         }
 
         /// <summary>
-        /// Call the delegate <paramref name="fill"/> using data in <paramref name="rawFileInfo"/> and <paramref name="fi"/>.
+        /// Call the delegate <paramref name="fill"/> using data in <paramref name="fi"/> and <paramref name="findStreamContext"/>.
         /// </summary>
         /// <param name="fill">The delegate of type <see cref="FILL_FIND_STREAM_DATA"/> to be called.</param>
-        /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/> to be used when calling <paramref name="fill"/>.</param>
+        /// <param name="findStreamContext">A <see cref="IntPtr"/> to be used when calling <paramref name="fill"/>.</param>
         /// <param name="fi">A <see cref="FileInformation"/> with information to be used when calling <paramref name="fill"/>.</param>
         /// <returns>Whether the buffer is full or not.</returns>
         private static bool AddTo(FILL_FIND_STREAM_DATA fill, IntPtr findStreamContext, FileInformation fi)

@@ -1,6 +1,3 @@
-/// <summary>
-/// Namespace for interface and classes related to logging.
-/// </summary>
 namespace DokanNet.Logging
 {
    /// <summary>
