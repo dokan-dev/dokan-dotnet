@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.5.2] - 2023-09-28
+
 ### Changed
 - Library - Add `GenerateDocumentationFile` to project file to make it generate documentation XML file in the Nuget package.
 
@@ -205,7 +207,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...HEAD
+[2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
 [2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.4.1...v2.0.5.1
 [2.0.4.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.1...v2.0.4.1
 [2.0.1.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.0...v2.0.1.1
