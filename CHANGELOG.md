@@ -208,7 +208,7 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanRemoveMountPoint``
 
 [Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...HEAD
-[2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
+[2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
 [2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.4.1...v2.0.5.1
 [2.0.4.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.1...v2.0.4.1
 [2.0.1.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.0...v2.0.1.1
