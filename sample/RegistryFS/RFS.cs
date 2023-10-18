@@ -275,7 +275,7 @@ namespace RegistryFS
             features = FileSystemFeatures.None;
             fileSystemName = string.Empty;
             maximumComponentLength = 256;
-            return DokanResult.Error;
+            return DokanResult.Success;
         }
 
         public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
