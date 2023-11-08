@@ -1,8 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System;
 using DokanNet.Native;
 
 namespace DokanNet;
@@ -25,6 +25,7 @@ internal sealed class DokanInstanceNotifyCompletion : ICriticalNotifyCompletion
     public bool IsCompleted => !DokanInstance.IsFileSystemRunning();
     private nint waitHandle;
     private bool timedOut;
+    private Action continuation;
 
     public DokanInstanceNotifyCompletion GetAwaiter() => this;
 
@@ -32,16 +33,38 @@ internal sealed class DokanInstanceNotifyCompletion : ICriticalNotifyCompletion
 
     public void UnsafeOnCompleted(Action continuation)
     {
-        void callback(nint state, bool timedOut)
-        {
-            this.timedOut = timedOut;
-            continuation();
-        }
+        this.continuation = continuation;
 
-        if (!NativeMethods.DokanRegisterWaitForFileSystemClosed(DokanInstance.DokanHandle, out waitHandle, callback, 0, MilliSeconds))
+        if (!NativeMethods.DokanRegisterWaitForFileSystemClosed(DokanInstance.DokanHandle,
+                                                                out waitHandle,
+                                                                Callback,
+                                                                (nint)GCHandle.Alloc(this),
+                                                                MilliSeconds))
         {
             throw new Win32Exception();
         }
+    }
+
+    private static void Callback(nint state, bool timedOut)
+    {
+        var handle = GCHandle.FromIntPtr(state);
+        var target = (DokanInstanceNotifyCompletion)handle.Target!;
+
+        handle.Free();
+
+        while (target.waitHandle == 0)
+        {
+            Thread.Sleep(20);
+        }
+
+        NativeMethods.DokanUnregisterWaitForFileSystemClosed(target.waitHandle,
+            waitForCallbacks: false);
+
+        target.waitHandle = 0;
+
+        target.timedOut = timedOut;
+
+        target.continuation!();
     }
 
     /// <summary>
@@ -50,22 +73,18 @@ internal sealed class DokanInstanceNotifyCompletion : ICriticalNotifyCompletion
     /// <returns>True if DokanInstance was closed or false if await timed out</returns>
     public bool GetResult()
     {
-        if (!timedOut && !IsCompleted)
+        if (timedOut)
         {
-            throw new InvalidOperationException("Invalid state for GetResult");
+            return false;
         }
 
-        var handle = waitHandle;
-        
-        waitHandle = 0;
-
-        if (handle != 0)
+        if (!IsCompleted)
         {
-            NativeMethods.DokanUnregisterWaitForFileSystemClosed(handle, waitForCallbacks: false);
+            throw new InvalidOperationException($"Invalid state for {nameof(GetResult)}");
         }
 
-        return IsCompleted;
+        return true;
     }
 }
-    
+
 #endif
