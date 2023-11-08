@@ -8,10 +8,12 @@
 
 This is a .NET wrapper over Dokan, and allows you to create your own file systems in Windows.</Description>
     <Copyright>Copyright (C) 2022</Copyright>
-    <Version>2.0.5.1</Version>
-    <AssemblyVersion>2.0.5.1</AssemblyVersion>
-    <FileVersion>2.0.5.1</FileVersion>
+    <Version>2.0.5.2</Version>
+    <AssemblyVersion>2.0.5.2</AssemblyVersion>
+    <FileVersion>2.0.5.2</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
     <Company>Dokan-dev</Company>
     <Authors>AdrienJ, MaximeC, Hiroki Asakawa</Authors>
     <PackageProjectUrl>https://dokan-dev.github.io/</PackageProjectUrl>
@@ -34,6 +36,7 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
 
   <ItemGroup>
     <None Include="..\dokan_logo.png" Pack="true" PackagePath="\" />
+	<None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

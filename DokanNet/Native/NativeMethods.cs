@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-/// <summary>
-/// Namespace for structures and classes related to native API.
-/// </summary>
 namespace DokanNet.Native
 {
     public delegate void NativeWaitOrTimerCallback(nint state, bool timedOut);
@@ -70,8 +67,8 @@ namespace DokanNet.Native
         /// Wait until the FileSystem is unmount.
         /// </summary>
         /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanCreateFileSystem"/>.</param>
-        /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If <param name="milliSeconds"> is zero,
-        /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <param name="milliSeconds"> is INFINITE, the function will return only when the object is signaled.</param>
+        /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If set to zero,
+        /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If set to INFINITE, the function will return only when the object is signaled.</param>
         /// <returns>See <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject">WaitForSingleObject</a> for a description of return values.</returns>
         [DllImport(DOKAN_DLL, ExactSpelling = true)]
         public static extern uint DokanWaitForFileSystemClosed(DokanHandle dokanInstance, uint milliSeconds);

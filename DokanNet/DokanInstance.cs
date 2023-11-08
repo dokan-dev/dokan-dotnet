@@ -5,7 +5,7 @@ using DokanNet.Native;
 namespace DokanNet
 {
     /// <summary>
-    /// Created by <see cref="Dokan.CreateFileSystem"/>.
+    /// Created by <see cref="DokanInstance.DokanInstance"/>.
     /// It holds all the resources required to be alive for the time of the mount.
     /// </summary>
     public class DokanInstance : IDisposable
@@ -49,6 +49,10 @@ namespace DokanNet
         internal DokanHandle DokanHandle { get; private set; }
         private readonly object _disposeLock;
         private bool _disposed = false;
+
+        /// <summary>
+        /// Whether the object was already disposed.
+        /// </summary>
         public bool IsDisposed
         {
             get { lock (_disposeLock) return _disposed; }
@@ -68,6 +72,10 @@ namespace DokanNet
             DokanHandle = handle;
         }
 
+        /// <summary>
+        /// Dispose the native Dokan Library resources
+        /// </summary>
+        /// <param name="disposing">Whether this was called from <see cref="Dispose()"/></param>
         protected virtual void Dispose(bool disposing)
         {
             lock (_disposeLock)
@@ -76,7 +84,6 @@ namespace DokanNet
                 {
                     if (disposing)
                     {
-                        // Dispose managed state (managed objects)
                         DokanHandle?.Dispose();     // This calls DokanCloseHandle and waits for dismount
                         DokanOptions?.Dispose();    // After that, it is safe to free unmanaged memory
                         DokanOperations?.Dispose();
@@ -94,12 +101,18 @@ namespace DokanNet
             }
         }
 
+        /// <summary>
+        /// Destructor that force dispose
+        /// </summary>
         ~DokanInstance()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: false);
         }
 
+        /// <summary>
+        /// Dispose the native Dokan Library resources
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

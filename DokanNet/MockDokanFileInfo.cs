@@ -22,12 +22,8 @@ namespace DokanNet
     /// </remarks>
     public sealed class MockDokanFileInfo : IDokanFileInfo
     {
-        public MockDokanFileInfo()
-        {
-        }
-
         /// <summary>
-        /// A <see cref="DOKAN_OPTIONS"> structure used to help the kernel notification functions work.
+        /// A <see cref="DOKAN_OPTIONS"/> structure used to help the kernel notification functions work.
         /// </summary>
         private DOKAN_OPTIONS _dokanOptions = new DOKAN_OPTIONS();
 

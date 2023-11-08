@@ -83,6 +83,10 @@ namespace DokanNet.Logging
             }
         }
 
+        /// <summary>
+        /// Dispose the object from the native resources.
+        /// </summary>
+        /// <param name="disposing">Whether it was call by <see cref="Dispose()"/></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -100,13 +104,9 @@ namespace DokanNet.Logging
             }
         }
 
-        // override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~ConsoleLogger()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
+        /// <summary>
+        /// Dispose the object from the native resources.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

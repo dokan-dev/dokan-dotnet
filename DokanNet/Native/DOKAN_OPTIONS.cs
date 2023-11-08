@@ -45,10 +45,10 @@ namespace DokanNet.Native
         [MarshalAs(UnmanagedType.LPWStr)]
         public string UNCName;
 
+        private uint Timeout;
         /// <summary>
         /// Max timeout in milliseconds of each request before Dokan give up.
         /// </summary>
-        private uint Timeout;
         public System.TimeSpan TimeOut
         {
             get => System.TimeSpan.FromMilliseconds(Timeout);
@@ -66,12 +66,12 @@ namespace DokanNet.Native
         public uint SectorSize;
         /// <summary>
         /// Length of the optional VolumeSecurityDescriptor provided. Set 0 will disable the option.
-        /// <summary>
+        /// </summary>
         public uint VolumeSecurityDescriptorLength;
 
         /// <summary>
         /// Optional Volume Security descriptor. See <a href="https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-initializesecuritydescriptor">InitializeSecurityDescriptor</a>
-        /// <summary>
+        /// </summary>
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16384, ArraySubType = UnmanagedType.U1)]
         public byte[] VolumeSecurityDescriptor;
     }
