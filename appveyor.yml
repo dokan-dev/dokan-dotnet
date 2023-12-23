@@ -1,6 +1,6 @@
 environment:
     AccessTokenDokanDoc:
-      secure: I5h+AfRZtFrYozCriNfwwO3FhiMH4kfQPvSi0vaKg6aaHu5mKWnShZPBUCTz7pEJ
+      secure: DN88uTxiO/keexbCfFg47FGQvXG3BaxWeYJvZftxGQ7tHLrBPnAqjZe4LmwuofFa
     global:
       DOKAN_CI_CACHE: C:\dokan_ci_cache
       DOXYGEN_INST_DIR: '%DOKAN_CI_CACHE%\doxygen'
