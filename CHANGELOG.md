@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.1.0.0] - 2023-12-22
+
+### Added
+- Library - New API `WaitForFileSystemClosedAsync` that wait async for the FileSystem to unmount. It requires Dokany 2.1.0
 
 ## [2.0.5.2] - 2023-09-28
 
@@ -207,7 +210,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...HEAD
+[2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...v2.1.0.0
 [2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
 [2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.4.1...v2.0.5.1
 [2.0.4.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.1...v2.0.4.1
