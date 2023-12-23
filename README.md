@@ -29,9 +29,9 @@ To make a file system, an application needs to implement IDokanOperations interf
 Once implemented, you can invoke Mount function on your driver instance
 to mount a drive. The function blocks until the file system is unmounted.
 Semantics and parameters are just like Dokan library. Details are described
-at 'README.md' file in Dokan library. See sample codes under 'sample'
+at `README.md` file in Dokan library. See sample codes under 'sample'
 directory.
-Doxygen documentation is also available [here](https://dokan-dev.github.io/dokan-dotnet-doc/html/).
+Doxygen documentation is also available [![API documentation](https://img.shields.io/badge/Documentation-API-green.svg)](https://dokan-dev.github.io/dokan-dotnet-doc/html/)
 
 ## Unmounting
 Just run the bellow command or your file system application call Dokan.Unmount
