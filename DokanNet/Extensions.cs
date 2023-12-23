@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using DokanNet.Native;
 
 namespace DokanNet
@@ -31,5 +32,19 @@ namespace DokanNet
         {
             return NativeMethods.DokanWaitForFileSystemClosed(dokanInstance.DokanHandle, milliSeconds);
         }
+
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+
+        /// <summary>
+        /// Wait asynchronously until the FileSystem is unmounted.
+        /// </summary>
+        /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance"/>.</param>
+        /// <param name="milliSeconds">The time-out interval, in milliseconds. If a nonzero value is specified, the function waits until the object is signaled or the interval elapses. If <paramref name="milliSeconds" /> is zero,
+        /// the function does not enter a wait state if the object is not signaled; it always returns immediately. If <paramref name="dokanInstance"/> is INFINITE, the function will return only when the object is signaled.</param>
+        /// <returns>True if instance was dismounted or false if time out occurred.</returns>
+        public static async Task<bool> WaitForFileSystemClosedAsync(this DokanInstance dokanInstance, uint milliSeconds)
+            => dokanInstance is null || await new DokanInstanceNotifyCompletion(dokanInstance, milliSeconds);
+#endif
+
     }
 }
