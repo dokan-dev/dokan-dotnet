@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace DokanNet.Logging
 {
@@ -12,14 +13,17 @@ namespace DokanNet.Logging
     public class DebugViewLogger : ILogger
     {
         private readonly string _loggerName;
+        private readonly DateTimeFormatInfo _dateTimeFormatInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugViewLogger"/> class.
         /// </summary>
         /// <param name="loggerName">Optional name to be added to each log line.</param>
-        public DebugViewLogger(string loggerName = "")
+        /// <param name="dateTimeFormatInfo">An object that supplies format information for DateTime.</param>
+        public DebugViewLogger(string loggerName = "", DateTimeFormatInfo dateTimeFormatInfo = null)
         {
             _loggerName = loggerName;
+            _dateTimeFormatInfo = dateTimeFormatInfo;
         }
 
         /// <inheritdoc />
@@ -62,7 +66,7 @@ namespace DokanNet.Logging
         {
             if (args?.Length > 0)
                 message = string.Format(message, args);
-            OutputDebugString(message.FormatMessageForLogging(category, _loggerName));
+            OutputDebugString(message.FormatMessageForLogging(category, _loggerName, _dateTimeFormatInfo));
         }
     }
 }

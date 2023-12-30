@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace DokanNet.Logging
@@ -9,6 +10,7 @@ namespace DokanNet.Logging
     public class ConsoleLogger : ILogger, IDisposable
     {
         private readonly string _loggerName;
+        private readonly DateTimeFormatInfo _dateTimeFormatInfo;
         private readonly System.Collections.Concurrent.BlockingCollection<Tuple<String, ConsoleColor>> _PendingLogs
             = new System.Collections.Concurrent.BlockingCollection<Tuple<String, ConsoleColor>>();
 
@@ -19,9 +21,11 @@ namespace DokanNet.Logging
         /// Initializes a new instance of the <see cref="ConsoleLogger"/> class.
         /// </summary>
         /// <param name="loggerName">Optional name to be added to each log line.</param>
-        public ConsoleLogger(string loggerName = "")
+        /// <param name="dateTimeFormatInfo">An object that supplies format information for DateTime.</param>
+        public ConsoleLogger(string loggerName = "", DateTimeFormatInfo dateTimeFormatInfo = null)
         {
             _loggerName = loggerName;
+            _dateTimeFormatInfo = dateTimeFormatInfo;
             _WriterTask = Task.Factory.StartNew(() =>
             {
                 foreach (var tuple in _PendingLogs.GetConsumingEnumerable())
@@ -78,7 +82,7 @@ namespace DokanNet.Logging
             {
                 var origForegroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = newColor;
-                Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName));
+                Console.WriteLine(message.FormatMessageForLogging(true, loggerName: _loggerName, dateTimeFormatInfo: _dateTimeFormatInfo));
                 Console.ForegroundColor = origForegroundColor;
             }
         }

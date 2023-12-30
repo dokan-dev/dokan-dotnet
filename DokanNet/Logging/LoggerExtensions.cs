@@ -15,13 +15,15 @@ namespace DokanNet.Logging
         /// <param name="message">Message to format.</param>
         /// <param name="category">Optional category to add to the log message.</param>
         /// <param name="loggerName">Optional log name to at to the log message.</param>
+        /// <param name="dateTimeFormatInfo">An object that supplies format information for DateTime.</param>
         /// <returns>A formated log message.</returns>
         public static string FormatMessageForLogging(
             this string message,
             string category = null,
-            string loggerName = "")
+            string loggerName = "",
+            DateTimeFormatInfo dateTimeFormatInfo = null)
         {
-            return message.FormatMessageForLogging(false, category, loggerName);
+            return message.FormatMessageForLogging(false, category, loggerName, dateTimeFormatInfo);
         }
 
         /// <summary>
@@ -31,17 +33,19 @@ namespace DokanNet.Logging
         /// <param name="addDateTime">If date and time shout be added to the log message.</param>
         /// <param name="category">Optional category to add to the log message.</param>
         /// <param name="loggerName">Optional log name to at to the log message.</param>
+        /// <param name="dateTimeFormatInfo">An object that supplies format information for DateTime.</param>
         /// <returns>A formated log message.</returns>
         public static string FormatMessageForLogging(
             this string message,
             bool addDateTime = false,
             string category = null,
-            string loggerName = "")
+            string loggerName = "",
+            DateTimeFormatInfo dateTimeFormatInfo = null)
         {
             var stringBuilder = new StringBuilder();
             if (addDateTime)
             {
-                stringBuilder.AppendFormat("{0} - ", DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                stringBuilder.AppendFormat("{0} - ", DateTime.Now.ToString((IFormatProvider)dateTimeFormatInfo ?? CultureInfo.InvariantCulture));
             }
 
             if (!string.IsNullOrEmpty(loggerName))
