@@ -408,7 +408,7 @@ namespace DokanNet
                     try
                     {
                         result = operations.ReadFile(rawFileName, buffer, out rawReadLength, rawOffset, rawFileInfo);
-                        Marshal.Copy(buffer, 0, rawBuffer, (int)rawBufferLength);
+                        Marshal.Copy(buffer, 0, rawBuffer, rawReadLength);
                     }
                     finally
                     {
