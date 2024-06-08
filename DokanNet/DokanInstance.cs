@@ -5,7 +5,7 @@ using DokanNet.Native;
 namespace DokanNet
 {
     /// <summary>
-    /// Created by <see cref="DokanInstance.DokanInstance"/>.
+    /// Created by <see cref="DokanInstanceBuilder.Build"/>.
     /// It holds all the resources required to be alive for the time of the mount.
     /// </summary>
     public class DokanInstance : IDisposable
@@ -58,6 +58,11 @@ namespace DokanNet
             get { lock (_disposeLock) return _disposed; }
         }
 
+        /// <summary>
+        /// Mount the filesystem described by <see cref="DOKAN_OPTIONS"/>.
+        // <see cref="IDokanOperations"/> will start to received operations from the system and applications for this device.
+        /// See <see cref="DokanInstanceBuilder"/>
+        /// </summary>
         internal DokanInstance(ILogger logger, DOKAN_OPTIONS options, IDokanOperations operations)
         {
             DokanOptions = NativeStructWrapper.Wrap(options);
