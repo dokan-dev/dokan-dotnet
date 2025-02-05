@@ -273,7 +273,7 @@ namespace RegistryFS
         {
             volumeLabel = "RFS";
             features = FileSystemFeatures.None;
-            fileSystemName = string.Empty;
+            fileSystemName = "FAT";
             maximumComponentLength = 256;
             return DokanResult.Success;
         }
