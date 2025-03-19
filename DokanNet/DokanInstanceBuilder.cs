@@ -89,7 +89,7 @@ namespace DokanNet
         /// </summary>
         public DokanInstance Build(IDokanOperations operations)
         {
-            return new DokanInstance(_logger, _options, operations);
+            return new DokanInstance(_logger, _options, _dokan, operations);
         }
 
     }

@@ -47,6 +47,7 @@ namespace DokanNet
         internal NativeStructWrapper<DOKAN_OPTIONS> DokanOptions { get; private set; }
         internal NativeStructWrapper<DOKAN_OPERATIONS> DokanOperations { get; private set; }
         internal DokanHandle DokanHandle { get; private set; }
+        internal Dokan Dokan { get; private set; }
         private readonly object _disposeLock;
         private bool _disposed = false;
 
@@ -60,10 +61,10 @@ namespace DokanNet
 
         /// <summary>
         /// Mount the filesystem described by <see cref="DOKAN_OPTIONS"/>.
-        // <see cref="IDokanOperations"/> will start to received operations from the system and applications for this device.
+        /// <see cref="IDokanOperations"/> will start to received operations from the system and applications for this device.
         /// See <see cref="DokanInstanceBuilder"/>
         /// </summary>
-        internal DokanInstance(ILogger logger, DOKAN_OPTIONS options, IDokanOperations operations)
+        internal DokanInstance(ILogger logger, DOKAN_OPTIONS options, Dokan dokan, IDokanOperations operations)
         {
             DokanOptions = NativeStructWrapper.Wrap(options);
             var preparedOperations = PrepareOperations(logger, operations);
@@ -75,6 +76,7 @@ namespace DokanNet
                 throw new DokanException(status);
             }
             DokanHandle = handle;
+            Dokan = dokan;
         }
 
         /// <summary>
@@ -100,6 +102,7 @@ namespace DokanNet
                     DokanOptions = null;
                     DokanOperations = null;
                     DokanHandle = null;
+                    Dokan = null;
 
                     _disposed = true;
                 }
