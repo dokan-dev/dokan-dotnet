@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+## [2.2.1.0] - 2025-03-29
+
+### Added
+- Library - Allow passing a date time format info for console and debug logger
+
+### Changed
+- Library - `Read` - Only copy the actual read data by the operation to the destination buffer
+- Library - Hold `Dokan` reference in `DokanInstance` as it cannot live without it. Avoid impromptu native resources being released.
+
 ## [2.1.0.0] - 2023-12-22
 
 ### Added
@@ -210,8 +221,9 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...HEAD
-[2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...v2.1.0.0
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.2.1.0...HEAD
+[2.2.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...v2.2.1.0
+[2.1.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...v2.1.0.0
 [2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
 [2.0.5.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.4.1...v2.0.5.1
 [2.0.4.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.1.1...v2.0.4.1

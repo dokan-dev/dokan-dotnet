@@ -7,10 +7,10 @@
     <Description>A user mode file system for windows. 
 
 This is a .NET wrapper over Dokan, and allows you to create your own file systems in Windows.</Description>
-    <Copyright>Copyright (C) 2022</Copyright>
-    <Version>2.1.0.0</Version>
-    <AssemblyVersion>2.1.0.0</AssemblyVersion>
-    <FileVersion>2.1.0.0</FileVersion>
+    <Copyright>Copyright (C) 2025</Copyright>
+    <Version>2.2.1.0</Version>
+    <AssemblyVersion>2.2.1.0</AssemblyVersion>
+    <FileVersion>2.2.1.0</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
