@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0.0] - 2025-04-26
+- Library - `IDokanFileInfo.DeleteOnClose` was renamed `IDokanFileInfo.DeletePending`. Same expectation (remove the object) but is set when last handle on the object is being closed. See [here](https://github.com/dokan-dev/dokany/issues/883).
+
 ## [2.2.1.0] - 2025-03-29
 
 ### Added
@@ -221,7 +224,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.2.1.0...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.0...HEAD
+[2.3.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.2.1.0...v2.3.0.0
 [2.2.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...v2.2.1.0
 [2.1.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...v2.1.0.0
 [2.0.5.2]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.1...v2.0.5.2
