@@ -8,7 +8,7 @@ namespace DokanNet.Tests
     [TestClass]
     public static class Mounter
     {
-        private static Logging.NullLogger NullLogger;
+        private static Logging.NullLogger NullLogger = new Logging.NullLogger();
         private static Dokan Dokan;
         private static DokanInstance safeMount;
         private static DokanInstance unsafeMount;
