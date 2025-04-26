@@ -1349,13 +1349,13 @@ namespace DokanNet.Tests
                     => Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
                 .Verifiable();
 
-            ExpectCloseFile(path, context, isDirectory, deleteOnClose);
+            ExpectCloseFile(path, context, isDirectory);
         }
 
-        internal void ExpectCloseFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        internal void ExpectCloseFile(string path, object context = null, bool isDirectory = false)
         {
             operations
-                .Setup(d => d.CloseFile(path, It.Is<IDokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
+                .Setup(d => d.CloseFile(path, It.Is<IDokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory)))
                 .Callback((string fileName, IDokanFileInfo info)
                     =>
                     {
