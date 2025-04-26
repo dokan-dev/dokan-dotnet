@@ -351,6 +351,7 @@ namespace DokanNet.Tests
             }
 
             fixture.Verify();
+#endif
         }
 
         [TestMethod, TestCategory(TestCategories.Manual)]
@@ -358,8 +359,8 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTests.Configuration.xml", "ConfigWrite", DataAccessMethod.Sequential)]
         public void OpenWrite_WithVariableSizes_Overlapped_CallsApiCorrectly()
         {
-            var bufferSize = int.Parse((string) TestContext.DataRow["BufferSize"]);
-            var fileSize = int.Parse((string) TestContext.DataRow["FileSize"]);
+            var bufferSize = int.Parse((string)TestContext.DataRow["BufferSize"]);
+            var fileSize = int.Parse((string)TestContext.DataRow["FileSize"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
@@ -379,7 +380,7 @@ namespace DokanNet.Tests
 #endif
 
             var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(bufferSize, fileSize))
-                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte) (i + 1), NativeMethods.BufferSize(bufferSize, testData.Length, i)).ToArray()))
+                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte)(i + 1), NativeMethods.BufferSize(bufferSize, testData.Length, i)).ToArray()))
                 .ToArray();
 
             NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), bufferSize, testData.Length, inputs);
@@ -394,6 +395,5 @@ namespace DokanNet.Tests
             fixture.Verify();
 #endif
         }
-#endif
     }
 }
