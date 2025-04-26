@@ -52,7 +52,9 @@ namespace DokanNetMirror
             else // normal read
             {
                 var stream = info.Context as FileStream;
+#pragma warning disable CA2002
                 lock (stream) //Protect from overlapped read
+#pragma warning restore CA2002
                 {
                     DoRead(stream.SafeFileHandle, buffer, bufferLength, out bytesRead, offset);
                 }
@@ -78,7 +80,9 @@ namespace DokanNetMirror
             else
             {
                 var stream = info.Context as FileStream;
+#pragma warning disable CA2002
                 lock (stream) //Protect from overlapped write
+#pragma warning restore CA2002
                 {
                     var bytesToCopy = (uint)GetNumOfBytesToCopy((int)bufferLength, offset, info, stream);
                     DoWrite(stream.SafeFileHandle, buffer, bytesToCopy, out bytesWritten, offset);
