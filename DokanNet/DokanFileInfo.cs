@@ -42,7 +42,7 @@ namespace DokanNet
 
         [MarshalAs(UnmanagedType.U1)] private bool _isDirectory;
 
-        [MarshalAs(UnmanagedType.U1)] private bool _deleteOnClose;
+        [MarshalAs(UnmanagedType.U1)] private bool _deletePending;
 
         [MarshalAs(UnmanagedType.U1)] private bool _pagingIo;
 
@@ -109,10 +109,10 @@ namespace DokanNet
         /// Gets or sets a value indicating whether the file has to be delete
         /// during the <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
-        public bool DeleteOnClose
+        public bool DeletePending
         {
-            get => _deleteOnClose;
-            set => _deleteOnClose = value;
+            get => _deletePending;
+            set => _deletePending = value;
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace DokanNet
         {
             return
                 DokanFormat(
-                    $"{{{Context}, {DeleteOnClose}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
+                    $"{{{Context}, {DeletePending}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
         }
     }
 }

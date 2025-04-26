@@ -64,7 +64,7 @@ namespace DokanNet
         /// Gets or sets a value indicating whether the file has to be deleted
         /// during the <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
-        public bool DeleteOnClose { get; set; }
+        public bool DeletePending { get; set; }
 
         /// <summary>
         /// Read or write is paging IO.
@@ -125,7 +125,7 @@ namespace DokanNet
         {
             return
                 DokanFormat(
-                    $"mock: {{{Context}, {DeleteOnClose}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
+                    $"mock: {{{Context}, {DeletePending}, {IsDirectory}, {NoCache}, {PagingIo}, #{ProcessId}, {SynchronousIo}, {WriteToEndOfFile}}}");
         }
     }
 }

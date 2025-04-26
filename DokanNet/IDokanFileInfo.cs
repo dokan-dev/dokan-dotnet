@@ -21,7 +21,7 @@ namespace DokanNet
         /// Gets or sets a value indicating whether the file has to be delete
         /// during the <see cref="IDokanOperations.Cleanup"/> event.
         /// </summary>
-        bool DeleteOnClose { get; set; }
+        bool DeletePending { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether it requesting a directory

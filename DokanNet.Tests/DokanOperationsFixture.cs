@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using Castle.Core.Internal;
 using Moq;
 using Moq.Language;
 using static DokanNet.Tests.FileSettings;
@@ -575,6 +577,9 @@ namespace DokanNet.Tests
 
         public static bool HasPendingFiles => Instance?.pendingFiles > 0;
 
+        private HashSet<string> deletePendingExpected = new HashSet<string>();
+        private HashSet<string> deletePendingExecuted = new HashSet<string>();
+
         internal static IDokanOperations Operations => proxy;
         internal static IDokanOperations UnsafeOperations => unsafeProxy;
 
@@ -905,13 +910,35 @@ namespace DokanNet.Tests
                 .Setup(d => d.DeleteDirectory(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, IDokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                    =>
+                {
+                    if (info.DeletePending)
+                    {
+                        deletePendingExpected.Add(fileName);
+                    }
+                    else
+                    {
+                        deletePendingExpected.Remove(fileName);
+                    }
+                    Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                });
 
             operations
                 .Setup(d => d.DeleteFile(It.IsAny<string>(), It.IsAny<IDokanFileInfo>()))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, IDokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"));
+                    =>
+                {
+                    if (info.DeletePending)
+                    {
+                        deletePendingExpected.Add(fileName);
+                    }
+                    else
+                    {
+                        deletePendingExpected.Remove(fileName);
+                    }
+                    Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                });
 
             var files = GetEmptyDirectoryDefaultFiles();
             operations
@@ -1236,7 +1263,13 @@ namespace DokanNet.Tests
                 operations
                     .Setup(d => d.Cleanup(path, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                     .Callback((string fileName, IDokanFileInfo info)
-                        => Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})")),
+                        => {
+                            if (info.DeletePending)
+                            {
+                                deletePendingExecuted.Add(fileName);
+                            }
+                            Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                            }),
                 operations
                     .Setup(d => d.CloseFile(path, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                     .Callback((string fileName, IDokanFileInfo info)
@@ -1280,12 +1313,27 @@ namespace DokanNet.Tests
                 .Setup(d => d.DeleteDirectory(path, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, IDokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
+                    =>
+                {
+                    if (info.DeletePending)
+                    {
+                        deletePendingExpected.Add(path);
+                    }
+                    else
+                    {
+                        deletePendingExpected.Remove(path);
+                    }
+                    Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                })
                 .Verifiable();
         }
 
-        private IVerifies SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
+        private IVerifies SetupCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
+            if (deleteOnClose)
+            {
+                deletePendingExpected.Add(path);
+            }
             return operations
                 .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<IDokanFileInfo>(i => i.IsDirectory == isDirectory)))
                 .Returns(DokanResult.Success)
@@ -1304,11 +1352,11 @@ namespace DokanNet.Tests
 
         internal void ExpectCreateFile(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false, bool deleteOnClose = false)
         {
-            SetupCreateFile(path, access, share, mode, options, attributes, context, isDirectory)
+            SetupCreateFile(path, access, share, mode, options, attributes, context, isDirectory, deleteOnClose)
                 .Verifiable();
 
             PermitGetFileInformation(path, FileAttributes.Normal);
-            ExpectCleanupFile(path, context, isDirectory, deleteOnClose);
+            ExpectCleanupFile(path, context, isDirectory);
         }
 
         internal void ExpectCreateFileWithoutCleanup(string path, FileAccess access, FileShare share, FileMode mode, FileOptions options = FileOptions.None, FileAttributes attributes = default(FileAttributes), object context = null, bool isDirectory = false)
@@ -1341,13 +1389,17 @@ namespace DokanNet.Tests
                 ExpectCloseFile(path);
         }
 
-        internal void ExpectCleanupFile(string path, object context = null, bool isDirectory = false, bool deleteOnClose = false)
+        internal void ExpectCleanupFile(string path, object context = null, bool isDirectory = false)
         {
             operations
-                .Setup(d => d.Cleanup(path, It.Is<IDokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory && i.DeleteOnClose == deleteOnClose)))
-                .Callback((string fileName, IDokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
-                .Verifiable();
+                .Setup(d => d.Cleanup(path, It.Is<IDokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory)))
+                .Callback((string fileName, IDokanFileInfo info) => {
+                    if (info.DeletePending)
+                    {
+                        deletePendingExecuted.Add(path);
+                    }
+                Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+            })                .Verifiable();
 
             ExpectCloseFile(path, context, isDirectory);
         }
@@ -1507,7 +1559,18 @@ namespace DokanNet.Tests
                 .Setup(d => d.DeleteFile(path, It.Is<IDokanFileInfo>(i => !i.IsDirectory)))
                 .Returns(DokanResult.Success)
                 .Callback((string fileName, IDokanFileInfo info)
-                    => Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
+                    =>
+                {
+                    if (info.DeletePending)
+                    {
+                        deletePendingExpected.Add(path);
+                    }
+                    else
+                    {
+                        deletePendingExpected.Remove(path);
+                    }
+                    Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                })
                 .Verifiable();
         }
 
@@ -1625,6 +1688,18 @@ namespace DokanNet.Tests
                 Trace($"Waiting for closure (#{i})");
                 Thread.Sleep(1);
             }
+            var deletePendingExpectedNotExecuted = deletePendingExpected.Except(deletePendingExecuted);
+            foreach (var i in deletePendingExpectedNotExecuted)
+            {
+                Trace($"DeletePending not executed: {i}");
+            }
+            var deletePendingUnexpectedlyExecuted = deletePendingExecuted.Except(deletePendingExpected);
+            foreach (var i in deletePendingUnexpectedlyExecuted)
+            {
+                Trace($"DeletePending unexpected: {i}");
+            }
+            if (!deletePendingExpectedNotExecuted.IsNullOrEmpty() || !deletePendingUnexpectedlyExecuted.IsNullOrEmpty())
+                throw new TimeoutException("Found DeletePending expectation difference");
         }
 
         internal void Verify()

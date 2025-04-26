@@ -269,7 +269,7 @@ namespace DokanNetMirror
             (info.Context as FileStream)?.Dispose();
             info.Context = null;
 
-            if (info.DeleteOnClose)
+            if (info.DeletePending)
             {
                 if (info.IsDirectory)
                 {

@@ -63,7 +63,7 @@ namespace DokanNet
         /// Cleanup is requested before <see cref="CloseFile"/> is called.
         /// </summary>
         /// <remarks>
-        /// When <see cref="IDokanFileInfo.DeleteOnClose"/> is <c>true</c>, you must delete the file in Cleanup.
+        /// When <see cref="IDokanFileInfo.DeletePending"/> is <c>true</c>, you must delete the file in Cleanup.
         /// Refer to <see cref="DeleteFile"/> and <see cref="DeleteDirectory"/> for explanation.
         /// </remarks>
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
@@ -200,11 +200,11 @@ namespace DokanNet
         /// and return <see cref="NtStatus.Success"/> (when you can delete it) or appropriate error
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectNameNotFound"/>.
         ///
-        /// DeleteFile will also be called with <see cref="IDokanFileInfo.DeleteOnClose"/> set to <c>false</c>
+        /// DeleteFile will also be called with <see cref="IDokanFileInfo.DeletePending"/> set to <c>false</c>
         /// to notify the driver when the file is no longer requested to be deleted.
         /// 
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
-        /// <see cref="IDokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
+        /// <see cref="IDokanFileInfo.DeletePending"/> set to <c>true</c> and only then you have to actually
         /// delete the file being closed.
         /// </remarks>
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
@@ -224,11 +224,11 @@ namespace DokanNet
         /// codes such as <see cref="NtStatus.AccessDenied"/>, <see cref="NtStatus.ObjectPathNotFound"/>,
         /// <see cref="NtStatus.ObjectNameNotFound"/>.
         ///
-        /// DeleteFile will also be called with <see cref="IDokanFileInfo.DeleteOnClose"/> set to <c>false</c>
+        /// DeleteFile will also be called with <see cref="IDokanFileInfo.DeletePending"/> set to <c>false</c>
         /// to notify the driver when the file is no longer requested to be deleted.
         ///
         /// When you return <see cref="NtStatus.Success"/>, you get a <see cref="Cleanup"/> call afterwards with
-        /// <see cref="IDokanFileInfo.DeleteOnClose"/> set to <c>true</c> and only then you have to actually
+        /// <see cref="IDokanFileInfo.DeletePending"/> set to <c>true</c> and only then you have to actually
         /// delete the file being closed.
         /// </remarks>
         /// <param name="fileName">File path requested by the Kernel on the FileSystem.</param>
