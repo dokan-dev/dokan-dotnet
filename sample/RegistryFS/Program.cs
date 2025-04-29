@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.AccessControl;
+using System.Runtime.Versioning;
 using DokanNet;
 using DokanNet.Logging;
-using Microsoft.Win32;
-using FileAccess = DokanNet.FileAccess;
+
+#if NET5_0_OR_GREATER
+[assembly: SupportedOSPlatform("windows")]
+#endif
 
 namespace RegistryFS
 {
@@ -15,29 +15,28 @@ namespace RegistryFS
         {
             try
             {
-                using (var mre = new System.Threading.ManualResetEvent(false))
-                using (var dokanLogger = new ConsoleLogger("[Dokan] "))
-                using (var dokan = new Dokan(dokanLogger))
+                using var mre = new System.Threading.ManualResetEvent(false);
+                using var dokanLogger = new ConsoleLogger("[Dokan] ");
+                using var dokan = new Dokan(dokanLogger);
+                Console.CancelKeyPress += (object? sender, ConsoleCancelEventArgs e) =>
                 {
-                    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
-                    {
-                        e.Cancel = true;
-                        mre.Set();
-                    };
+                    e.Cancel = true;
+                    mre.Set();
+                };
 
-                    var rfs = new RFS();
-                    var dokanBuilder = new DokanInstanceBuilder(dokan)
-                        .ConfigureOptions(options =>
-                        {
-                            options.Options = DokanOptions.DebugMode | DokanOptions.StderrOutput;
-                            options.MountPoint = "r:\\";
-                        });
-                    using (var dokanInstance = dokanBuilder.Build(rfs))
+                var rfs = new RFS();
+                var dokanBuilder = new DokanInstanceBuilder(dokan)
+                    .ConfigureOptions(options =>
                     {
-                        mre.WaitOne();
-                    }
-                    Console.WriteLine(@"Success");
+                        options.Options = DokanOptions.DebugMode | DokanOptions.StderrOutput;
+                        options.MountPoint = "r:\\";
+                    });
+                using (var dokanInstance = dokanBuilder.Build(rfs))
+                {
+                    mre.WaitOne();
                 }
+
+                Console.WriteLine(@"Success");
             }
             catch (DokanException ex)
             {

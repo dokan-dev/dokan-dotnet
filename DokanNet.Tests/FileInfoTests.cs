@@ -386,7 +386,7 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, FileOptions.SequentialScan);
             fixture.ExpectGetFileInformation(path, FileAttributes.Normal);
-            fixture.ExpectFindStreams(path, new FileInformation[0]);
+            fixture.ExpectFindStreams(path, []);
             fixture.ExpectCreateFileToFail(destinationPath, DokanResult.FileExists, true);
             fixture.ExpectCloseFile(path);
 #endif
@@ -637,33 +637,33 @@ namespace DokanNet.Tests
             foreach (var access in accessModes)
             {
                 Console.WriteLine($"{nameof(info.Open)} {mode}/{access}");
-                using (var stream = info.Open(mode, access))
+                using var stream = info.Open(mode, access);
+#if !LOGONLY
+                Assert.IsNotNull(stream, $"{nameof(info.Open)} {mode}/{access}");
+#endif
+                if (access.HasFlag(System.IO.FileAccess.Write))
                 {
+                    Assert.IsTrue(stream.CanWrite, "Stream should be writable");
+                    stream.Write(smallData, 0, smallData.Length);
 #if !LOGONLY
-                    Assert.IsNotNull(stream, $"{nameof(info.Open)} {mode}/{access}");
+                    Assert.AreEqual(smallData.Length, stream.Position, "Unexpected write count");
 #endif
-                    if (access.HasFlag(System.IO.FileAccess.Write))
-                    {
-                        Assert.IsTrue(stream.CanWrite, "Stream should be writable");
-                        stream.Write(smallData, 0, smallData.Length);
-#if !LOGONLY
-                        Assert.AreEqual(smallData.Length, stream.Position, "Unexpected write count");
-#endif
-                    }
+                }
 
-                    if (access.HasFlag(System.IO.FileAccess.ReadWrite))
-                        stream.Seek(0, SeekOrigin.Begin);
+                if (access.HasFlag(System.IO.FileAccess.ReadWrite))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
 
-                    if (access.HasFlag(System.IO.FileAccess.Read))
-                    {
-                        Assert.IsTrue(stream.CanRead, "Stream should be readable");
-                        var target = new byte[4096];
-                        var readBytes = stream.Read(target, 0, target.Length);
+                if (access.HasFlag(System.IO.FileAccess.Read))
+                {
+                    Assert.IsTrue(stream.CanRead, "Stream should be readable");
+                    var target = new byte[4096];
+                    var readBytes = stream.Read(target, 0, target.Length);
 #if !LOGONLY
-                        Assert.AreEqual(target.Length, readBytes, "Unexpected read count");
-                        CollectionAssert.AreEquivalent(smallData, target, "Unexpected result content");
+                    Assert.AreEqual(target.Length, readBytes, "Unexpected read count");
+                    CollectionAssert.AreEquivalent(smallData, target, "Unexpected result content");
 #endif
-                    }
                 }
             }
         }
@@ -704,7 +704,10 @@ namespace DokanNet.Tests
             fixture.PermitAny();
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            {
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Create, FileOptions.None);
+            }
+
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
@@ -729,7 +732,10 @@ namespace DokanNet.Tests
             fixture.PermitAny();
 #else
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            {
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.CreateNew, FileOptions.None);
+            }
+
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
@@ -773,7 +779,10 @@ namespace DokanNet.Tests
             fixture.PermitAny();
 #else
             foreach (var access in new[] { ReadAccess, WriteAccess, ReadWriteAccess })
+            {
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.Open, FileOptions.None);
+            }
+
             fixture.ExpectReadFile(path, smallData, smallData.Length);
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 #endif
@@ -818,7 +827,10 @@ namespace DokanNet.Tests
 #else
             fixture.ExpectCreateFile(path, ReadAccess, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
             foreach (var access in new[] { WriteAccess, ReadWriteAccess })
+            {
                 fixture.ExpectCreateFile(path, access, WriteShare, FileMode.OpenOrCreate, FileOptions.None);
+            }
+
             fixture.ExpectWriteFile(path, smallData, smallData.Length);
 
             fixture.PermitProbeFile(path, smallData, smallData.Length);

@@ -128,12 +128,12 @@ namespace DokanNet.Tests
             }
 
             internal static int BufferSize(long bufferSize, long fileSize, int chunks)
-                => (int) Math.Min(bufferSize, fileSize - chunks*bufferSize);
+                => (int)Math.Min(bufferSize, fileSize - chunks * bufferSize);
 
             internal static int NumberOfChunks(long bufferSize, long fileSize)
             {
                 var quotient = Math.DivRem(fileSize, bufferSize, out long remainder);
-                return (int) quotient + (remainder > 0 ? 1 : 0);
+                return (int)quotient + (remainder > 0 ? 1 : 0);
             }
 
             internal static OverlappedChunk[] ReadEx(string fileName, long bufferSize, long fileSize)
@@ -161,11 +161,11 @@ namespace DokanNet.Tests
                 {
                     for (var i = 0; i < chunks.Length; ++i)
                     {
-                        var offset = i*bufferSize;
+                        var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped()
                         {
-                            OffsetHigh = (int) (offset >> 32),
-                            OffsetLow = (int) (offset & 0xffffffff),
+                            OffsetHigh = (int)(offset >> 32),
+                            OffsetLow = (int)(offset & 0xffffffff),
                             EventHandle = IntPtr.Zero
                         };
                         var buffer = chunks[i].Buffer;
@@ -176,6 +176,7 @@ namespace DokanNet.Tests
                             waitHandles[i].Set();
                         }
                     }
+
                     awaiterThread.Join();
                 }
 
@@ -204,9 +205,9 @@ namespace DokanNet.Tests
                 using (var handle = CreateFile(fileName, DesiredAccess.GENERIC_WRITE, ShareMode.FILE_SHARE_NONE,
                         IntPtr.Zero, CreationDisposition.OPEN_EXISTING, FlagsAndAttributes.FILE_FLAG_NO_BUFFERING | FlagsAndAttributes.FILE_FLAG_OVERLAPPED, IntPtr.Zero))
                 {
-                    var offsetHigh = (int) (fileSize >> 32);
-                    if (SetFilePointer(handle, (int) (fileSize & 0xffffffff), out offsetHigh, MoveMethod.FILE_BEGIN) !=
-                        fileSize || offsetHigh != (int) (fileSize >> 32) || !SetEndOfFile(handle))
+                    var offsetHigh = (int)(fileSize >> 32);
+                    if (SetFilePointer(handle, (int)(fileSize & 0xffffffff), out offsetHigh, MoveMethod.FILE_BEGIN) !=
+                        fileSize || offsetHigh != (int)(fileSize >> 32) || !SetEndOfFile(handle))
                     {
                         chunks[0].Win32Error = Marshal.GetLastWin32Error();
                         throw new InvalidOperationException();
@@ -214,18 +215,21 @@ namespace DokanNet.Tests
 
                     for (var i = 0; i < chunks.Length; ++i)
                     {
-                        var offset = i*bufferSize;
+                        var offset = i * bufferSize;
                         var overlapped = new NativeOverlapped()
                         {
-                            OffsetHigh = (int) (offset >> 32),
-                            OffsetLow = (int) (offset & 0xffffffff),
+                            OffsetHigh = (int)(offset >> 32),
+                            OffsetLow = (int)(offset & 0xffffffff),
                             EventHandle = IntPtr.Zero
                         };
                         var buffer = chunks[i].Buffer;
 
                         if (!WriteFileEx(handle, buffer, buffer.Length, ref overlapped, completions[i]))
+                        {
                             chunks[i].Win32Error = Marshal.GetLastWin32Error();
+                        }
                     }
+
                     awaiterThread.Join();
                 }
 
@@ -240,7 +244,7 @@ namespace DokanNet.Tests
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            testData = DokanOperationsFixture.InitBlockTestData(FILE_BUFFER_SIZE, 5*FILE_BUFFER_SIZE + 65536);
+            testData = DokanOperationsFixture.InitBlockTestData(FILE_BUFFER_SIZE, 5 * FILE_BUFFER_SIZE + 65536);
         }
 
         [ClassCleanup]
@@ -272,7 +276,7 @@ namespace DokanNet.Tests
             fixture.PermitAny();
 #else
             fixture.ExpectCreateFile(path, ReadAccess, ReadShare, FileMode.Open, context: testData);
-            fixture.ExpectReadFileInChunks(path, testData, (int) FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectReadFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
             var outputs = NativeMethods.ReadEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length);
@@ -282,7 +286,7 @@ namespace DokanNet.Tests
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i}");
                 Assert.AreEqual(NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i}");
-                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte) i + 1), $"Unexpected data in output {i}");
+                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i}");
             }
 
             fixture.Verify();
@@ -301,11 +305,11 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path, WriteAccess, WriteShare, FileMode.Open, context: testData);
             fixture.ExpectSetAllocationSize(path, testData.Length);
             fixture.ExpectSetEndOfFile(path, testData.Length);
-            fixture.ExpectWriteFileInChunks(path, testData, (int) FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
+            fixture.ExpectWriteFileInChunks(path, testData, (int)FILE_BUFFER_SIZE, context: testData, synchronousIo: false);
 #endif
 
             var inputs = Enumerable.Range(0, NativeMethods.NumberOfChunks(FILE_BUFFER_SIZE, testData.Length))
-                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte) (i + 1), NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i)).ToArray()))
+                .Select(i => new NativeMethods.OverlappedChunk(Enumerable.Repeat((byte)(i + 1), NativeMethods.BufferSize(FILE_BUFFER_SIZE, testData.Length, i)).ToArray()))
                 .ToArray();
 
             NativeMethods.WriteEx(fixture.FileName.AsDriveBasedPath(), FILE_BUFFER_SIZE, testData.Length, inputs);
@@ -326,8 +330,8 @@ namespace DokanNet.Tests
         [DataSource("Microsoft.VisualStudio.TestTools.DataSource.XML", "|DataDirectory|\\OverlappedTests.Configuration.xml", "ConfigRead", DataAccessMethod.Sequential)]
         public void OpenRead_WithVariableSizes_Overlapped_CallsApiCorrectly()
         {
-            var bufferSize = int.Parse((string) TestContext.DataRow["BufferSize"]);
-            var fileSize = int.Parse((string) TestContext.DataRow["FileSize"]);
+            var bufferSize = int.Parse((string)TestContext.DataRow["BufferSize"]);
+            var fileSize = int.Parse((string)TestContext.DataRow["FileSize"]);
 
             var fixture = DokanOperationsFixture.Instance;
 
@@ -347,7 +351,7 @@ namespace DokanNet.Tests
             {
                 Assert.AreEqual(0, outputs[i].Win32Error, $"Unexpected Win32 error in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
                 Assert.AreEqual(NativeMethods.BufferSize(bufferSize, fileSize, i), outputs[i].BytesTransferred, $"Unexpected number of bytes read in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
-                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte) i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
+                Assert.IsTrue(Enumerable.All(outputs[i].Buffer, b => b == (byte)i + 1), $"Unexpected data in output {i} for BufferSize={bufferSize}, FileSize={fileSize}");
             }
 
             fixture.Verify();

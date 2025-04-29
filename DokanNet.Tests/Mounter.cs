@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.IO;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -28,14 +27,17 @@ namespace DokanNet.Tests
 
             Dokan = new Dokan(NullLogger);
             var safeDokanBuilder = new DokanInstanceBuilder(Dokan)
-                .ConfigureOptions(options => { options.Options = dokanOptions;
+                .ConfigureOptions(options =>
+                {
+                    options.Options = dokanOptions;
                     options.MountPoint = DokanOperationsFixture.NormalMountPoint;
                 });
 
             safeMount = safeDokanBuilder.Build(DokanOperationsFixture.Operations);
-            
+
             var unsafeDokanBuilder = new DokanInstanceBuilder(Dokan)
-               .ConfigureOptions(options => {
+               .ConfigureOptions(options =>
+               {
                    options.Options = dokanOptions;
                    options.MountPoint = DokanOperationsFixture.UnsafeMountPoint;
                });
@@ -43,9 +45,14 @@ namespace DokanNet.Tests
             var drive = new DriveInfo(DokanOperationsFixture.NormalMountPoint);
             var drive2 = new DriveInfo(DokanOperationsFixture.UnsafeMountPoint);
             while (!drive.IsReady || !drive2.IsReady)
+            {
                 Thread.Sleep(50);
+            }
+
             while (DokanOperationsFixture.HasPendingFiles)
+            {
                 Thread.Sleep(50);
+            }
         }
 
         [AssemblyCleanup]

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DokanNet
+﻿namespace DokanNet
 {
     /// <summary>
     /// Error codes returned by DokanMain.

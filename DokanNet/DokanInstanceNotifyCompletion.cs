@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System;
 using DokanNet.Native;
+using System.Runtime.Versioning;
 
 namespace DokanNet;
 
@@ -12,6 +13,9 @@ namespace DokanNet;
 /// <summary>
 /// Support for async/await operation on DokanInstance objects
 /// </summary>
+#if NET5_0_OR_GREATER
+[SupportedOSPlatform("windows")]
+#endif
 internal sealed class DokanInstanceNotifyCompletion : ICriticalNotifyCompletion
 {
     public DokanInstanceNotifyCompletion(DokanInstance dokanInstance, uint milliSeconds)
@@ -25,7 +29,7 @@ internal sealed class DokanInstanceNotifyCompletion : ICriticalNotifyCompletion
     public bool IsCompleted => !DokanInstance.IsFileSystemRunning();
     private nint waitHandle;
     private bool timedOut;
-    private Action continuation;
+    private Action? continuation;
 
     public DokanInstanceNotifyCompletion GetAwaiter() => this;
 

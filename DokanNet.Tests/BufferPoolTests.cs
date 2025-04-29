@@ -42,7 +42,7 @@ namespace DokanNet.Tests
             for (int i = 0; i < 1000; i++)
             {
                 int size = random.Next(0, 2 * MB);
-                buffer = pool.RentBuffer((uint)size, logger);
+                buffer = pool.RentBuffer(size, logger);
                 Assert.AreEqual(size, buffer.Length, "Wrong buffer size.");
                 pool.ReturnBuffer(buffer, logger);
             }

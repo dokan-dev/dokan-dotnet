@@ -15,7 +15,7 @@ namespace DokanNet
         /// The Context can carry whatever type like <c><see cref="System.IO.FileStream"/></c>, <c>struct</c>, <c>int</c>,
         /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
-        object Context { get; set; }
+        object? Context { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the file has to be delete

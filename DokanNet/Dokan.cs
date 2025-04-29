@@ -1,6 +1,5 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Runtime.Versioning;
 using DokanNet.Logging;
 using DokanNet.Native;
 
@@ -9,6 +8,9 @@ namespace DokanNet
     /// <summary>
     /// Helper methods to %Dokan.
     /// </summary>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
     public class Dokan : IDisposable
     {
         private readonly ILogger _logger;
@@ -90,7 +92,7 @@ namespace DokanNet
             /// <returns>true if the notification succeeded.</returns>
             public static bool Create(DokanInstance dokanInstance, string filePath, bool isDirectory)
             {
-                return NativeMethods.DokanNotifyCreate(dokanInstance.DokanHandle, filePath, isDirectory);
+                return dokanInstance.NotifyCreate(filePath, isDirectory);
             }
 
             /// <summary>
@@ -103,7 +105,7 @@ namespace DokanNet
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Delete(DokanInstance dokanInstance, string filePath, bool isDirectory)
             {
-                return NativeMethods.DokanNotifyDelete(dokanInstance.DokanHandle, filePath, isDirectory);
+                return dokanInstance.NotifyDelete(filePath, isDirectory);
             }
 
             /// <summary>
@@ -115,7 +117,7 @@ namespace DokanNet
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Update(DokanInstance dokanInstance, string filePath)
             {
-                return NativeMethods.DokanNotifyUpdate(dokanInstance.DokanHandle, filePath);
+                return dokanInstance.NotifyUpdate(filePath);
             }
 
             /// <summary>
@@ -127,7 +129,7 @@ namespace DokanNet
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool XAttrUpdate(DokanInstance dokanInstance, string filePath)
             {
-                return NativeMethods.DokanNotifyXAttrUpdate(dokanInstance.DokanHandle, filePath);
+                return dokanInstance.NotifyXAttrUpdate(filePath);
             }
 
             /// <summary>
@@ -143,7 +145,7 @@ namespace DokanNet
             /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Rename(DokanInstance dokanInstance, string oldPath, string newPath, bool isDirectory, bool isInSameDirectory)
             {
-                return NativeMethods.DokanNotifyRename(dokanInstance.DokanHandle, oldPath,
+                return dokanInstance.NotifyRename(oldPath,
                     newPath,
                     isDirectory,
                     isInSameDirectory);

@@ -9,9 +9,14 @@
     <ProjectReference Include="..\..\DokanNet\DokanNet.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+    <PackageReference Include="LTRData.DiscUtils.Streams" Version="*" />
+  </ItemGroup>
+
   <PropertyGroup>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <!--Set to True to run Code Analysis-->
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>

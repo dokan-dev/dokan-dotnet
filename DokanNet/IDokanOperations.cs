@@ -362,7 +362,7 @@ namespace DokanNet
         /// \see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa446639(v=vs.85).aspx">GetFileSecurity function (MSDN)</a>
         NtStatus GetFileSecurity(
             string fileName,
-            out FileSystemSecurity security,
+            out FileSystemSecurity? security,
             AccessControlSections sections,
             IDokanFileInfo info);
 

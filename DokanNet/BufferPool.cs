@@ -20,9 +20,6 @@ namespace DokanNet
     /// </summary>
     internal class BufferPool
     {
-        // An empty array does not contain data and can be statically cached.
-        private static readonly byte[] _emptyArray = new byte[0];
-
         private readonly uint _maxBuffersPerPool; // Max buffers to cache per buffer size.
 
         // The pools for each buffer size. Index is log2(size).
@@ -36,7 +33,7 @@ namespace DokanNet
         /// </summary>
         /// <param name="maxBufferSize">The max size (bytes) buffer that will be cached. </param>
         /// <param name="maxBuffersPerBufferSize">Maximum number of buffers cached per buffer size.</param>
-        public BufferPool(uint maxBufferSize = 1024 * 1024, uint maxBuffersPerBufferSize = 10)
+        public BufferPool(int maxBufferSize = 1024 * 1024, uint maxBuffersPerBufferSize = 10)
         {
             _maxBuffersPerPool = maxBuffersPerBufferSize;
             int log2 = GetPoolIndex(maxBufferSize);
@@ -49,7 +46,7 @@ namespace DokanNet
             _pools = new ConcurrentBag<byte[]>[log2 + 1];
             for (int i = 0; i < _pools.Length; i++)
             {
-                _pools[i] = new ConcurrentBag<byte[]>();
+                _pools[i] = [];
             }
         }
 
@@ -66,7 +63,7 @@ namespace DokanNet
             _servedBytes = 0;
             for (int i = 0; i < _pools.Length; i++)
             {
-                _pools[i] = new ConcurrentBag<byte[]>(); // There's no clear method on ConcurrentBag...
+                _pools[i] = []; // There's no clear method on ConcurrentBag...
             }
         }
 
@@ -82,11 +79,11 @@ namespace DokanNet
         /// <param name="bufferSize">The size of buffer requested.</param>
         /// <param name="logger">Logger for debug spew about what the buffer pool did.</param>
         /// <returns>The byte[] buffer.</returns>
-        public byte[] RentBuffer(uint bufferSize, ILogger logger)
+        public byte[] RentBuffer(int bufferSize, ILogger logger)
         {
             if (bufferSize == 0)
             {
-                return _emptyArray; // byte[0] is statically cached.
+                return [];
             }
 
             Interlocked.Add(ref _servedBytes, bufferSize);
@@ -95,19 +92,30 @@ namespace DokanNet
             int poolIndex = GetPoolIndex(bufferSize);
             if (poolIndex == -1 || poolIndex >= _pools.Length)
             {
-                if (logger.DebugEnabled) logger.Debug($"Buffer size {bufferSize} not power of 2 or too large, returning unpooled buffer.");
+                if (logger.DebugEnabled)
+                {
+                    logger.Debug($"Buffer size {bufferSize} not power of 2 or too large, returning unpooled buffer.");
+                }
+
                 return new byte[bufferSize];
             }
 
             // Try getting a buffer from the pool. If it's empty, make a new buffer.
             ConcurrentBag<byte[]> pool = _pools[poolIndex];
-            if (pool.TryTake(out byte[] buffer))
+            if (pool.TryTake(out var buffer))
             {
-                if (logger.DebugEnabled) logger.Debug($"Using pooled buffer from pool {poolIndex}.");
+                if (logger.DebugEnabled)
+                {
+                    logger.Debug($"Using pooled buffer from pool {poolIndex}.");
+                }
             }
             else
             {
-                if (logger.DebugEnabled) logger.Debug($"Pool {poolIndex} empty, creating new buffer.");
+                if (logger.DebugEnabled)
+                {
+                    logger.Debug($"Pool {poolIndex} empty, creating new buffer.");
+                }
+
                 buffer = new byte[bufferSize];
             }
 
@@ -128,7 +136,7 @@ namespace DokanNet
             }
 
             // If the buffer is a power of 2 and below max pooled size, return it to the appropriate pool.
-            int poolIndex = GetPoolIndex((uint)buffer.Length);
+            int poolIndex = GetPoolIndex(buffer.Length);
             if (poolIndex >= 0 && poolIndex < _pools.Length)
             {
                 // Check if the pool is full. This is racy if multiple threads return buffers concurrently,
@@ -138,16 +146,25 @@ namespace DokanNet
                 {
                     Array.Clear(buffer, 0, buffer.Length);
                     pool.Add(buffer);
-                    if (logger.DebugEnabled) logger.Debug($"Returned buffer to pool {poolIndex}.");
+                    if (logger.DebugEnabled)
+                    {
+                        logger.Debug($"Returned buffer to pool {poolIndex}.");
+                    }
                 }
                 else
                 {
-                    if (logger.DebugEnabled) logger.Debug($"Pool {poolIndex} is full, discarding buffer.");
+                    if (logger.DebugEnabled)
+                    {
+                        logger.Debug($"Pool {poolIndex} is full, discarding buffer.");
+                    }
                 }
             }
             else
             {
-                if (logger.DebugEnabled) logger.Debug($"{poolIndex} (size {buffer.Length}) outside pool range, discarding buffer.");
+                if (logger.DebugEnabled)
+                {
+                    logger.Debug($"{poolIndex} (size {buffer.Length}) outside pool range, discarding buffer.");
+                }
             }
         }
 
@@ -157,19 +174,23 @@ namespace DokanNet
         /// </summary>
         /// <param name="bufferSize">Buffer size in bytes.</param>
         /// <returns>The pool index, log2(number), or -1 if bufferSize is not a power of 2.</returns>
-        private static int GetPoolIndex(uint bufferSize)
+        private static int GetPoolIndex(int bufferSize)
         {
-            double log2 = Math.Log(bufferSize, 2);
-            int log2AsInt = (int)log2;
+            // Fast calculate two-log for bufferSize
+            var log2 = 0;
 
-            // If they are not equal, the number is not a power of 2.
-            //
-            if (log2 != log2AsInt)
+            for (var i = bufferSize; i > 1; i >>= 1)
+            {
+                log2++;
+            }
+
+            // If not equal, the number is not a power of 2.
+            if (1 << log2 != bufferSize)
             {
                 return -1;
             }
 
-            return log2AsInt;
+            return log2;
         }
     }
 }

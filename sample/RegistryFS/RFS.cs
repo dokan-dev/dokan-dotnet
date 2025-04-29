@@ -44,7 +44,10 @@ namespace RegistryFS
             IDokanFileInfo info)
         {
             if (info.IsDirectory && mode == FileMode.CreateNew)
+            {
                 return DokanResult.AccessDenied;
+            }
+
             return DokanResult.Success;
         }
 
@@ -58,12 +61,14 @@ namespace RegistryFS
             return DokanResult.Error;
         }
 
-        private RegistryKey GetRegistoryEntry(string name)
+        private RegistryKey? GetRegistoryEntry(string name)
         {
             Console.WriteLine($"GetRegistoryEntry : {name}");
             var top = name.IndexOf('\\', 1) - 1;
             if (top < 0)
+            {
                 top = name.Length - 1;
+            }
 
             var topname = name.Substring(1, top);
             var sub = name.IndexOf('\\', 1);
@@ -71,10 +76,15 @@ namespace RegistryFS
             if (TopDirectory.ContainsKey(topname))
             {
                 if (sub == -1)
+                {
                     return TopDirectory[topname];
+                }
                 else
+                {
                     return TopDirectory[topname].OpenSubKey(name.Substring(sub + 1));
+                }
             }
+
             return null;
         }
 
@@ -90,7 +100,7 @@ namespace RegistryFS
             out IList<FileInformation> files,
             IDokanFileInfo info)
         {
-            files = new List<FileInformation>();
+            files = [];
             if (filename == "\\")
             {
                 foreach (var name in TopDirectory.Keys)
@@ -105,13 +115,17 @@ namespace RegistryFS
                     };
                     files.Add(finfo);
                 }
+
                 return DokanResult.Success;
             }
             else
             {
                 var key = GetRegistoryEntry(filename);
                 if (key == null)
+                {
                     return DokanResult.Error;
+                }
+
                 foreach (var name in key.GetSubKeyNames())
                 {
                     var finfo = new FileInformation
@@ -124,12 +138,14 @@ namespace RegistryFS
                     };
                     files.Add(finfo);
                 }
+
                 foreach (var name in key.GetValueNames())
                 {
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         continue;
                     }
+
                     var finfo = new FileInformation
                     {
                         FileName = name,
@@ -140,6 +156,7 @@ namespace RegistryFS
                     };
                     files.Add(finfo);
                 }
+
                 return DokanResult.Success;
             }
         }
@@ -149,7 +166,7 @@ namespace RegistryFS
             out FileInformation fileinfo,
             IDokanFileInfo info)
         {
-            fileinfo = new FileInformation {FileName = filename};
+            fileinfo = new FileInformation { FileName = filename };
 
             if (filename == "\\")
             {
@@ -163,7 +180,9 @@ namespace RegistryFS
 
             var key = GetRegistoryEntry(filename);
             if (key == null)
+            {
                 return DokanResult.Error;
+            }
 
             fileinfo.Attributes = FileAttributes.Directory;
             fileinfo.LastAccessTime = DateTime.Now;
@@ -251,9 +270,9 @@ namespace RegistryFS
             out long totalFreeBytes,
             IDokanFileInfo info)
         {
-            freeBytesAvailable = 512*1024*1024;
-            totalBytes = 1024*1024*1024;
-            totalFreeBytes = 512*1024*1024;
+            freeBytesAvailable = 512 * 1024 * 1024;
+            totalBytes = 1024 * 1024 * 1024;
+            totalFreeBytes = 512 * 1024 * 1024;
             return DokanResult.Success;
         }
 
@@ -278,7 +297,7 @@ namespace RegistryFS
             return DokanResult.Success;
         }
 
-        public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections,
+        public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity? security, AccessControlSections sections,
             IDokanFileInfo info)
         {
             security = null;
@@ -291,24 +310,16 @@ namespace RegistryFS
             return DokanResult.Error;
         }
 
-        public NtStatus EnumerateNamedStreams(string fileName, IntPtr enumContext, out string streamName,
-            out long streamSize, IDokanFileInfo info)
-        {
-            streamName = string.Empty;
-            streamSize = 0;
-            return DokanResult.NotImplemented;
-        }
-
         public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, IDokanFileInfo info)
         {
-            streams = new FileInformation[0];
+            streams = [];
             return DokanResult.NotImplemented;
         }
 
         public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files,
             IDokanFileInfo info)
         {
-            files = new FileInformation[0];
+            files = [];
             return DokanResult.NotImplemented;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -10,11 +11,10 @@ namespace DokanNet.Logging
     public class ConsoleLogger : ILogger, IDisposable
     {
         private readonly string _loggerName;
-        private readonly DateTimeFormatInfo _dateTimeFormatInfo;
-        private readonly System.Collections.Concurrent.BlockingCollection<Tuple<String, ConsoleColor>> _PendingLogs
-            = new System.Collections.Concurrent.BlockingCollection<Tuple<String, ConsoleColor>>();
+        private readonly DateTimeFormatInfo? _dateTimeFormatInfo;
+        private readonly BlockingCollection<(string Message, ConsoleColor Color)> _PendingLogs = [];
 
-        private readonly Task _WriterTask = null;
+        private readonly Task? _WriterTask = null;
         private bool _disposed;
 
         /// <summary>
@@ -22,15 +22,15 @@ namespace DokanNet.Logging
         /// </summary>
         /// <param name="loggerName">Optional name to be added to each log line.</param>
         /// <param name="dateTimeFormatInfo">An object that supplies format information for DateTime.</param>
-        public ConsoleLogger(string loggerName = "", DateTimeFormatInfo dateTimeFormatInfo = null)
+        public ConsoleLogger(string loggerName = "", DateTimeFormatInfo? dateTimeFormatInfo = null)
         {
             _loggerName = loggerName;
             _dateTimeFormatInfo = dateTimeFormatInfo;
             _WriterTask = Task.Factory.StartNew(() =>
             {
-                foreach (var tuple in _PendingLogs.GetConsumingEnumerable())
+                foreach (var (Message, Color) in _PendingLogs.GetConsumingEnumerable())
                 {
-                    WriteMessage(tuple.Item1, tuple.Item2);
+                    WriteMessage(Message, Color);
                 }
             });
         }
@@ -71,9 +71,11 @@ namespace DokanNet.Logging
         private void EnqueueMessage(ConsoleColor newColor, string message, params object[] args)
         {
             if (args.Length > 0)
+            {
                 message = string.Format(message, args);
+            }
 
-            _PendingLogs.Add(Tuple.Create(message, newColor));
+            _PendingLogs.Add((message, newColor));
         }
 
         private void WriteMessage(string message, ConsoleColor newColor)
@@ -99,7 +101,7 @@ namespace DokanNet.Logging
                 {
                     // dispose managed state (managed objects)
                     _PendingLogs.CompleteAdding();
-                    _WriterTask.Wait();
+                    _WriterTask?.Wait();
                 }
 
                 // free unmanaged resources (unmanaged objects) and override finalizer

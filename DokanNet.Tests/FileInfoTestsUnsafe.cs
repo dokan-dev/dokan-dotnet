@@ -1,6 +1,4 @@
-﻿using System;
-using DokanNet.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DokanNet.Tests
 {
