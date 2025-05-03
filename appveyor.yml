@@ -76,7 +76,7 @@ after_build:
       New-Item C:\TMP -type directory
       ls c:\TMP
       
-      foreach ($target in @("net462")) {
+      foreach ($target in @("net48")) {
          if ($app) {
             Write-Host "Waiting for the driver to unmount..."
             Stop-Mirror($app)
