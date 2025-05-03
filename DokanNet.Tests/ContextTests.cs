@@ -135,6 +135,11 @@ namespace DokanNet.Tests
                 do
                 {
                     totalReadBytes += stream.Read(target, totalReadBytes, target.Length - totalReadBytes);
+
+                    if (totalReadBytes == 0)
+                    {
+                        throw new EndOfStreamException("Unexpected end of file");
+                    }
                 } while (totalReadBytes < largeData.Length);
             }
 

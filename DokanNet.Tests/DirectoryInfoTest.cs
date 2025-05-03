@@ -941,6 +941,7 @@ namespace DokanNet.Tests
                 destination = Path.Combine(fixture.DestinationDirectoryName, fixture.DestinationSubDirectoryName),
                 path = origin.AsRootedPath(),
                 destinationPath = destination.AsRootedPath();
+
 #if LOGONLY
             fixture.PermitAny();
 #else

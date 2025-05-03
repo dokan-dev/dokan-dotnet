@@ -700,7 +700,7 @@ namespace DokanNet.Tests
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private string currentTestName;
 
-        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>(MockBehavior.Strict);
+        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>();
 
         private long pendingFiles;
 
