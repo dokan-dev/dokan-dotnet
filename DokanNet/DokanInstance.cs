@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,12 +95,21 @@ public class DokanInstance : IDisposable
 
         async void KeepReferenceAlive()
         {
+            var gchandle = GCHandle.Alloc(this);
+
             try
             {
                 await WaitForFileSystemClosedAsync(uint.MaxValue).ConfigureAwait(false);
             }
             catch
             {
+            }
+            finally
+            {
+                if (gchandle.IsAllocated)
+                {
+                    gchandle.Free();
+                }
             }
         }
     }

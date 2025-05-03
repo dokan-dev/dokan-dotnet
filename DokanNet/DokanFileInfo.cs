@@ -43,42 +43,49 @@ public struct DokanFileInfo
     /// Process id for the thread that originally requested a given I/O
     /// operation.
     /// </summary>
-    public int ProcessId { get; }
+    public readonly int ProcessId { get; }
+
+    private byte isDirectory;
+    private byte deletePending;
+    private readonly byte pagingIo;
+    private readonly byte synchronousIo;
+    private readonly byte noCache;
+    private readonly byte writeToEndOfFile;
 
     /// <summary>
     /// Gets or sets a value indicating whether it requesting a directory
     /// file. Must be set in <see cref="IDokanOperations2.CreateFile"/> if
     /// the file appear to be a folder.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool IsDirectory { get; set; }
+    public bool IsDirectory { readonly get => isDirectory != 0; set => isDirectory = value ? (byte)1 : (byte)0; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the file has to be deleted
     /// during the <see cref="IDokanOperations2.Cleanup"/> event.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool DeletePending { get; set; }
+    public bool DeletePending { readonly get => deletePending != 0; set => deletePending = value ? (byte)1 : (byte)0; }
 
     /// <summary>
     /// Read or write is paging IO.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool PagingIo { get; }
+    public readonly bool PagingIo => pagingIo != 0;
 
     /// <summary>
     /// Read or write is synchronous IO.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool SynchronousIo { get; }
+    public readonly bool SynchronousIo => synchronousIo != 0;
 
     /// <summary>
     /// Read or write directly from data source without cache.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool NoCache { get; }
-
+    public readonly bool NoCache => noCache != 0;
+    
     /// <summary>
     /// If <c>true</c>, write to the current end of file instead 
     /// of using the <c>Offset</c> parameter.
     /// </summary>
-    [field: MarshalAs(UnmanagedType.U1)] public bool WriteToEndOfFile { get; }
-
+    public readonly bool WriteToEndOfFile => writeToEndOfFile != 0;
+    
     /// <summary>
     /// Gets or sets context that can be used to carry information between operation.
     /// The Context can carry whatever type like <c><see cref="System.IO.FileStream"/></c>, <c>struct</c>, <c>int</c>,

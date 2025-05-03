@@ -25,7 +25,6 @@ public class DokanInstanceBuilder
 
     private readonly DOKAN_OPTIONS _options;
 
-    [SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Dokan instance isn't really needed, a reference is kept to enforce a workflow")]
     private readonly Dokan _dokan;
 
     private ILogger _logger;
