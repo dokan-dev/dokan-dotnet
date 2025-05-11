@@ -6,7 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0.1] - 2025-05-11
+
+### Changed
+- Library - IDokanOperations2 is a new way to implement Dokan file systems in .NET with less CPU and memory pressure.
+  * Includes several other minor optimizations as well.
+  * Existing `IDokanOperation` and `IDokanOperationUnsafe` implementations get wrapped in a compatibility layer called `DokanOperationsAdapter`, that in turn implements the new `IDokanOperations2` interface.
+- Library - Removed "-windows" suffix from target frameworks to allow library to be consumed by applicaitons that chose between Windows and other OS implementations at runtime.
+- Library - Removed .NET Framework 4.0 from target frameworks and added 4.6 and 4.8 (last supported on Windows Vista and last supported on Windows 7).
+- Library - Added some logic to keep a reference to `DokanInstance` and associated operations alive while file system is mounted, to avoid crashes in native code if the last reference is collected by GC.
+
+### Added
+- Sample - New DokanNetMirror with `IDokanOperations2`. Old `DokanNetMirror` moved to ``DokanNetMirrorLegacy`.
+
 ## [2.3.0.0] - 2025-04-26
+
+### Changed
 - Library - `IDokanFileInfo.DeleteOnClose` was renamed `IDokanFileInfo.DeletePending`. Same expectation (remove the object) but is set when last handle on the object is being closed. See [here](https://github.com/dokan-dev/dokany/issues/883).
 
 ## [2.2.1.0] - 2025-03-29
@@ -224,7 +239,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.0...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.1...HEAD
+[2.3.0.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.0...v2.3.0.1
 [2.3.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.2.1.0...v2.3.0.0
 [2.2.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...v2.2.1.0
 [2.1.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.0.5.2...v2.1.0.0
