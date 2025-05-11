@@ -219,15 +219,15 @@ namespace DokanNet.Tests
             fixture.ExpectCreateFile(path.AsRootedPath(), ReadAttributesAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(path.AsRootedPath(), FileAttributes.Normal);
             fixture.ExpectOpenDirectory(DokanOperationsFixture.RootName, FileAccess.Synchronize, FileShare.None);
-            fixture.ExpectFindFiles(DokanOperationsFixture.RootName, new[]
-            {
+            fixture.ExpectFindFiles(DokanOperationsFixture.RootName,
+            [
                 new FileInformation()
                 {
                     FileName = path, Attributes = FileAttributes.Normal,
                     Length = 0,
                     CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
                 }
-            });
+            ]);
             fixture.ExpectCreateDirectoryToFail(path.AsRootedPath(), DokanResult.FileExists);
 #endif
 
@@ -340,7 +340,7 @@ namespace DokanNet.Tests
         }
 
         public static IEnumerable<object[]> ConfigFindFilesData
-            => new object[][] { new object[] { true }, new object[] { false } };
+            => [[true], [false]];
 
         [DataTestMethod, TestCategory(TestCategories.Success), DynamicData(nameof(ConfigFindFilesData))]
         public void Delete_WhereRecurseIsTrueAndDirectoryIsNonempty_CallsApiCorrectly(bool supportsPatternSearch)
@@ -358,29 +358,30 @@ namespace DokanNet.Tests
             fixture.ExpectOpenDirectory(path);
             if (supportsPatternSearch)
             {
-                fixture.ExpectFindFilesWithPattern(path, "*", DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[]
-                    {
+                fixture.ExpectFindFilesWithPattern(path, "*", DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(
+                    [
                         new FileInformation()
                         {
                             FileName = subFileName, Attributes = FileAttributes.Normal,
                             Length = 100,
                             CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
                         }
-                    }).ToArray());
+                    ]).ToArray());
             }
             else
             {
                 fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
-                fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(new[]
-                {
+                fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles().Concat(
+                [
                     new FileInformation()
                     {
                         FileName = subFileName, Attributes = FileAttributes.Normal,
                         Length = 100,
                         CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
                     }
-                }).ToArray());
+                ]).ToArray());
             }
+
             fixture.ExpectCreateFile(path + subFilePath, DeleteAccess, ReadWriteShare, FileMode.Open, deleteOnClose: true);
             fixture.ExpectGetFileInformation(path + subFilePath, FileAttributes.Normal);
             fixture.ExpectDeleteFile(path + subFilePath);
@@ -418,6 +419,7 @@ namespace DokanNet.Tests
                 fixture.ExpectFindFilesWithPatternToFail(path, "*", DokanResult.NotImplemented);
                 fixture.ExpectFindFiles(path, DokanOperationsFixture.GetEmptyDirectoryDefaultFiles());
             }
+
             fixture.ExpectOpenDirectory(path, DeleteFromDirectoryAccess);
             fixture.ExpectDeleteDirectory(path);
 #endif
@@ -939,6 +941,7 @@ namespace DokanNet.Tests
                 destination = Path.Combine(fixture.DestinationDirectoryName, fixture.DestinationSubDirectoryName),
                 path = origin.AsRootedPath(),
                 destinationPath = destination.AsRootedPath();
+
 #if LOGONLY
             fixture.PermitAny();
 #else
@@ -1026,13 +1029,14 @@ namespace DokanNet.Tests
             fixture.ExpectOpenDirectory(path.AsRootedPath(), share: FileShare.ReadWrite);
             if (supportsPatternSearch)
             {
-                fixture.ExpectFindFilesWithPattern(path.AsRootedPath(), "*", new FileInformation[0]);
+                fixture.ExpectFindFilesWithPattern(path.AsRootedPath(), "*", []);
             }
             else
             {
                 fixture.ExpectFindFilesWithPatternToFail(path.AsRootedPath(), "*", DokanResult.NotImplemented);
-                fixture.ExpectFindFiles(path.AsRootedPath(), new FileInformation[0]);
+                fixture.ExpectFindFiles(path.AsRootedPath(), []);
             }
+
             fixture.ExpectSetFileSecurity(path.AsRootedPath(), security);
             fixture.ExpectCreateFile(DokanOperationsFixture.RootName, ReadPermissionsAccess, ReadWriteShare, FileMode.Open);
             fixture.ExpectGetFileInformation(DokanOperationsFixture.RootName, FileAttributes.Directory);

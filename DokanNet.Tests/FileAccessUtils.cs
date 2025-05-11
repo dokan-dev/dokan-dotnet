@@ -41,16 +41,19 @@ namespace DokanNet.Tests
                 outDesiredAccess |= FileAccess.GenericRead;
                 genericRead = true;
             }
+
             if ((outDesiredAccess & FILE_GENERIC_WRITE) == FILE_GENERIC_WRITE)
             {
                 outDesiredAccess |= FileAccess.GenericWrite;
                 genericWrite = true;
             }
+
             if ((outDesiredAccess & FILE_GENERIC_EXECUTE) == FILE_GENERIC_EXECUTE)
             {
                 outDesiredAccess |= FileAccess.GenericExecute;
                 genericExecute = true;
             }
+
             if ((outDesiredAccess & FILE_ALL_ACCESS) == FILE_ALL_ACCESS)
             {
                 outDesiredAccess |= FileAccess.GenericAll;
@@ -58,13 +61,24 @@ namespace DokanNet.Tests
             }
 
             if (genericRead)
+            {
                 outDesiredAccess &= ~FILE_GENERIC_READ;
+            }
+
             if (genericWrite)
+            {
                 outDesiredAccess &= ~FILE_GENERIC_WRITE;
+            }
+
             if (genericExecute)
+            {
                 outDesiredAccess &= ~FILE_GENERIC_EXECUTE;
+            }
+
             if (genericAll)
+            {
                 outDesiredAccess &= ~FILE_ALL_ACCESS;
+            }
 
             return outDesiredAccess;
         }

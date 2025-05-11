@@ -19,9 +19,9 @@ namespace DokanNet.Logging
         /// <returns>A formated log message.</returns>
         public static string FormatMessageForLogging(
             this string message,
-            string category = null,
+            string? category = null,
             string loggerName = "",
-            DateTimeFormatInfo dateTimeFormatInfo = null)
+            DateTimeFormatInfo? dateTimeFormatInfo = null)
         {
             return message.FormatMessageForLogging(false, category, loggerName, dateTimeFormatInfo);
         }
@@ -38,14 +38,14 @@ namespace DokanNet.Logging
         public static string FormatMessageForLogging(
             this string message,
             bool addDateTime = false,
-            string category = null,
+            string? category = null,
             string loggerName = "",
-            DateTimeFormatInfo dateTimeFormatInfo = null)
+            DateTimeFormatInfo? dateTimeFormatInfo = null)
         {
             var stringBuilder = new StringBuilder();
             if (addDateTime)
             {
-                stringBuilder.AppendFormat("{0} - ", DateTime.Now.ToString((IFormatProvider)dateTimeFormatInfo ?? CultureInfo.InvariantCulture));
+                stringBuilder.AppendFormat("{0} - ", DateTime.Now.ToString((IFormatProvider?)dateTimeFormatInfo ?? CultureInfo.InvariantCulture));
             }
 
             if (!string.IsNullOrEmpty(loggerName))

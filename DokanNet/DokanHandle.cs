@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using DokanNet.Native;
 using Microsoft.Win32.SafeHandles;
 
@@ -12,6 +13,9 @@ namespace DokanNet
     /// calls. It also uses reference counting and guaranteed to stay alive during such calls.
     /// <see cref="SafeHandle"/>
     /// </summary>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
     internal class DokanHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         /// <summary>

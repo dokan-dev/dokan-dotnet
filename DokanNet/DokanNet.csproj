@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;netstandard2.0;net462;net40</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net48;net46;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>DokanNet</AssemblyName>
     <RootNamespace>DokanNet</RootNamespace>
     <Description>A user mode file system for windows. 
@@ -23,9 +23,10 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
     <RepositoryType>git</RepositoryType>
     <PackageTags>dokan file files disk directory storage filesystem io filestore FAT NTFS FUSE</PackageTags>
     <AssemblyOriginatorKeyFile>Dokan.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <CLSCompliant>True</CLSCompliant>
     <LangVersion>Latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,15 +37,25 @@ This is a .NET wrapper over Dokan, and allows you to create your own file system
 
   <ItemGroup>
     <None Include="..\dokan_logo.png" Pack="true" PackagePath="\" />
-	<None Include="..\README.md" Pack="true" PackagePath="\"/>
+	<None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
+  <ItemGroup>
+    <PackageReference Include="LTRData.Extensions.Native" Version="*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+    <PackageReference Include="System.Memory" Version="*" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="*" />
+    <PackageReference Include="System.ValueTuple" Version="*" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="*" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &lt; 0">
+    <PackageReference Include="System.Memory" Version="4.5.*" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.*" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.*" />
     <PackageReference Include="StringInterpolationBridgeStrong" Version="0.9.1" />
   </ItemGroup>
 

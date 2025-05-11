@@ -2,18 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0-windows;net462</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net6.0-windows'">
-    <RuntimeIdentifier>win</RuntimeIdentifier>
+    <TargetFrameworks>net9.0;net46;net48</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\DokanNet\DokanNet.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="StringInterpolationBridgeStrong" Version="0.9.1" />
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+    <PackageReference Include="LTRData.DiscUtils.Streams" Version="*" />
   </ItemGroup>
 
   <PropertyGroup>

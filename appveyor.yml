@@ -76,13 +76,13 @@ after_build:
       New-Item C:\TMP -type directory
       ls c:\TMP
       
-      foreach ($target in @("net462")) {
+      foreach ($target in @("net48")) {
          if ($app) {
             Write-Host "Waiting for the driver to unmount..."
             Stop-Mirror($app)
          }
          Write-Host "Run Windows file system testing for $target..." -ForegroundColor Green
-         $app = Start-Process -passthru .\sample\DokanNetMirror\bin\$env:CONFIGURATION\$target\win\DokanNetMirror.exe
+         $app = Start-Process -passthru .\sample\DokanNetMirror\bin\$env:CONFIGURATION\$target\DokanNetMirror.exe
          Start-Sleep -s 5
          
          Exec-External { & .\winfstest\TestSuite\run-winfstest.bat t\base N:\TMP\ }

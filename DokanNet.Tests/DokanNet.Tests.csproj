@@ -15,38 +15,33 @@
     net4.6              net4.6
     netstandard1.3      <missing>
     -->
-    <TargetFrameworks>net462</TargetFrameworks>
-
+    <TargetFrameworks>net48</TargetFrameworks>
     <!--Add the Target Framework to the output file names. -->
-    <AssemblyName>$(MSBuildProjectName).$(TargetFramework)</AssemblyName>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <CLSCompliant>True</CLSCompliant>
+    <Nullable>disable</Nullable>
     <!-- We need to sign the test assembly to use it in InternalsVisibleTo for DokanNet.dll. -->
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\DokanNet\Dokan.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="OverlappedTests.Configuration.xml">
       <DependentUpon>OverlappedTests.cs</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="Moq" Version="4.7.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\DokanNet\DokanNet.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <CodeAnalysisRuleSet>DokanNet.Tests.ruleset</CodeAnalysisRuleSet>
     <!--Set to True to run Code Analysis-->

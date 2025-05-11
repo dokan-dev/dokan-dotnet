@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -47,7 +46,9 @@ namespace DokanNet.Tests
             private void TryExecute(string fileName, IDokanFileInfo info, Action<string, IDokanFileInfo> func, string funcName, bool restrictCallingProcessId = true)
             {
                 if (restrictCallingProcessId && info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return;
+                }
 
                 try
                 {
@@ -57,7 +58,9 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
                 }
             }
 
@@ -65,17 +68,22 @@ namespace DokanNet.Tests
             private NtStatus TryExecute(IDokanFileInfo info, Func<IDokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return DokanResult.AccessDenied;
+                }
 
                 try
                 {
-                    return func(info as DokanFileInfo);
+                    return func(info);
                 }
                 catch (Exception ex)
                 {
                     Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     return DokanResult.InvalidParameter;
                 }
             }
@@ -84,7 +92,9 @@ namespace DokanNet.Tests
             private NtStatus TryExecute(string fileName, IDokanFileInfo info, Func<string, IDokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return DokanResult.AccessDenied;
+                }
 
                 try
                 {
@@ -94,7 +104,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     return DokanResult.InvalidParameter;
                 }
             }
@@ -103,7 +116,9 @@ namespace DokanNet.Tests
             private NtStatus TryExecute<T>(string fileName, T arg, IDokanFileInfo info, Func<string, T, IDokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return DokanResult.AccessDenied;
+                }
 
                 try
                 {
@@ -113,7 +128,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {arg}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     return DokanResult.InvalidParameter;
                 }
             }
@@ -122,7 +140,9 @@ namespace DokanNet.Tests
             private NtStatus TryExecute<T1, T2>(string fileName, T1 arg1, T2 arg2, IDokanFileInfo info, Func<string, T1, T2, IDokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return DokanResult.AccessDenied;
+                }
 
                 try
                 {
@@ -132,7 +152,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     return DokanResult.InvalidParameter;
                 }
             }
@@ -141,7 +164,9 @@ namespace DokanNet.Tests
             private NtStatus TryExecute<T1, T2, T3>(string fileName, T1 arg1, T2 arg2, T3 arg3, IDokanFileInfo info, Func<string, T1, T2, T3, IDokanFileInfo, NtStatus> func, string funcName)
             {
                 if (info.ProcessId != Process.GetCurrentProcess().Id)
+                {
                     return DokanResult.AccessDenied;
+                }
 
                 try
                 {
@@ -151,7 +176,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {arg1}, {arg2}, {arg3}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     return DokanResult.InvalidParameter;
                 }
             }
@@ -173,7 +201,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut = default(TOut);
                     return DokanResult.InvalidParameter;
                 }
@@ -196,7 +227,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut = default(TOut);
                     return DokanResult.InvalidParameter;
                 }
@@ -219,7 +253,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {argIn}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut = default(TOut);
                     return DokanResult.InvalidParameter;
                 }
@@ -242,7 +279,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} (\"{fileName}\", {argIn1}, {argIn2}, {info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut = default(TOut);
                     return DokanResult.InvalidParameter;
                 }
@@ -268,7 +308,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut1 = default(TOut1);
                     argOut2 = default(TOut2);
                     argOut3 = default(TOut3);
@@ -296,7 +339,10 @@ namespace DokanNet.Tests
                 {
                     Trace($"{funcName} ({info.Log()}) -> **{ex.GetType().Name}**: {ex.Message}\n{ex.StackTrace}");
                     if (ex is MockException)
+                    {
                         HasUnmatchedInvocations = true;
+                    }
+
                     argOut1 = default(TOut1);
                     argOut2 = default(TOut2);
                     argOut3 = default(TOut3);
@@ -309,175 +355,250 @@ namespace DokanNet.Tests
             public void Cleanup(string fileName, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.Cleanup(f, i), nameof(Cleanup), false);
+                }
+
+                TryExecute(fileName, info, (f, i) => Target.Cleanup(f, i), nameof(Cleanup), false);
             }
 
             public void CloseFile(string fileName, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.CloseFile(f, i), nameof(CloseFile), false);
+                }
+
+                TryExecute(fileName, info, (f, i) => Target.CloseFile(f, i), nameof(CloseFile), false);
             }
 
             public NtStatus CreateFile(string fileName, FileAccess access, FileShare share, FileMode mode, FileOptions options, FileAttributes attributes, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.CreateFile(f, access, share, mode, options, attributes, i), nameof(CreateFile));
+                }
+
+                return TryExecute(fileName, info, (f, i) => Target.CreateFile(f, access, share, mode, options, attributes, i), nameof(CreateFile));
             }
 
             public NtStatus DeleteDirectory(string fileName, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.DeleteDirectory(f, i), nameof(DeleteDirectory));
+                }
+
+                return TryExecute(fileName, info, (f, i) => Target.DeleteDirectory(f, i), nameof(DeleteDirectory));
             }
 
             public NtStatus DeleteFile(string fileName, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.DeleteFile(f, i), nameof(DeleteFile));
+                }
+
+                return TryExecute(fileName, info, (f, i) => Target.DeleteFile(f, i), nameof(DeleteFile));
             }
 
             public NtStatus FindFiles(string fileName, out IList<FileInformation> files, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, out files, (IDokanFileInfo)info, (string f, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindFiles(f, out o, i), nameof(FindFiles));
+                }
+
+                return TryExecute(fileName, out files, info, (string f, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindFiles(f, out o, i), nameof(FindFiles));
             }
 
             public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, searchPattern, out files, (IDokanFileInfo)info, (string f, string s, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindFilesWithPattern(f, s, out o, i), nameof(FindFilesWithPattern));
+                }
+
+                return TryExecute(fileName, searchPattern, out files, info, (string f, string s, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindFilesWithPattern(f, s, out o, i), nameof(FindFilesWithPattern));
             }
 
             public NtStatus FindStreams(string fileName, out IList<FileInformation> streams, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, out streams, (IDokanFileInfo)info, (string f, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
+                }
+
+                return TryExecute(fileName, out streams, info, (string f, out IList<FileInformation> o, IDokanFileInfo i) => Target.FindStreams(f, out o, i), nameof(FindStreams));
             }
 
             public NtStatus FlushFileBuffers(string fileName, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, (IDokanFileInfo)info, (f, i) => Target.FlushFileBuffers(f, i), nameof(FlushFileBuffers));
+                }
+
+                return TryExecute(fileName, info, (f, i) => Target.FlushFileBuffers(f, i), nameof(FlushFileBuffers));
             }
 
             public NtStatus GetDiskFreeSpace(out long freeBytesAvailable, out long totalNumberOfBytes, out long totalNumberOfFreeBytes, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, (IDokanFileInfo)info, (out long a, out long t, out long f, IDokanFileInfo i) => Target.GetDiskFreeSpace(out a, out t, out f, i), nameof(GetDiskFreeSpace));
+                }
+
+                return TryExecute(out freeBytesAvailable, out totalNumberOfBytes, out totalNumberOfFreeBytes, info, (out long a, out long t, out long f, IDokanFileInfo i) => Target.GetDiskFreeSpace(out a, out t, out f, i), nameof(GetDiskFreeSpace));
             }
 
             public NtStatus GetFileInformation(string fileName, out FileInformation fileInfo, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, out fileInfo, (IDokanFileInfo)info, (string f, out FileInformation fi, IDokanFileInfo i) => Target.GetFileInformation(f, out fi, i), nameof(GetFileInformation));
+                }
+
+                return TryExecute(fileName, out fileInfo, info, (string f, out FileInformation fi, IDokanFileInfo i) => Target.GetFileInformation(f, out fi, i), nameof(GetFileInformation));
             }
 
             public NtStatus GetFileSecurity(string fileName, out FileSystemSecurity security, AccessControlSections sections, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, out security, sections, (IDokanFileInfo)info, (string f, out FileSystemSecurity s, AccessControlSections a, IDokanFileInfo i) => Target.GetFileSecurity(f, out s, a, i), nameof(GetFileSecurity));
+                }
+
+                return TryExecute(fileName, out security, sections, info, (string f, out FileSystemSecurity s, AccessControlSections a, IDokanFileInfo i) => Target.GetFileSecurity(f, out s, a, i), nameof(GetFileSecurity));
             }
 
             public NtStatus GetVolumeInformation(out string volumeLabel, out FileSystemFeatures features, out string fileSystemName, out uint maximumComponentLength, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, (IDokanFileInfo)info, (out string v, out FileSystemFeatures f, out string n, out uint c, IDokanFileInfo i) => Target.GetVolumeInformation(out v, out f, out n, out c, i), nameof(GetVolumeInformation));
+                }
+
+                return TryExecute(out volumeLabel, out features, out fileSystemName, out maximumComponentLength, info, (out string v, out FileSystemFeatures f, out string n, out uint c, IDokanFileInfo i) => Target.GetVolumeInformation(out v, out f, out n, out c, i), nameof(GetVolumeInformation));
             }
 
             public NtStatus LockFile(string fileName, long offset, long length, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, offset, length, (IDokanFileInfo)info, (f, o, l, i) => Target.LockFile(f, o, l, i), nameof(LockFile));
+                }
+
+                return TryExecute(fileName, offset, length, info, (f, o, l, i) => Target.LockFile(f, o, l, i), nameof(LockFile));
             }
 
             public NtStatus MoveFile(string oldName, string newName, bool replace, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(oldName, newName, replace, (IDokanFileInfo)info, (o, n, r, i) => Target.MoveFile(o, n, r, i), nameof(MoveFile));
+                }
+
+                return TryExecute(oldName, newName, replace, info, (o, n, r, i) => Target.MoveFile(o, n, r, i), nameof(MoveFile));
             }
 
             public NtStatus ReadFile(string fileName, byte[] buffer, out int bytesRead, long offset, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, buffer, out bytesRead, offset, (IDokanFileInfo)info, (string f, byte[] b, out int r, long o, IDokanFileInfo i) => Target.ReadFile(f, b, out r, o, i), nameof(ReadFile));
+                }
+
+                return TryExecute(fileName, buffer, out bytesRead, offset, info, (string f, byte[] b, out int r, long o, IDokanFileInfo i) => Target.ReadFile(f, b, out r, o, i), nameof(ReadFile));
             }
 
             public NtStatus SetAllocationSize(string fileName, long length, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, length, (IDokanFileInfo)info, (f, l, i) => Target.SetAllocationSize(f, l, i), nameof(SetAllocationSize));
+                }
+
+                return TryExecute(fileName, length, info, (f, l, i) => Target.SetAllocationSize(f, l, i), nameof(SetAllocationSize));
             }
 
             public NtStatus SetEndOfFile(string fileName, long length, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, length, (IDokanFileInfo)info, (f, l, i) => Target.SetEndOfFile(f, l, i), nameof(SetEndOfFile));
+                }
+
+                return TryExecute(fileName, length, info, (f, l, i) => Target.SetEndOfFile(f, l, i), nameof(SetEndOfFile));
             }
 
             public NtStatus SetFileAttributes(string fileName, FileAttributes attributes, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, attributes, (IDokanFileInfo)info, (f, a, i) => Target.SetFileAttributes(f, a, i), nameof(SetFileAttributes));
+                }
+
+                return TryExecute(fileName, attributes, info, (f, a, i) => Target.SetFileAttributes(f, a, i), nameof(SetFileAttributes));
             }
 
             public NtStatus SetFileSecurity(string fileName, FileSystemSecurity security, AccessControlSections sections, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, security, sections, (IDokanFileInfo)info, (f, s, a, i) => Target.SetFileSecurity(f, s, a, i), nameof(SetFileSecurity));
+                }
+
+                return TryExecute(fileName, security, sections, info, (f, s, a, i) => Target.SetFileSecurity(f, s, a, i), nameof(SetFileSecurity));
             }
 
             public NtStatus SetFileTime(string fileName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, creationTime, lastAccessTime, lastWriteTime, (IDokanFileInfo)info, (f, c, a, w, i) => Target.SetFileTime(f, c, a, w, i), nameof(SetFileTime));
+                }
+
+                return TryExecute(fileName, creationTime, lastAccessTime, lastWriteTime, info, (f, c, a, w, i) => Target.SetFileTime(f, c, a, w, i), nameof(SetFileTime));
             }
 
             public NtStatus UnlockFile(string fileName, long offset, long length, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, offset, length, (IDokanFileInfo)info, (f, o, l, i) => Target.UnlockFile(f, o, l, i), nameof(UnlockFile));
+                }
+
+                return TryExecute(fileName, offset, length, info, (f, o, l, i) => Target.UnlockFile(f, o, l, i), nameof(UnlockFile));
             }
 
             public NtStatus Mounted(string mountPoint, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(mountPoint, (IDokanFileInfo)info, (m, i) => Target.Mounted(m, i), nameof(Mounted));
+                }
+
+                return TryExecute(mountPoint, info, (m, i) => Target.Mounted(m, i), nameof(Mounted));
             }
 
             public NtStatus Unmounted(IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute((IDokanFileInfo)info, i => Target.Unmounted(i), nameof(Unmounted));
+                }
+
+                return TryExecute(info, i => Target.Unmounted(i), nameof(Unmounted));
             }
             public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return TryExecute(fileName, buffer, out bytesWritten, offset, (IDokanFileInfo)info, (string f, byte[] b, out int w, long o, IDokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
+                }
+
+                return TryExecute(fileName, buffer, out bytesWritten, offset, info, (string f, byte[] b, out int w, long o, IDokanFileInfo i) => Target.WriteFile(f, b, out w, o, i), nameof(WriteFile));
             }
             #endregion
         }
@@ -491,16 +612,22 @@ namespace DokanNet.Tests
             public NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesRead, offset, (IDokanFileInfo)info,
+                }
+
+                return MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesRead, offset, info,
                     (string f, byte[] buf, out int r, long o, IDokanFileInfo i) => base.ReadFile(f, buf, out r, o, i));
             }
 
             public NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, IDokanFileInfo info)
             {
                 if (!(info is IDokanFileInfo))
+                {
                     throw new ArgumentException("Not IDokanFileInfo", nameof(info));
-                return MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesWritten, offset, (IDokanFileInfo)info,
+                }
+
+                return MarshalUnsafeCall(fileName, buffer, bufferLength, out bytesWritten, offset, info,
                     (string f, byte[] buf, out int r, long o, IDokanFileInfo i) => base.WriteFile(f, buf, out r, o, i));
             }
 
@@ -544,7 +671,9 @@ namespace DokanNet.Tests
                 {
                     var letter = alphabet.Pop();
                     if (!drives.Contains(letter))
+                    {
                         return $"{letter}:";
+                    }
                 }
 
                 throw new InvalidOperationException("No drive letters available to test with.");
@@ -571,14 +700,14 @@ namespace DokanNet.Tests
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private string currentTestName;
 
-        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>(MockBehavior.Strict);
+        private Mock<IDokanOperations> operations = new Mock<IDokanOperations>();
 
         private long pendingFiles;
 
         public static bool HasPendingFiles => Instance?.pendingFiles > 0;
 
-        private HashSet<string> deletePendingExpected = new HashSet<string>();
-        private HashSet<string> deletePendingExecuted = new HashSet<string>();
+        private HashSet<string> deletePendingExpected = [];
+        private HashSet<string> deletePendingExecuted = [];
 
         internal static IDokanOperations Operations => proxy;
         internal static IDokanOperations UnsafeOperations => unsafeProxy;
@@ -608,7 +737,7 @@ namespace DokanNet.Tests
         private const string destinationSubDirectoryName = "DestinationSubDir";
 
         private static FileInformation[] rootDirectoryItems =
-        {
+        [
             new FileInformation()
             {
                 FileName = directoryName, Attributes = FileAttributes.Directory,
@@ -634,10 +763,10 @@ namespace DokanNet.Tests
                 FileName = "ThirdFile.ext", Attributes = FileAttributes.Normal,
                 CreationTime = ToDateTime("2015-01-04 10:11:12"), LastWriteTime = ToDateTime("2015-01-04 20:21:22"), LastAccessTime = ToDateTime("2015-01-04 20:21:22")
             }
-        };
+        ];
 
         private static FileInformation[] directoryItems =
-        {
+        [
             new FileInformation()
             {
                 FileName = subDirectoryName, Attributes = FileAttributes.Directory,
@@ -658,10 +787,10 @@ namespace DokanNet.Tests
                 FileName = "ThirdSubFile.ext", Attributes = FileAttributes.Normal,
                 CreationTime = ToDateTime("2015-02-04 10:11:12"), LastWriteTime = ToDateTime("2015-02-04 20:21:22"), LastAccessTime = ToDateTime("2015-02-04 20:21:22")
             }
-        };
+        ];
 
         private static FileInformation[] directory2Items =
-        {
+        [
             new FileInformation()
             {
                 FileName = subDirectory2Name, Attributes = FileAttributes.Directory,
@@ -682,10 +811,10 @@ namespace DokanNet.Tests
                 FileName = "ThirdSubFile2.ext", Attributes = FileAttributes.Normal,
                 CreationTime = ToDateTime("2015-02-04 10:11:12"), LastWriteTime = ToDateTime("2015-02-04 20:21:22"), LastAccessTime = ToDateTime("2015-02-04 20:21:22")
             }
-        };
+        ];
 
         private static FileInformation[] subDirectoryItems =
-        {
+        [
             new FileInformation()
             {
                 FileName = "SubSubFile.ext", Attributes = FileAttributes.Normal,
@@ -701,7 +830,7 @@ namespace DokanNet.Tests
                 FileName = "ThirdSubSubFile.ext", Attributes = FileAttributes.Normal,
                 CreationTime = ToDateTime("2015-03-03 10:11:12"), LastWriteTime = ToDateTime("2015-03-03 20:21:22"), LastAccessTime = ToDateTime("2015-03-03 20:21:22")
             }
-        };
+        ];
 
         internal static DirectorySecurity DefaultDirectorySecurity { get; private set; }
 
@@ -823,8 +952,8 @@ namespace DokanNet.Tests
         }
 
         internal static IList<FileInformation> GetEmptyDirectoryDefaultFiles()
-            => new[]
-            {
+            =>
+            [
                 new FileInformation()
                 {
                     FileName = ".", Attributes = FileAttributes.Directory,
@@ -835,7 +964,7 @@ namespace DokanNet.Tests
                     FileName = "..", Attributes = FileAttributes.Directory,
                     CreationTime = DateTime.Today, LastWriteTime = DateTime.Today, LastAccessTime = DateTime.Today
                 }
-            };
+            ];
 
         internal static IList<FileInformation> RemoveDatesFromFileInformations(IEnumerable<FileInformation> fileInformations)
         {
@@ -869,7 +998,11 @@ namespace DokanNet.Tests
 #endif
 
         private FileInformation[] Named(FileInformation[] infos)
-            => infos.Aggregate(new List<FileInformation>(), (l, i) => { l.Add(Named(i)); return l; }, l => l.ToArray());
+            => infos.Aggregate(new List<FileInformation>(), (l, i) =>
+            {
+                l.Add(Named(i));
+                return l;
+            }, l => l.ToArray());
 
         private FileInformation Named(FileInformation info) => new FileInformation()
         {
@@ -920,6 +1053,7 @@ namespace DokanNet.Tests
                     {
                         deletePendingExpected.Remove(fileName);
                     }
+
                     Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 });
 
@@ -937,6 +1071,7 @@ namespace DokanNet.Tests
                     {
                         deletePendingExpected.Remove(fileName);
                     }
+
                     Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 });
 
@@ -1180,7 +1315,9 @@ namespace DokanNet.Tests
         private IVerifies SetupGetFileInformationToFail(string path, NtStatus result, bool? isDirectory = null)
         {
             if (result == DokanResult.Success)
+            {
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
+            }
 
             var fileInfo = default(FileInformation);
             return operations
@@ -1253,8 +1390,8 @@ namespace DokanNet.Tests
 
         private IVerifies[] SetupCreateDirectory(string path, FileAccess access = ReadDirectoryAccess, FileShare share = FileShare.ReadWrite, FileMode mode = FileMode.CreateNew, FileOptions options = FileOptions.None, FileAttributes attributes = FileAttributes.Normal)
         {
-            return new[]
-            {
+            return
+            [
                 operations
                     .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                     .Returns(DokanResult.Success)
@@ -1268,13 +1405,14 @@ namespace DokanNet.Tests
                             {
                                 deletePendingExecuted.Add(fileName);
                             }
+
                             Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                             }),
                 operations
                     .Setup(d => d.CloseFile(path, It.Is<IDokanFileInfo>(i => i.IsDirectory)))
                     .Callback((string fileName, IDokanFileInfo info)
                         => Trace($"{nameof(IDokanOperations.CloseFile)}[{Interlocked.Decrement(ref pendingFiles)}] (\"{fileName}\", {info.Log()})"))
-            };
+            ];
         }
 
         internal void PermitCreateDirectory(string path, FileAccess access = ReadDirectoryAccess, FileShare share = FileShare.ReadWrite, FileMode mode = FileMode.CreateNew, FileOptions options = FileOptions.None, FileAttributes attributes = FileAttributes.Normal)
@@ -1294,7 +1432,9 @@ namespace DokanNet.Tests
         internal void ExpectCreateDirectoryToFail(string path, NtStatus result)
         {
             if (result == DokanResult.Success)
+            {
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
+            }
 
             operations
                 .Setup(d => d.CreateFile(path, ReadDirectoryAccess, FileShare.ReadWrite, FileMode.CreateNew, It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.Is<IDokanFileInfo>(i => i.IsDirectory)))
@@ -1323,6 +1463,7 @@ namespace DokanNet.Tests
                     {
                         deletePendingExpected.Remove(path);
                     }
+
                     Trace($"{nameof(IDokanOperations.DeleteDirectory)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 })
                 .Verifiable();
@@ -1334,6 +1475,7 @@ namespace DokanNet.Tests
             {
                 deletePendingExpected.Add(path);
             }
+
             return operations
                 .Setup(d => d.CreateFile(path, FileAccessUtils.MapSpecificToGenericAccess(access), share, mode, options, attributes, It.Is<IDokanFileInfo>(i => i.IsDirectory == isDirectory)))
                 .Returns(DokanResult.Success)
@@ -1376,7 +1518,9 @@ namespace DokanNet.Tests
         internal void ExpectCreateFileToFail(string path, NtStatus result, bool closeFile = false)
         {
             if (result == DokanResult.Success)
+            {
                 throw new ArgumentException($"{DokanResult.Success} not supported", nameof(result));
+            }
 
             operations
                 .Setup(d => d.CreateFile(path, It.IsAny<FileAccess>(), It.IsAny<FileShare>(), It.IsAny<FileMode>(), It.IsAny<FileOptions>(), It.IsAny<FileAttributes>(), It.IsAny<IDokanFileInfo>()))
@@ -1386,20 +1530,24 @@ namespace DokanNet.Tests
                 .Verifiable();
 
             if (closeFile)
+            {
                 ExpectCloseFile(path);
+            }
         }
 
         internal void ExpectCleanupFile(string path, object context = null, bool isDirectory = false)
         {
             operations
                 .Setup(d => d.Cleanup(path, It.Is<IDokanFileInfo>(i => i.Context == context && i.IsDirectory == isDirectory)))
-                .Callback((string fileName, IDokanFileInfo info) => {
+                .Callback((string fileName, IDokanFileInfo info) =>
+                {
                     if (info.DeletePending)
                     {
                         deletePendingExecuted.Add(path);
                     }
-                Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
-            })                .Verifiable();
+
+                    Trace($"{nameof(IDokanOperations.Cleanup)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
+                }).Verifiable();
 
             ExpectCloseFile(path, context, isDirectory);
         }
@@ -1569,6 +1717,7 @@ namespace DokanNet.Tests
                     {
                         deletePendingExpected.Remove(path);
                     }
+
                     Trace($"{nameof(IDokanOperations.DeleteFile)}[{Interlocked.Read(ref pendingFiles)}] (\"{fileName}\", {info.Log()})");
                 })
                 .Verifiable();
@@ -1678,28 +1827,37 @@ namespace DokanNet.Tests
             Thread.Yield();
 
             if (Interlocked.Read(ref pendingFiles) < 0)
+            {
                 throw new InvalidOperationException("Negative pending files count");
+            }
 
             for (var i = 1; Interlocked.Read(ref pendingFiles) > 0; ++i)
             {
                 if (i > 5)
+                {
                     throw new TimeoutException("Cleanup wait cycles exceeded");
+                }
 
                 Trace($"Waiting for closure (#{i})");
                 Thread.Sleep(1);
             }
+
             var deletePendingExpectedNotExecuted = deletePendingExpected.Except(deletePendingExecuted);
             foreach (var i in deletePendingExpectedNotExecuted)
             {
                 Trace($"DeletePending not executed: {i}");
             }
+
             var deletePendingUnexpectedlyExecuted = deletePendingExecuted.Except(deletePendingExpected);
             foreach (var i in deletePendingUnexpectedlyExecuted)
             {
                 Trace($"DeletePending unexpected: {i}");
             }
+
             if (!deletePendingExpectedNotExecuted.IsNullOrEmpty() || !deletePendingUnexpectedlyExecuted.IsNullOrEmpty())
+            {
                 throw new TimeoutException("Found DeletePending expectation difference");
+            }
         }
 
         internal void Verify()

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.Versioning;
 using System.Security.Principal;
 using DokanNet.Native;
-using Microsoft.Win32.SafeHandles;
 using static DokanNet.FormatProviders;
 
 #pragma warning disable 649,169
@@ -20,6 +18,9 @@ namespace DokanNet
     /// also has support methods available to cause it (and the Dokan.Net library) to behave in certain
     /// ways useful for testing all potential returns, both success and failure.
     /// </remarks>
+#if NET5_0_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
     public sealed class MockDokanFileInfo : IDokanFileInfo
     {
         /// <summary>
@@ -31,7 +32,7 @@ namespace DokanNet
         /// This must be set to a potentially valid path. Examples might be @"M:\\" or @"C:\\JunctionPoint".
         /// </summary>
         /// <remarks>The trailing backslash is not optional for drive letters, and must be omitted for paths.</remarks>
-        public string MountPoint
+        public string? MountPoint
         {
             get => _dokanOptions.MountPoint;
             set => _dokanOptions.MountPoint = value;
@@ -42,7 +43,7 @@ namespace DokanNet
         /// The Context can carry an arbitrary type, like <c><see cref="System.IO.FileStream"/></c>, <c>struct</c>, <c>int</c>,
         /// or internal reference that will help the implementation understand the request context of the event.
         /// </summary>
-        public object Context
+        public object? Context
         {
             get; set;
         }
@@ -117,7 +118,6 @@ namespace DokanNet
         /// <remarks>This Mock implementation returns <see cref="WhatTryResetTimeoutShouldReturn"/>.
         /// </remarks>
         public bool TryResetTimeout(int milliseconds) => WhatTryResetTimeoutShouldReturn;
-
 
         /// <summary>Returns a string that represents the current object.</summary>
         /// <returns>A string that represents the current object.</returns>

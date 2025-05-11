@@ -44,7 +44,7 @@ namespace DokanNet
         /// that type of object; otherwise, <c>null</c>.</returns>
         /// <param name="formatType">An object that specifies the type of format
         /// object to return. </param>
-        public object GetFormat(Type formatType)
+        public object? GetFormat(Type? formatType)
         {
             return formatType == typeof(ICustomFormatter) ? this : null;
         }
@@ -63,12 +63,17 @@ namespace DokanNet
         /// <param name="arg">An object to format. </param>
         /// <param name="formatProvider">An object that supplies format
         /// information about the current instance. </param>
-        public string Format(string format, object arg, IFormatProvider formatProvider)
+        public string Format(string? format, object? arg, IFormatProvider? formatProvider)
         {
-            if (arg == null) return NullStringRepresentation;
+            if (arg == null)
+            {
+                return NullStringRepresentation;
+            }
+
             var formattable = arg as IFormattable;
-            return formattable?.ToString(format, formatProvider) 
-                ?? arg.ToString();
+
+            return formattable?.ToString(format, formatProvider)
+                ?? arg.ToString() ?? "";
         }
     }
 }

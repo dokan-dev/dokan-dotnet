@@ -22,10 +22,11 @@ Dokan.NET Binding is distributed under a version of the "MIT License",
 which is a BSD-like license. See the 'license.mit.txt' file for details.
 
 ## Environment
-Microsoft .NET Framework 4.0 and Dokan library
+* Either of Microsoft .NET Framework 4.6, .NET Framework 4.8, .NET Standard 2.0, .NET Standard 2.1, .NET 8.0 or .NET 9.0
+* Dokan library
 
 ## How to write a file system
-To make a file system, an application needs to implement IDokanOperations interface.
+To make a file system, an application needs to implement IDokanOperations interface, or the modernized variant, IDokanOperations2.
 Once implemented, you can invoke Mount function on your driver instance
 to mount a drive. The function blocks until the file system is unmounted.
 Semantics and parameters are just like Dokan library. Details are described

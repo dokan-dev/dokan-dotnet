@@ -9,88 +9,92 @@ hence we want to avoid touching the filestream once obtained the safefilehandle
 using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Versioning;
 using DokanNet;
 using DokanNet.Logging;
 using Microsoft.Win32.SafeHandles;
+using LTRData.Extensions.Native.Memory;
+using FileAccess = System.IO.FileAccess;
 
-namespace DokanNetMirror
+namespace DokanNetMirror;
+
+/// <summary>
+/// Implementation of IDokanOperationsUnsafe to demonstrate usage.
+/// </summary>
+#if NET5_0_OR_GREATER
+[SupportedOSPlatform("windows")]
+#endif
+internal class UnsafeMirror : Mirror
 {
-    /// <summary>
-    /// Implementation of IDokanOperationsUnsafe to demonstrate usage.
-    /// </summary>
-    internal class UnsafeMirror : Mirror, IDokanOperationsUnsafe
+    static void DoRead(SafeFileHandle handle, nint buffer, int bufferLength, out int bytesRead, long offset)
     {
-        static void DoRead(SafeFileHandle handle, IntPtr buffer, uint bufferLength, out int bytesRead, long offset)
-        {
-            handle.SetFilePointer(offset);
-            handle.ReadFile(buffer, bufferLength, out bytesRead);
-        }
+        handle.SetFilePointer(offset);
+        handle.ReadFile(buffer, (uint)bufferLength, out bytesRead);
+    }
 
-        static void DoWrite(SafeFileHandle handle, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset)
-        {
-            var newpos = Extensions.SetFilePointer(handle, offset);
-            handle.WriteFile(buffer, bufferLength, out bytesWritten);
-        }
-        /// <summary>
-        /// Constructs a new unsafe mirror for the specified root path.
-        /// </summary>
-        /// <param name="path">Root path of mirror.</param>
-        public UnsafeMirror(ILogger logger, string path) : base(logger, path) { }
+    static void DoWrite(SafeFileHandle handle, nint buffer, int bufferLength, out int bytesWritten, long offset)
+    {
+        var newpos = Extensions.SetFilePointer(handle, offset);
+        handle.WriteFile(buffer, (uint)bufferLength, out bytesWritten);
+    }
 
-        /// <summary>
-        /// Read from file using unmanaged buffers.
-        /// </summary>
-        public NtStatus ReadFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesRead, long offset, IDokanFileInfo info)
+    /// <summary>
+    /// Constructs a new unsafe mirror for the specified root path.
+    /// </summary>
+    /// <param name="path">Root path of mirror.</param>
+    public UnsafeMirror(ILogger logger, string path) : base(logger, path) { }
+
+    /// <summary>
+    /// Read from file using unmanaged buffers.
+    /// </summary>
+    public override NtStatus ReadFile(ReadOnlyNativeMemory<char> fileName, NativeMemory<byte> buffer, out int bytesRead, long offset, ref DokanFileInfo info)
+    {
+        if (info.Context is not FileStream stream) // memory mapped read
         {
-            if (info.Context == null) // memory mapped read
+            using (stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Read))
             {
-                using (var stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Read))
-                {
-                    DoRead(stream.SafeFileHandle, buffer, bufferLength, out bytesRead, offset);
-                }
+                DoRead(stream.SafeFileHandle, buffer.Address, buffer.Length, out bytesRead, offset);
             }
-            else // normal read
-            {
-                var stream = info.Context as FileStream;
+        }
+        else // normal read
+        {
 #pragma warning disable CA2002
-                lock (stream) //Protect from overlapped read
+            lock (stream) //Protect from overlapped read
 #pragma warning restore CA2002
-                {
-                    DoRead(stream.SafeFileHandle, buffer, bufferLength, out bytesRead, offset);
-                }
+            {
+                DoRead(stream.SafeFileHandle, buffer.Address, buffer.Length, out bytesRead, offset);
             }
-
-            return Trace($"Unsafe{nameof(ReadFile)}", fileName, info, DokanResult.Success, "out " + bytesRead.ToString(),
-                offset.ToString(CultureInfo.InvariantCulture));
         }
 
-        /// <summary>
-        /// Write to file using unmanaged buffers.
-        /// </summary>
-        public NtStatus WriteFile(string fileName, IntPtr buffer, uint bufferLength, out int bytesWritten, long offset, IDokanFileInfo info)
+        return Trace($"Unsafe{nameof(ReadFile)}", fileName, info, DokanResult.Success, "out " + bytesRead.ToString(),
+            offset.ToString(CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Write to file using unmanaged buffers.
+    /// </summary>
+    public override NtStatus WriteFile(ReadOnlyNativeMemory<char> fileName, ReadOnlyNativeMemory<byte> buffer, out int bytesWritten, long offset, ref DokanFileInfo info)
+    {
+        if (info.Context is not FileStream stream)
         {
-            if (info.Context == null)
+            using (stream = new FileStream(GetPath(fileName), FileMode.Open, FileAccess.Write))
             {
-                using (var stream = new FileStream(GetPath(fileName), FileMode.Open, System.IO.FileAccess.Write))
-                {
-                    var bytesToCopy = (uint)GetNumOfBytesToCopy((int)bufferLength, offset, info, stream);
-                    DoWrite(stream.SafeFileHandle, buffer, bytesToCopy, out bytesWritten, offset);
-                }
+                var bytesToCopy = GetNumOfBytesToCopy(buffer.Length, offset, info, stream);
+                DoWrite(stream.SafeFileHandle, buffer.Address, bytesToCopy, out bytesWritten, offset);
             }
-            else
-            {
-                var stream = info.Context as FileStream;
-#pragma warning disable CA2002
-                lock (stream) //Protect from overlapped write
-#pragma warning restore CA2002
-                {
-                    var bytesToCopy = (uint)GetNumOfBytesToCopy((int)bufferLength, offset, info, stream);
-                    DoWrite(stream.SafeFileHandle, buffer, bytesToCopy, out bytesWritten, offset);
-                }
-            }
-
-            return Trace($"Unsafe{nameof(WriteFile)}", fileName, info, DokanResult.Success, "out " + bytesWritten.ToString(),
-                offset.ToString(CultureInfo.InvariantCulture));
         }
+        else
+        {
+#pragma warning disable CA2002
+            lock (stream) //Protect from overlapped write
+#pragma warning restore CA2002
+            {
+                var bytesToCopy = GetNumOfBytesToCopy(buffer.Length, offset, info, stream);
+                DoWrite(stream.SafeFileHandle, buffer.Address, bytesToCopy, out bytesWritten, offset);
+            }
+        }
+
+        return Trace($"Unsafe{nameof(WriteFile)}", fileName, info, DokanResult.Success, $"out {bytesWritten}",
+            offset.ToString(CultureInfo.InvariantCulture));
     }
 }
