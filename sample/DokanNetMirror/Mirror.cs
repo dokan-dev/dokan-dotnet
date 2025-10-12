@@ -214,8 +214,12 @@ internal class Mirror : IDokanOperations2
                     }
                     else
                     {
+                        var status = fileName.Span.IndexOfAny(invalidFileNameChars) >= 0
+                            ? DokanResult.InvalidName
+                            : DokanResult.FileNotFound;
+
                         return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
-                            DokanResult.FileNotFound);
+                            status);
                     }
 
                     break;
@@ -303,6 +307,8 @@ internal class Mirror : IDokanOperations2
         return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
             result);
     }
+
+    private static readonly char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
 
     public void Cleanup(ReadOnlyNativeMemory<char> fileName, ref DokanFileInfo info)
     {
