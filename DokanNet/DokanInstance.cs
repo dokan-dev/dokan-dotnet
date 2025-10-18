@@ -166,7 +166,6 @@ public class DokanInstance : IDisposable
     /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
     /// <param name="isDirectory">Indicates if the path is a directory.</param>
     /// <returns>true if notification succeeded.</returns>
-    /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
     public bool NotifyDelete(string filePath, bool isDirectory)
     {
         return NativeMethods.DokanNotifyDelete(DokanHandle, filePath, isDirectory);
@@ -177,7 +176,6 @@ public class DokanInstance : IDisposable
     /// </summary>
     /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
     /// <returns>true if notification succeeded.</returns>
-    /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
     public bool NotifyUpdate(string filePath)
     {
         return NativeMethods.DokanNotifyUpdate(DokanHandle, filePath);
@@ -188,7 +186,6 @@ public class DokanInstance : IDisposable
     /// </summary>
     /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
     /// <returns>true if notification succeeded.</returns>
-    /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
     public bool NotifyXAttrUpdate(string filePath)
     {
         return NativeMethods.DokanNotifyXAttrUpdate(DokanHandle, filePath);
@@ -203,7 +200,6 @@ public class DokanInstance : IDisposable
     /// <param name="isDirectory">Indicates if the path is a directory.</param>
     /// <param name="isInSameDirectory">Indicates if the file or directory have the same parent directory.</param>
     /// <returns>true if notification succeeded.</returns>
-    /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
     public bool NotifyRename(string oldPath, string newPath, bool isDirectory, bool isInSameDirectory)
     {
         return NativeMethods.DokanNotifyRename(DokanHandle, oldPath,

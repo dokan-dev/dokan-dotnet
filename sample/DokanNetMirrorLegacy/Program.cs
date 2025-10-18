@@ -48,12 +48,12 @@ namespace DokanNetMirror
                         .ConfigureLogger(() => dokanLogger)
                         .ConfigureOptions(options =>
                         {
-                            options.Options = DokanOptions.DebugMode | DokanOptions.EnableNotificationAPI;
+                            options.Options = DokanOptions.DebugMode;
                             options.MountPoint = mountPath;
                         });
                     using var dokanInstance = dokanBuilder.Build(mirror);
                     using var notify = new Notify(mirrorPath, mountPath, dokanInstance);
-                    Console.CancelKeyPress += (object? sender, ConsoleCancelEventArgs e) =>
+                    Console.CancelKeyPress += (sender, e) =>
                     {
                         e.Cancel = true;
                         dokan.RemoveMountPoint(mountPath);

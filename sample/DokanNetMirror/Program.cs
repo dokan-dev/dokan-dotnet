@@ -51,15 +51,15 @@ internal class Program
                     .ConfigureLogger(() => dokanLogger)
                     .ConfigureOptions(options =>
                     {
-                        options.Options = DokanNet.DokanOptions.DebugMode | DokanNet.DokanOptions.EnableNotificationAPI;
+                        options.Options = DokanNet.DokanOptions.DebugMode;
                         options.MountPoint = mountPath;
                     });
 
                 using var dokanInstance = dokanBuilder.Build(mirror);
-                
+
                 using var notify = new Notify(mirrorPath, mountPath, dokanInstance);
-                
-                Console.CancelKeyPress += (object? sender, ConsoleCancelEventArgs e) =>
+
+                Console.CancelKeyPress += (sender, e) =>
                 {
                     e.Cancel = true;
 

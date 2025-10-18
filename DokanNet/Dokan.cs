@@ -66,8 +66,7 @@ namespace DokanNet
         /// <summary>
         /// Dokan User FS file-change notifications
         /// </summary>
-        /// <remarks> If <see cref="DokanOptions.EnableNotificationAPI"/> is passed to <see cref="DOKAN_OPTIONS.Options"/>,
-        /// the application implementing the user file system can notify
+        /// <remarks>The application implementing the user file system can notify
         /// the Dokan kernel driver of external file- and directory-changes.
         /// 
         /// For example, the mirror application can notify the driver about
@@ -102,7 +101,6 @@ namespace DokanNet
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <returns>true if notification succeeded.</returns>
-            /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Delete(DokanInstance dokanInstance, string filePath, bool isDirectory)
             {
                 return dokanInstance.NotifyDelete(filePath, isDirectory);
@@ -114,7 +112,6 @@ namespace DokanNet
             /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
-            /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Update(DokanInstance dokanInstance, string filePath)
             {
                 return dokanInstance.NotifyUpdate(filePath);
@@ -126,7 +123,6 @@ namespace DokanNet
             /// <param name="dokanInstance">The dokan mount context created by <see cref="DokanInstance.DokanInstance"/></param>
             /// <param name="filePath">Absolute path to the file or directory, including the mount-point of the file system.</param>
             /// <returns>true if notification succeeded.</returns>
-            /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool XAttrUpdate(DokanInstance dokanInstance, string filePath)
             {
                 return dokanInstance.NotifyXAttrUpdate(filePath);
@@ -142,7 +138,6 @@ namespace DokanNet
             /// <param name="isDirectory">Indicates if the path is a directory.</param>
             /// <param name="isInSameDirectory">Indicates if the file or directory have the same parent directory.</param>
             /// <returns>true if notification succeeded.</returns>
-            /// <remarks><see cref="DokanOptions.EnableNotificationAPI"/> must be set in the mount options for this to succeed.</remarks>
             public static bool Rename(DokanInstance dokanInstance, string oldPath, string newPath, bool isDirectory, bool isInSameDirectory)
             {
                 return dokanInstance.NotifyRename(oldPath,
