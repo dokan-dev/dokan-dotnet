@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0.3] - 2025-10-22
+- Library - Brings DokanOptions flags up to date and in sync with changes in native library.
+  * The `EnableNotificationAPI` is no longer necessary and has been removed, just like in native library.
+  * Several `DokanOptions` flag values have changed, rebuilt implementations to get the correct values!
+  * Added missing `DokanOptions.AllowIpcBatching`
+
 ## [2.3.0.1] - 2025-05-11
 
 ### Changed
@@ -239,7 +245,8 @@ See the [release note](http://web.archive.org/web/20150416102451/http://dokan-de
 - ``DokanOptions.Version``, ``DokanOptions.RemovableDrive`` and ``DokanOptions.MountPoint``
 - ``DokanRemoveMountPoint``
 
-[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.1...HEAD
+[Unreleased]: https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.3...HEAD
+[2.3.0.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.1...v2.3.0.3
 [2.3.0.1]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.3.0.0...v2.3.0.1
 [2.3.0.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.2.1.0...v2.3.0.0
 [2.2.1.0]:    https://github.com/dokan-dev/dokan-dotnet/compare/v2.1.0.0...v2.2.1.0
