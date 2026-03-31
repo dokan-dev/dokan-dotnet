@@ -214,7 +214,7 @@ internal class Mirror : IDokanOperations2
                     }
                     else
                     {
-                        var status = fileName.Span.IndexOfAny(invalidFileNameChars) >= 0
+                        var status = fileName.Span.IndexOfAny(invalidPathChars) >= 0
                             ? DokanResult.InvalidName
                             : DokanResult.FileNotFound;
 
@@ -308,7 +308,7 @@ internal class Mirror : IDokanOperations2
             result);
     }
 
-    private static readonly char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+    private static readonly char[] invalidPathChars = Path.GetInvalidPathChars();
 
     public void Cleanup(ReadOnlyNativeMemory<char> fileName, ref DokanFileInfo info)
     {
@@ -824,5 +824,5 @@ internal class Mirror : IDokanOperations2
         return Trace(nameof(FindFilesWithPattern), fileName, info, DokanResult.Success);
     }
 
-    #endregion Implementation of IDokanOperations
+#endregion Implementation of IDokanOperations
 }
