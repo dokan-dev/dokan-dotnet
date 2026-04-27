@@ -214,7 +214,8 @@ internal class Mirror : IDokanOperations2
                     }
                     else
                     {
-                        var status = fileName.Span.IndexOfAny(invalidPathChars) >= 0
+                        var baseName = Path.GetFileName(fileName.ToString());
+                        var status = baseName.IndexOfAny(invalidFileNameChars) >= 0
                             ? DokanResult.InvalidName
                             : DokanResult.FileNotFound;
 
