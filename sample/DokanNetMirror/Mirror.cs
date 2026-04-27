@@ -308,7 +308,7 @@ internal class Mirror : IDokanOperations2
             result);
     }
 
-    private static readonly char[] invalidPathChars = Path.GetInvalidPathChars();
+    private static readonly char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
 
     public void Cleanup(ReadOnlyNativeMemory<char> fileName, ref DokanFileInfo info)
     {
