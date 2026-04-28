@@ -113,4 +113,9 @@ public static class DokanResult
     /// Error - The parameter is incorrect.
     /// </summary>
     public const NtStatus InvalidParameter = NtStatus.InvalidParameter;
+
+    /// <summary>
+    /// Indicates that the specified file is actually a directory.
+    /// </summary>
+    public const NtStatus FileIsADirectory = NtStatus.FileIsADirectory;
 }

@@ -620,6 +620,11 @@ public enum NtStatus : long
     ObjectPathSyntaxBad = 0xc000003b,
 
     /// <summary>
+    /// Indicates that the specified file is actually a directory.
+    /// </summary>
+    FileIsADirectory = 0xc00000ba,
+
+    /// <summary>
     /// Error - {Data Overrun} A data overrun error occurred.
     /// </summary>
     DataOverrun = 0xc000003c,

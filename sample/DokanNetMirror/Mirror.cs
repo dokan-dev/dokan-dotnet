@@ -107,12 +107,24 @@ internal class Mirror : IDokanOperations2
     }
 
     #region Implementation of IDokanOperations
+    private static NtStatus CreateDirectoryWithParentCheck(string path)
+    {
+        // Get the parent directory information
+        if (!Directory.Exists(Path.GetDirectoryName(path)))
+        {
+            return DokanResult.PathNotFound;
+        }
 
-    public NtStatus CreateFile(ReadOnlyNativeMemory<char> fileName, NativeFileAccess access, FileShare share, FileMode mode,
+        Directory.CreateDirectory(path);
+
+        return DokanResult.Success;
+    }
+
+    public NtStatus CreateFile(ReadOnlyNativeMemory<char> filePathPtr, NativeFileAccess access, FileShare share, FileMode mode,
         FileOptions options, FileAttributes attributes, ref DokanFileInfo info)
     {
         var result = DokanResult.Success;
-        var filePath = GetPath(fileName);
+        var filePath = GetPath(filePathPtr);
 
         if (info.IsDirectory)
         {
@@ -127,17 +139,17 @@ internal class Mirror : IDokanOperations2
                             {
                                 if (!File.GetAttributes(filePath).HasFlag(FileAttributes.Directory))
                                 {
-                                    return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                                    return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                         attributes, DokanResult.NotADirectory);
                                 }
                             }
                             catch (Exception)
                             {
-                                return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                                return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                     attributes, DokanResult.FileNotFound);
                             }
 
-                            return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                 attributes, DokanResult.PathNotFound);
                         }
 
@@ -148,27 +160,35 @@ internal class Mirror : IDokanOperations2
                     case FileMode.CreateNew:
                         if (Directory.Exists(filePath))
                         {
-                            return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                 attributes, DokanResult.FileExists);
                         }
 
                         try
                         {
                             File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
-                            return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                            
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                 attributes, DokanResult.AlreadyExists);
                         }
                         catch (IOException)
                         {
                         }
 
-                        Directory.CreateDirectory(GetPath(fileName));
+                        // Creating a subdirectory directly when the parent directory does not exist is not supported.
+                        var status = CreateDirectoryWithParentCheck(filePath);
+
+                        if (status != DokanResult.Success)
+                        {
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes, status);
+                        }
+
                         break;
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                     DokanResult.AccessDenied);
             }
         }
@@ -182,7 +202,7 @@ internal class Mirror : IDokanOperations2
 
             try
             {
-                pathExists = (Directory.Exists(filePath) || File.Exists(filePath));
+                pathExists = Directory.Exists(filePath) || File.Exists(filePath);
                 pathIsDirectory = pathExists && File.GetAttributes(filePath).HasFlag(FileAttributes.Directory);
             }
             catch (IOException)
@@ -201,24 +221,37 @@ internal class Mirror : IDokanOperations2
                             if (pathIsDirectory && (access & NativeFileAccess.Delete) == NativeFileAccess.Delete
                                 && (access & NativeFileAccess.Synchronize) != NativeFileAccess.Synchronize)
                             {
-                                //It is a DeleteFile request on a directory
-                                return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
-                                    attributes, DokanResult.AccessDenied);
+                                // It is a DeleteFile request on a directory
+                                // Cannot open a dir as a file
+                                return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
+                                    attributes, DokanResult.FileIsADirectory);
                             }
 
                             info.IsDirectory = pathIsDirectory;
 
-                            return Trace(nameof(CreateFile), fileName, info, access, share, mode, options,
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options,
                                 attributes, DokanResult.Success);
                         }
                     }
                     else
                     {
-                        var status = fileName.Span.IndexOfAny(invalidPathChars) >= 0
+                        if (filePath.IndexOfAny(invalidPathChars) >= 0)
+                        {
+                            return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
+                                NtStatus.ObjectPathSyntaxBad);
+                        }
+
+#if NETCOREAPP || NETSTANDARD2_1_OR_GREATER
+                        var fileName = Path.GetFileName(filePath.AsSpan());
+#else
+                        var fileName = Path.GetFileName(filePath);
+#endif
+
+                        var status = fileName.IndexOfAny(invalidFileNameChars) >= 0
                             ? DokanResult.InvalidName
                             : DokanResult.FileNotFound;
 
-                        return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                        return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                             status);
                     }
 
@@ -227,7 +260,7 @@ internal class Mirror : IDokanOperations2
                 case FileMode.CreateNew:
                     if (pathExists)
                     {
-                        return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                        return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                             DokanResult.FileExists);
                     }
 
@@ -236,7 +269,7 @@ internal class Mirror : IDokanOperations2
                 case FileMode.Truncate:
                     if (!pathExists)
                     {
-                        return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                        return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                             DokanResult.FileNotFound);
                     }
 
@@ -282,21 +315,26 @@ internal class Mirror : IDokanOperations2
                     info.Context = null;
                 }
 
-                return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
-                    DokanResult.AccessDenied);
+                var status = access.HasFlag(NativeFileAccess.Delete)
+                    ? NtStatus.CannotDelete
+                    : DokanResult.AccessDenied;
+
+                return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
+                     status);
+               
             }
             catch (DirectoryNotFoundException)
             {
-                return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                     DokanResult.PathNotFound);
             }
             catch (Exception ex)
             {
-                var hr = (uint)Marshal.GetHRForException(ex);
+                var hr = (uint)ex.HResult;
                 switch (hr)
                 {
                     case 0x80070020: //Sharing violation
-                        return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+                        return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
                             DokanResult.SharingViolation);
                     default:
                         throw;
@@ -304,11 +342,13 @@ internal class Mirror : IDokanOperations2
             }
         }
 
-        return Trace(nameof(CreateFile), fileName, info, access, share, mode, options, attributes,
+        return Trace(nameof(CreateFile), filePathPtr, info, access, share, mode, options, attributes,
             result);
     }
 
     private static readonly char[] invalidPathChars = Path.GetInvalidPathChars();
+
+    private static readonly char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
 
     public void Cleanup(ReadOnlyNativeMemory<char> fileName, ref DokanFileInfo info)
     {
