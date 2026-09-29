@@ -589,7 +589,7 @@ internal sealed unsafe class DokanOperationProxy(ILogger logger, IDokanOperation
     /// <param name="fi">A <see cref="ByHandleFileInformation"/> with information to be used when calling <paramref name="rawFillFindData"/>.</param>
     private static unsafe void AddFileFindDataTo(nint rawFillFindData, in DokanFileInfo rawFileInfo, in FindFileInformation fi)
     {
-        var fill = (delegate* unmanaged[Stdcall]<in WIN32_FIND_DATA, in DokanFileInfo, long>)rawFillFindData;
+        var fill = (delegate* unmanaged[Stdcall]<in WIN32_FIND_DATA, in DokanFileInfo, int>)rawFillFindData;
 
         Debug.Assert(!fi.FileName.IsEmpty, "FileName must not be empty or null");
         var ctime = ToFileTime(fi.CreationTime);
@@ -693,7 +693,7 @@ internal sealed unsafe class DokanOperationProxy(ILogger logger, IDokanOperation
     /// The library casts the second argument to <c>PDOKAN_IO_EVENT</c>, so it must be the context received by
     /// <see cref="FindStreamsProxy"/>, passed back unchanged.
     /// </remarks>
-    /// <param name="rawFillStreamData">Pointer to unmanaged function of type <see cref="FILL_FIND_STREAM_DATA"/> to be called.</param>
+    /// <param name="rawFillStreamData">Pointer to unmanaged function to be called.</param>
     /// <param name="findStreamContext">The context received by <see cref="FindStreamsProxy"/>.</param>
     /// <param name="fi">A <see cref="ByHandleFileInformation"/> with information to be used when calling <paramref name="rawFillStreamData"/>.</param>
     /// <returns><c>false</c> if the native buffer is full and the entry was not added.</returns>
@@ -708,7 +708,6 @@ internal sealed unsafe class DokanOperationProxy(ILogger logger, IDokanOperation
             StreamSize = fi.Length,
             StreamName = fi.FileName.Span
         };
-        //ZeroMemory(&data, sizeof(WIN32_FIND_DATAW));
 
         return fill(data, findStreamContext) != 0;
     }
@@ -1350,18 +1349,4 @@ internal sealed unsafe class DokanOperationProxy(ILogger logger, IDokanOperation
         ref WIN32_FIND_DATA rawFindData, DokanFileInfo* rawFileInfo);
 
     #endregion Nested type: FILL_FIND_FILE_DATA
-
-    #region Nested type: FILL_FIND_STREAM_DATA
-
-    /// <summary>
-    /// Used to add an entry in <see cref="FindStreamsProxy"/>.
-    /// </summary>
-    /// <param name="rawFindData">A <see cref="WIN32_FIND_STREAM_DATA"/>.</param>
-    /// <param name="rawFileInfo">A <see cref="DokanFileInfo"/>.</param>
-    /// <returns><c>1</c> if buffer is full, otherwise <c>0</c> (currently it never returns <c>1</c>)</returns>
-    /// <remarks>This is the same delegate as <c>PFillFindStreamData</c> (dokan.h) in the C++ version of Dokan.</remarks>
-    private delegate long FILL_FIND_STREAM_DATA(
-        ref WIN32_FIND_STREAM_DATA rawFindData, DokanFileInfo* rawFileInfo);
-
-    #endregion Nested type: FILL_FIND_STREAM_DATA
 }
