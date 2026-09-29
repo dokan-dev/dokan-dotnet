@@ -19,12 +19,17 @@ internal struct WIN32_FIND_STREAM_DATA
     /// <summary>
     /// The name of the stream. The string name format is "<c>:streamname:$streamtype</c>".
     /// </summary>
-    public unsafe fixed char cStreamName[260];
+    /// <summary>
+    /// Size of <c>cStreamName</c> in the Windows definition: <c>WCHAR cStreamName[MAX_PATH + 36]</c>.
+    /// </summary>
+    internal const int StreamNameCapacity = 260 + 36;
+
+    public unsafe fixed char cStreamName[StreamNameCapacity];
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
     public unsafe ReadOnlySpan<char> StreamName
     {
-        set => value.CopyTo(MemoryMarshal.CreateSpan(ref cStreamName[0], 260));
+        set => value.CopyTo(MemoryMarshal.CreateSpan(ref cStreamName[0], StreamNameCapacity - 1));
     }
 #else
     public unsafe ReadOnlySpan<char> StreamName
@@ -33,7 +38,7 @@ internal struct WIN32_FIND_STREAM_DATA
         {
             fixed (char* ptr = cStreamName)
             {
-                value.CopyTo(new(ptr, 260));
+                value.CopyTo(new(ptr, StreamNameCapacity - 1));
             }
         }
     }
