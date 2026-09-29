@@ -9,7 +9,7 @@ version: 2.3.0-{build}
 configuration:
 - Release
 - Debug
-os: Visual Studio 2022
+image: Visual Studio 2026
 
 # To debug build issues, add your own fork to AppVeyor and uncomment below.
 # Connection details will be printed to the console output.
